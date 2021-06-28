@@ -101,6 +101,11 @@ Use CSS from
 
       ReactDOM.render(<App />, document.getElementById("mainApp"));
 
+      //const loggedInObservable = new rxjs.BehaviorSubject(null);
+
+      firebase.auth().onAuthStateChanged(user => 
+      //loggedInObservable.next(user)
+
       firebase
         .auth()
         .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -109,7 +114,6 @@ Use CSS from
             signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
             callbacks: {
               signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-                console.log(authResult);
                 const userId = authResult.user.uid;
                 // Manually redirect.
                 window.location.assign(`index.html`);
@@ -118,7 +122,9 @@ Use CSS from
               }
             }
           });
-        });
+        })
+
+      );
     </script>
   </body>
 </html>

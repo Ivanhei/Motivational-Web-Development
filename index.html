@@ -304,6 +304,21 @@ AND
       }
 
       function App() {
+        const [loggedIn, setLoggedIn] = React.useState(false);
+
+        // const loggedInObservable = new rxjs.BehaviorSubject(null);
+
+        React.useEffect(() => {
+          const unsub_auth = firebase.auth().onAuthStateChanged(user => 
+            // loggedInObservable.next(user)
+            setLoggedIn(!!user)
+          );
+
+          return () => {
+            unsub_auth();
+          };
+        }, []);
+        
         // React.useEffect(() => {
         //   introJs().setOptions({
         //     steps:[{
@@ -314,7 +329,7 @@ AND
         //       title:''
         //     }]
         //   }).start()
-        // })
+        // }, [])
         return (
           <div class="h-full">
             {/*Navigation*/}
@@ -326,8 +341,7 @@ AND
                 <Link title="Challenge" img={iconChallenge} />
                 <Spacing />
                 <Spacing />
-                {(console.log(firebase.auth().currentUser),
-                firebase.auth().currentUser) ? (
+                { loggedIn ? (
                   <div class=" flex items-center">
                     <div
                       height="100%"
