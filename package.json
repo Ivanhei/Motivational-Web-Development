@@ -8,12 +8,7 @@
     "build": "echo This is a static template, there is no bundler or bundling involved!"
   },
   "keywords": [],
-  "author": "Ives van Hoorne",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/codesandbox-app/static-template/issues"
-  },
-  "homepage": "https://github.com/codesandbox-app/static-template#readme",
+  "author": "Alan Mok",
   "devDependencies": {
     "serve": "^11.2.0"
   }
