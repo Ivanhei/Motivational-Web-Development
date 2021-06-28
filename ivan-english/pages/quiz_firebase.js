@@ -1,4 +1,4 @@
-import firebase from './common/firebase_init';
+import firebase from '../common/firebase_init';
 import "firebase/firestore";
 import "firebase/storage";
 
@@ -246,6 +246,7 @@ const Challenge = (props, ref) => {
                     }
                     onClick={(e) => setAnswer(option)}
                     style={{ margin: 10, width: "50%" }}
+                    key={i}
                   >
                     {option}
                   </button>
@@ -350,7 +351,7 @@ function AnswerBox(props) {
   return <div></div>;
 }
 
-function Congratulations(props) {
+const Congratulations = (function (props) {
   const celebrationAudioRef = useRef();
 
   useEffect(() => {
@@ -365,7 +366,7 @@ function Congratulations(props) {
       <div>You have completed the quiz!</div>
     </div>
   );
-}
+});
 
 
 
