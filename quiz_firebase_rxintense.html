@@ -3,10 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <title>A Pen by Ivan</title>
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
-    />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.1.2/tailwind.min.css"
@@ -24,7 +20,6 @@
       input:focus,
       input.answered {
         color: #000;
-        background: white;
         border: 2px solid #b4b4b4;
         padding: 0.5rem 2rem;
         margin: 0rem 0.75rem;
@@ -64,7 +59,7 @@
       }
       button.play {
         border-color: rgb(236, 225, 71);
-        background: rgb(255, 243, 82);
+        background: rgba(236, 225, 71);
         box-shadow: 0 4px 6px -1px rgba(236, 225, 71, 0.1),
           0 0px 5px rgba(236, 225, 71, 0.25);
         text-shadow: 0 0px 5px rgba(236, 225, 71, 0.25);
@@ -76,32 +71,6 @@
       }
       main {
         padding: 0 10px;
-      }
-      .app-container {
-        display: grid;
-        grid-template-columns: 100%;
-        grid-template-rows: 100px 1fr 140px;
-      }
-      .footer {
-        overflow: hidden;
-        position: relative;
-      }
-      .footer > div {
-        top: 0%;
-        width: 100%;
-        height: 100%;
-        transition: 0.2s;
-      }
-      .footer > div.messageBox {
-        background: #d7ffb8;
-        position: absolute;
-        top: 100%;
-      }
-      .footer > div.messageBox.shown {
-        top: 0%;
-      }
-      .footer > div.messageBox.incorrect {
-        background: #ffcccc;
       }
     </style>
   </head>
@@ -223,70 +192,59 @@
         const [disabledChoice, setDisabledChoice] = React.useState([]);
 
         function checkAnswer() {
+          console.log(challenge.answer, "===", answer);
           if (challenge.type === "mc") return challenge.answer === answer;
           else return challenge.answer.toLowerCase() === answer.toLowerCase();
         }
-        const [answerState, setAnswerState] = React.useState(NOT_ANSWERED_YET);
 
-        function handleAnswerClick() {
-          if (answerState !== NOT_ANSWERED_YET) return;
-          const answer_state = checkAnswer()
-            ? ANSWER_CORRECT
-            : ANSWER_INCORRECT;
-          setAnswerState(answer_state);
-          if (answer_state == ANSWER_CORRECT) props.onCorrect();
-        }
+        //region answerState + setAnswerState replaced with observerable
+        const [answerState, answerStateSetter] = React.useState(
+          NOT_ANSWERED_YET
+        );
 
-        function handleHintClick() {
-          setShowHint((sh) => !sh);
-        }
+        React.useEffect(() => {
+          const subscription = //new rxjs.Subscription();
+            // subscription.add(
+            observables.answerState().subscribe(answerStateSetter);
+          // );
 
-        function handleNextClick() {
-          setAnswer("");
+          // additional: answer button press
+          subscription.add(
+            observables.answerButton().subscribe(() => {
+              const answer_state = checkAnswer()
+                ? ANSWER_CORRECT
+                : ANSWER_INCORRECT;
+              setAnswerState(answer_state);
+              if (answer_state == ANSWER_CORRECT) props.onCorrect();
+            })
+          );
 
-          // change to next page
-          props.onNext(answerState === ANSWER_CORRECT);
-          setAnswerState(NOT_ANSWERED_YET);
-        }
+          // additional: next button press
+          subscription.add(
+            observables.nextButton().subscribe(() => {
+              setAnswer("");
 
-        // //region answerState + setAnswerState replaced with observerable
-        // const [answerState, answerStateSetter] = React.useState(
-        //   NOT_ANSWERED_YET
-        // );
+              // change to next page
+              setAnswerState(NOT_ANSWERED_YET);
+              props.onNext();
+            })
+          );
 
-        // React.useEffect(() => {
-        //   const subscription = //new rxjs.Subscription();
-        //     // subscription.add(
-        //     observables.answerState().subscribe(answerStateSetter);
-        //   // );
+          return () => {
+            console.log("unsub");
+            subscription.unsubscribe();
+          };
+        }, []);
 
-        //   // additional: answer button press
-        //   subscription.add(
-        //     observables.answerButton().subscribe(() => {
-        //       handleAnswerClick()
-        //     })
-        //   );
-
-        //   // additional: next button press
-        //   subscription.add(
-        //     observables.nextButton().subscribe(() => {
-        //       handleHintClick()
-        //     })
-        //   );
-
-        //   return () => {
-        //     console.log("unsub");
-        //     subscription.unsubscribe();
-        //   };
-        // }, []);
-
-        // const setAnswerState = (x) => nexts.answerState(x);
-        // //endregion
+        const setAnswerState = (x) => nexts.answerState(x);
+        //endregion
 
         const audioRef = React.useRef();
 
         React.useEffect(() => {
           audioRef.current.play();
+
+          console.log(challenge);
         }, [challenge]);
 
         const correctAudioRef = React.useRef();
@@ -303,181 +261,153 @@
         }, [answerState]);
 
         return (
-          <React.Fragment>
+          <div>
+            <audio src="assets/sounds/fairy.wav" ref={correctAudioRef} />
+            <audio src="assets/sounds/wrong.wav" ref={incorrectAudioRef} />
             <div class="flex-grow text-center p-10 px-40 lg:px-60 xl:px-80">
               <h2>{/*challenge.prompt.main_text*/}</h2>
-              <div class="mx-32">
-                <div class="flex p-10 mb-10 text-3xl">
-                  Listen to the audio and{" "}
-                  {challenge.type === "mc" ? "choose" : "spell"} the word you
-                  heard.
-                </div>
-                <audio
-                  src="assets/sounds/correct_2.mp3"
-                  ref={correctAudioRef}
-                />
-                <audio
-                  src="assets/sounds/incorrect_2.mp3"
-                  ref={incorrectAudioRef}
-                />
-                <div>
-                  <audio src={challenge.audio_url} ref={audioRef} />
-                  {challenge.audio_url ? (
-                    <button
-                      class="p-4 play w-20 p-4"
-                      onClick={(e) => {
-                        audioRef.current.play();
-                      }}
-                    >
-                      <svg
-                        viewBox="0 0 100 100"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <rect width="100" height="100" />
-                        <path
-                          d="M100 50L25 93.3013L25 6.69873L100 50Z"
-                          fill="#FF7676"
-                        />
-                      </svg>
-                    </button>
-                  ) : (
-                    <div style={{ color: "red" }}>
-                      Error while fetching audio.
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <div
-                    style={{
-                      marginTop: 10,
-                      marginBottom: 10
+              <div>Play the audio. Choose the vocabulary you listened.</div>
+              <div>
+                <audio src={challenge.audio_url} ref={audioRef} />
+                {challenge.audio_url ? (
+                  <button
+                    class="p-4 play w-20 p-4"
+                    onClick={(e) => {
+                      audioRef.current.play();
                     }}
                   >
-                    {challenge.type === "mc" ? (
-                      challenge.options.map((option, i) => (
-                        <button
-                          class={
-                            "" +
-                            (answer === option
-                              ? answerState === ANSWER_CORRECT
-                                ? "correct"
-                                : answerState === ANSWER_INCORRECT
-                                ? "incorrect"
-                                : "selected"
-                              : "")
-                          }
-                          onClick={(e) => setAnswer(option)}
-                          style={{ margin: 10, width: "50%" }}
-                        >
-                          {option}
-                        </button>
-                      ))
-                    ) : (
-                      // challenges[pageNum].type === "spelling"
-                      <input
-                        onChange={(e) => {
-                          setAnswer(event.target.value);
-                        }}
-                        class={
-                          "" +
-                          (answer.length > 0
-                            ? answerState === ANSWER_CORRECT
-                              ? "correct"
-                              : answerState === ANSWER_INCORRECT
-                              ? "incorrect"
-                              : "answered"
-                            : "")
-                        }
-                        value={answer}
+                    <svg
+                      viewBox="0 0 100 100"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <rect width="100" height="100" />
+                      <path
+                        d="M100 50L25 93.3013L25 6.69873L100 50Z"
+                        fill="#FF7676"
                       />
-                    )}
+                    </svg>
+                  </button>
+                ) : (
+                  <div style={{ color: "red" }}>
+                    Error while fetching audio.
                   </div>
-                </div>
+                )}
+              </div>
+              <div></div>
+              <div
+                style={{
+                  marginTop: 10,
+                  marginBottom: 10
+                }}
+              >
+                {challenge.type === "mc" ? (
+                  challenge.options.map((option, i) => (
+                    <button
+                      class={
+                        "" +
+                        (answer === option
+                          ? answerState === ANSWER_CORRECT
+                            ? "correct"
+                            : answerState === ANSWER_INCORRECT
+                            ? "incorrect"
+                            : "selected"
+                          : "")
+                      }
+                      onClick={(e) => setAnswer(option)}
+                      style={{ margin: 10, width: "50%" }}
+                    >
+                      {option}
+                    </button>
+                  ))
+                ) : (
+                  // challenges[pageNum].type === "spelling"
+                  <input
+                    onChange={(e) => {
+                      setAnswer(event.target.value);
+                    }}
+                    class={
+                      "" +
+                      (answer.length > 0
+                        ? answerState === ANSWER_CORRECT
+                          ? "correct"
+                          : answerState === ANSWER_INCORRECT
+                          ? "incorrect"
+                          : "answered"
+                        : "")
+                    }
+                    value={answer}
+                  />
+                )}
               </div>
             </div>
-            <div class="footer">
-              <div class="flex flex-cols align-middle items-center">
-                <div class="flex-grow"></div>
-                <button class="" onClick={handleHintClick}>
-                  Hint
-                </button>
-                <div class="flex-grow"></div>
-                {answerState === NOT_ANSWERED_YET ? (
-                  <button
-                    class="block"
-                    // disabled={!challengeRef.current.answerable()}
-                    onClick={handleAnswerClick}
-                  >
-                    answer
-                  </button>
-                ) : (
-                  <button class="block" onClick={handleNextClick}>
-                    {props.isLastQuestion ? "Complete Quiz" : "Go to Next"}
-                  </button>
-                )}
-                <div class="flex-grow"></div>
-              </div>
-              <div
-                class={
-                  "flex flex-cols align-middle items-center messageBox correct " +
-                  (answerState === ANSWER_CORRECT ? "shown" : "")
-                }
-              >
-                <div class="flex-grow"></div>
-                <div class="flex-grow"></div>
-                {answerState === NOT_ANSWERED_YET ? (
-                  <button
-                    class="block"
-                    // disabled={!challengeRef.current.answerable()}
-                    onClick={handleAnswerClick}
-                  >
-                    answer
-                  </button>
-                ) : (
-                  <button class="block" onClick={handleNextClick}>
-                    {props.isLastQuestion ? "Complete Quiz" : "Go to Next"}
-                  </button>
-                )}
-                <div class="flex-grow"></div>
-              </div>
-              <div
-                class={
-                  "flex flex-cols align-middle items-center messageBox incorrect " +
-                  (answerState === ANSWER_INCORRECT ? "shown" : "")
-                }
-              >
-                <div class="flex-grow"></div>
-                <div class="flex-grow"></div>
-                {answerState === NOT_ANSWERED_YET ? (
-                  <button
-                    class="block"
-                    // disabled={!challengeRef.current.answerable()}
-                    onClick={handleAnswerClick}
-                  >
-                    answer
-                  </button>
-                ) : (
-                  <button class="block" onClick={handleNextClick}>
-                    {props.isLastQuestion ? "Complete Quiz" : "Go to Next"}
-                  </button>
-                )}
-                <div class="flex-grow"></div>
-              </div>
-            </div>
-          </React.Fragment>
+          </div>
         );
       };
 
       function AnswerBox(props) {
-        return <div></div>;
+        //region answerState + setAnswerState replaced with observerable
+        const [answerState, answerStateSetter] = React.useState(
+          NOT_ANSWERED_YET
+        );
+
+        React.useEffect(() => {
+          const subscription = observables
+            .answerState()
+            .subscribe(answerStateSetter);
+
+          return () => {
+            subscription.unsubscribe();
+          };
+        }, []);
+
+        const setAnswerState = (x) => nexts.answerState(x);
+        //endregion
+
+        return (
+          <div class="flex my-20 flex-cols align-middle items-center">
+            <div class="flex-grow"></div>
+            <button
+              class=""
+              onClick={
+                (e) => {
+                  nexts.hintButton();
+                }
+                //(e) => setShowHint((sh) => !sh)
+              }
+            >
+              Hint
+            </button>
+            <div class="flex-grow"></div>
+            {answerState === NOT_ANSWERED_YET ? (
+              <button
+                class="block"
+                // disabled={!challengeRef.current.answerable()}
+                onClick={(e) => {
+                  nexts.answerButton();
+                }}
+              >
+                answer
+              </button>
+            ) : (
+              <button
+                class="block"
+                onClick={(e) => {
+                  nexts.nextButton();
+                }}
+              >
+                {props.isLastQuestion ? "Complete Quiz" : "Go to Next"}
+              </button>
+            )}
+            <div class="flex-grow"></div>
+          </div>
+        );
       }
 
       function Congratulations(props) {
         const celebrationAudioRef = React.useRef();
 
         React.useEffect(() => {
-          celebrationAudioRef.current.volume = 0.1;
           celebrationAudioRef.current.play();
         }, []);
 
@@ -549,8 +479,8 @@
               )
             )
             .pipe(
-              rxjs.operators.mergeMap(async (docs) =>
-                Promise.all(
+              rxjs.operators.mergeMap(async (docs) => {
+                return Promise.all(
                   docs.map((doc) =>
                     storage
                       .ref()
@@ -561,13 +491,13 @@
                         audio_url: url
                       }))
                       .catch((err) => {
-                        console.error("Error while getting Audio URL. ", err);
+                        console.log("Error while getting Audio URL. ", err);
 
                         return doc;
                       })
                   )
-                )
-              )
+                );
+              })
               // rxjs.operators.mergeMap(async (doc) => {
               //   let url = "";
               //   try {
@@ -594,8 +524,8 @@
         }, []);
 
         return (
-          <div class="h-screen app-container">
-            <nav class="flex py-16 items-center">
+          <div class="flex flex-col h-screen">
+            <nav class="flex mt-16 mb-36 items-center">
               <div class="flex-grow"></div>
               <div
                 style={{
@@ -627,62 +557,59 @@
                 <a href="index.html">{iconCross}</a>
               </div>
             </nav>
-            {pageNum < challenges.length ? (
-              <Challenge
-                ref={challengeRef}
-                challenge={challenges[pageNum]}
-                isLastQuestion={pageNum === challenges.length - 1}
-                onCorrect={() => {
-                  setProgress((progress) => progress + 1 / challenges.length);
-                }}
-                onNext={(isCorrect) => {
-                  if (isCorrect) setPageNum((pageNum) => pageNum + 1);
-                  else
-                    setChallenges((challenges) => {
-                      // slice the incorrect question out to the end of list,
-                      // and do not increment page number
-                      const spliced_challenges = challenges.splice(pageNum, 1); // mutates challenges
-                      return [...challenges, ...spliced_challenges];
-                    });
-                }}
-              />
-            ) : (
-              <div class="px-40 lg:px-60 xl:px-80 text-center">
-                {loaded ? (
-                  <Congratulations />
-                ) : (
-                  <svg
-                    version="1.1"
-                    id="loader-1"
-                    xmlns="http://www.w3.org/2000/svg"
-                    x="0px"
-                    y="0px"
-                    viewBox="0 0 50 50"
-                    style={{
-                      enableBackground: "new 0 0 50 50",
-                      width: "100%",
-                      maxWidth: "72px",
-                      display: "inline-block"
-                    }}
-                  >
-                    <path
-                      fill="#000"
-                      d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z"
+            <main>
+              {pageNum < challenges.length ? (
+                <Challenge
+                  ref={challengeRef}
+                  challenge={challenges[pageNum]}
+                  isLastQuestion={pageNum === challenges.length - 1}
+                  onCorrect={() => {
+                    setProgress((progress) => progress + 1 / challenges.length);
+                  }}
+                  onNext={() => {
+                    setPageNum((pageNum) => pageNum + 1);
+                  }}
+                />
+              ) : (
+                <div class="px-40 lg:px-60 xl:px-80 text-center">
+                  {loaded ? (
+                    <Congratulations />
+                  ) : (
+                    <svg
+                      version="1.1"
+                      id="loader-1"
+                      xmlns="http://www.w3.org/2000/svg"
+                      x="0px"
+                      y="0px"
+                      viewBox="0 0 50 50"
+                      style={{
+                        enableBackground: "new 0 0 50 50",
+                        width: "100%",
+                        maxWidth: "72px",
+                        display: "inline-block"
+                      }}
                     >
-                      <animateTransform
-                        attributeType="xml"
-                        attributeName="transform"
-                        type="rotate"
-                        from="0 25 25"
-                        to="360 25 25"
-                        dur="0.6s"
-                        repeatCount="indefinite"
-                      />
-                    </path>
-                  </svg>
-                )}
-              </div>
-            )}
+                      <path
+                        fill="#000"
+                        d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z"
+                      >
+                        <animateTransform
+                          attributeType="xml"
+                          attributeName="transform"
+                          type="rotate"
+                          from="0 25 25"
+                          to="360 25 25"
+                          dur="0.6s"
+                          repeatCount="indefinite"
+                        />
+                      </path>
+                    </svg>
+                  )}
+                </div>
+              )}
+            </main>
+
+            <AnswerBox />
           </div>
         );
       }
