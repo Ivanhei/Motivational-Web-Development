@@ -108,13 +108,13 @@ Use CSS from
 
       firebase
         .auth()
-        .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        //.setPersistence(firebase.auth.Auth.Persistence.LOCAL) // default
         .then(() => {
           ui.start("#login-container", {
             signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
             callbacks: {
               signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-                const userId = authResult.user.uid;
+                //const userId = authResult.user.uid;
                 // Manually redirect.
                 window.location.assign(`index.html`);
                 // Do not automatically redirect.

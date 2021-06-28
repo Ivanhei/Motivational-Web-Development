@@ -312,7 +312,6 @@ AND
           const unsub_auth = firebase.auth().onAuthStateChanged(user => {
             // loggedInObservable.next(user)
             setLoggedIn(!!user);
-            console.log(user);
           });
 
           return () => {
