@@ -110,7 +110,7 @@ Use CSS from
             callbacks: {
               signInSuccessWithAuthResult: function (authResult, redirectUrl) {
                 console.log(authResult);
-                const userId = currentUser.uid;
+                const userId = authResult.user.uid;
                 // Manually redirect.
                 window.location.assign(`/`);
                 // Do not automatically redirect.
