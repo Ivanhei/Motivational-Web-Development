@@ -89,11 +89,6 @@ const observables = {
   hintButton: () => subjects.hintButton.asObservable()
 };
 
-const Audio = forwardRef((props, ref) => (
-  <audio ref={ref} {...props}/>
-));
-Audio.displayName = "Audio";
-
 const Challenge = (props, ref) => {
   const challenge = props.challenge;
   const [answer, setAnswer] = useState("");
@@ -161,22 +156,29 @@ const Challenge = (props, ref) => {
   // const setAnswerState = (x) => nexts.answerState(x);
   // //endregion
 
-  const audioRef = useRef();
+  // word audio
+  const wordAudio = new Audio(challenge.audio_url);
+
+  function playWordAudio() {
+    wordAudio.play();
+  }
 
   useEffect(() => {
-    audioRef.current.play();
+    playWordAudio();
   }, [challenge]);
 
-  const correctAudioRef = useRef();
-  const incorrectAudioRef = useRef();
+  // sound effects
+  const correctAudio = new Audio("../assets/sounds/correct_2.mp3");
+  const incorrectAudio = new Audio("../assets/sounds/incorrect_2.mp3");
+  
+  correctAudio.volume = 0.1;
+  incorrectAudio.volume = 0.1;
 
   useEffect(() => {
     if (answerState === ANSWER_CORRECT) {
-      correctAudioRef.current.volume = 0.1;
-      correctAudioRef.current.play();
+      correctAudio.play();
     } else if (answerState === ANSWER_INCORRECT) {
-      incorrectAudioRef.current.volume = 0.1;
-      incorrectAudioRef.current.play();
+      incorrectAudio.play();
     }
   }, [answerState]);
 
@@ -186,26 +188,13 @@ const Challenge = (props, ref) => {
         <h2>{/*challenge.prompt.main_text*/}</h2>
         <div className="mx-32">
           <div className="flex p-10 mb-10 text-3xl">
-            Listen to the audio and{" "}
-            {challenge.type === "mc" ? "choose" : "spell"} the word you
-            heard.
+            {challenge.type === "mc" ? "Choose" : "Spell"} the word you heard.
           </div>
-          <Audio
-            src="assets/sounds/correct_2.mp3"
-            ref={correctAudioRef}
-          />
-          <Audio
-            src="assets/sounds/incorrect_2.mp3"
-            ref={incorrectAudioRef}
-          />
           <div>
-            <Audio src={challenge.audio_url} ref={audioRef} />
             {challenge.audio_url ? (
               <button
                 className="p-4 play w-20 p-4"
-                onClick={(e) => {
-                  audioRef.current.play();
-                }}
+                onClick={(e) => playWordAudio()}
               >
                 <svg
                   viewBox="0 0 100 100"
@@ -353,16 +342,15 @@ function AnswerBox(props) {
 }
 
 const Congratulations = (function (props) {
-  const celebrationAudioRef = useRef();
+  const celebrationAudio = new Audio("../assets/sounds/finish.wav");
+  celebrationAudio.volume = 0.1;
 
   useEffect(() => {
-    celebrationAudioRef.current.volume = 0.1;
-    celebrationAudioRef.current.play();
+    celebrationAudio.play();
   }, []);
 
   return (
     <div>
-      <Audio src="assets/sounds/finish.wav" ref={celebrationAudioRef} />
       <h2>Congratulations!</h2>
       <div>You have completed the quiz!</div>
     </div>
