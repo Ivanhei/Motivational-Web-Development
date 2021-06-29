@@ -90,7 +90,7 @@ const observables = {
 };
 
 const Audio = forwardRef((props, ref) => (
-  <audio {...props} ref={ref}/>
+  <audio ref={ref} {...props}/>
 ));
 
 const Challenge = (props, ref) => {
