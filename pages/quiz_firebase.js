@@ -92,6 +92,7 @@ const observables = {
 const Audio = forwardRef((props, ref) => (
   <audio ref={ref} {...props}/>
 ));
+Audio.displayName = "Audio";
 
 const Challenge = (props, ref) => {
   const challenge = props.challenge;
