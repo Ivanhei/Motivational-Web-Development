@@ -96,35 +96,41 @@ Use CSS from
 
     <script id="rendered-js" type="text/babel">
       function App(props) {
+        useEffect(() => {
+          //const loggedInObservable = new rxjs.BehaviorSubject(null);
+
+          const unsub = firebase.auth().onAuthStateChanged(user => 
+            //loggedInObservable.next(user)
+
+            firebase
+              .auth()
+              //.setPersistence(firebase.auth.Auth.Persistence.LOCAL) // default
+              .then(() => {
+                ui.start("#login-container", {
+                  signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
+                  callbacks: {
+                    signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+                      //const userId = authResult.user.uid;
+                      // Manually redirect.
+                      window.location.assign(`index.html`);
+                      // Do not automatically redirect.
+                      return false;
+                    }
+                  }
+                });
+              })
+
+          );
+
+          return () => {
+            unsub();
+          }
+        })
         return <div id="login-container"></div>;
       }
 
       ReactDOM.render(<App />, document.getElementById("mainApp"));
 
-      //const loggedInObservable = new rxjs.BehaviorSubject(null);
-
-      firebase.auth().onAuthStateChanged(user => 
-      //loggedInObservable.next(user)
-
-      firebase
-        .auth()
-        //.setPersistence(firebase.auth.Auth.Persistence.LOCAL) // default
-        .then(() => {
-          ui.start("#login-container", {
-            signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
-            callbacks: {
-              signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-                //const userId = authResult.user.uid;
-                // Manually redirect.
-                window.location.assign(`index.html`);
-                // Do not automatically redirect.
-                return false;
-              }
-            }
-          });
-        })
-
-      );
     </script>
   </body>
 </html>

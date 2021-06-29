@@ -260,7 +260,7 @@ export default function App() {
               />
             </div>
           ) : (
-            <Link title="Login" link="login.html" />
+            <Link title="Login" link="login" />
           )}
 
           <Spacing />
@@ -276,7 +276,7 @@ export default function App() {
                 name="Computer Science"
                 color="#f1f109"
                 overlay={logoComputer}
-                link="quiz_firebase.html"
+                link="quiz_firebase"
               />
             </div>
             <div>
@@ -284,7 +284,7 @@ export default function App() {
                 name="Studying abroad"
                 color="#476cff"
                 overlay={logoAirplane}
-                link="quiz_firebase.html"
+                link="quiz_firebase"
               />
             </div>
             <div>
@@ -292,7 +292,7 @@ export default function App() {
                 name="Friends"
                 color="#0bac61"
                 overlay={logoChat}
-                link="quiz_firebase.html"
+                link="quiz_firebase"
               />
             </div>
           </div>

@@ -504,7 +504,7 @@ export default function App() {
               paddingLeft: 40
             }}
           >
-            <a href="index.html">{iconCross}</a>
+            <a href="./">{iconCross}</a>
           </div>
         </nav>
         {pageNum < challenges.length ? (
