@@ -162,18 +162,17 @@ function LogoTopic(props) {
 function ItemLink(props) {
   return (
     <div className="flex">
-      <Link passHref
-        className="p-4 hover:bg-gray-100"
-        href={props.link ? props.link : "#"}
-      >
-        <span className="flex items-center">
-          <div style={{ height: "36px", width: "36px" }} className="mr-5">
-            {props.img}
-          </div>
-          <span style={{ fontWeight: "bold" }} className="mt-1.5">
-            {props.title || "TBD"}
+      <Link href={props.link ? props.link : "#"}>
+        <a className="p-4 hover:bg-gray-100">
+          <span className="flex items-center">
+            <div style={{ height: "36px", width: "36px" }} className="mr-5">
+              {props.img}
+            </div>
+            <span style={{ fontWeight: "bold" }} className="mt-1.5">
+              {props.title || "TBD"}
+            </span>
           </span>
-        </span>
+        </a>
       </Link>
     </div>
   );
