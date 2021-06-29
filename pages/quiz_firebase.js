@@ -1,3 +1,11 @@
+import correctAudioFile from '../assets/sounds/correct_2.mp3'
+import incorrectAudioFile from '../assets/sounds/incorrect_2.mp3'
+import celebrationAudioFile from '../assets/sounds/finish.wav'
+
+// const correctAudioFile = '../assets/sounds/correct_2.mp3'
+// const incorrectAudioFile = '../assets/sounds/incorrect_2.mp3'
+// const celebrationAudioFile = '../assets/sounds/finish.wav'
+
 import firebase from '../common/firebase_init';
 import "firebase/firestore";
 import "firebase/storage";
@@ -168,8 +176,9 @@ const Challenge = (props, ref) => {
   }, [challenge]);
 
   // sound effects
-  const correctAudio = new Audio("../assets/sounds/correct_2.mp3");
-  const incorrectAudio = new Audio("../assets/sounds/incorrect_2.mp3");
+  const correctAudio = new Audio(correctAudioFile);
+  const incorrectAudio = new Audio(incorrectAudioFile);
+  console.log(correctAudioFile);
   
   correctAudio.volume = 0.1;
   incorrectAudio.volume = 0.1;
@@ -342,7 +351,7 @@ function AnswerBox(props) {
 }
 
 const Congratulations = (function (props) {
-  const celebrationAudio = new Audio("../assets/sounds/finish.wav");
+  const celebrationAudio = new Audio(celebrationAudioFile);
   celebrationAudio.volume = 0.1;
 
   useEffect(() => {
