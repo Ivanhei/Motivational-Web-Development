@@ -29,7 +29,7 @@ export default function App(props) {
     // Popup signin flow rather than redirect flow.
     signInFlow: 'popup',
     // Redirect to /signedIn after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
-    signInSuccessUrl: './',
+    signInSuccessUrl: '../',
     // We will display Google and Facebook as auth providers.
     signInOptions: [
       firebase.auth.EmailAuthProvider.PROVIDER_ID,
@@ -47,6 +47,6 @@ export default function App(props) {
 
   return <div id="login-container">
     {showLoginDialog ? <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} /> : null}
-    <a href="./">Go Back</a>
+    <a href="../">Go Back</a>
   </div>;
 }
