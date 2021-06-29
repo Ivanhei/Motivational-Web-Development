@@ -282,7 +282,7 @@ export default function App() {
             </div>
             <div>
               <Topic
-                name="Studying abroad"
+                name="Academics"
                 color="#476cff"
                 overlay={logoAirplane}
                 link="quiz_firebase"
