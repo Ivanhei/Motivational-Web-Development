@@ -1,13 +1,12 @@
 
 * {
-  /*font-family: 'Rubik', sans-serif;*/
   color: #333333;
-  /* font-size: 17px; */
   font-family: Comic Sans MS;
 }
 
 body {
   font-size: 17px;
+  background-color: #fafafa;
 }
 
 button,
