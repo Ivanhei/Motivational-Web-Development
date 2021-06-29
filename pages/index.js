@@ -165,9 +165,9 @@ function ItemLink(props) {
       <Link href={props.link ? props.link : "#"}>
         <a className="p-4 hover:bg-gray-100">
           <span className="flex items-center">
-            <div style={{ height: "36px", width: "36px" }} className="mr-5">
+            {props.img ? <div style={{ height: "36px", width: "36px" }} className="mr-5">
               {props.img}
-            </div>
+            </div> : null}
             <span style={{ fontWeight: "bold" }} className="mt-1.5">
               {props.title || "TBD"}
             </span>
@@ -246,7 +246,7 @@ export default function App() {
           <Spacing />
           <Spacing />
           { loggedIn ? (
-            <div className=" flex items-center">
+            <div className="group relative flex items-center">
               <div
                 height="100%"
                 width="100%"
@@ -258,6 +258,18 @@ export default function App() {
                 className="w-9 h-9 rounded-full"
                 src=""
               />
+              <div
+                style={{top: "100%", right: -10, marginTop: -10, background: "#fff"}} 
+                className="group-hover:block absolute shadow-xl rounded-2xl hidden text-center"
+              >
+                <div className="px-8 py-3 hover:bg-gray-100 active:bg-gray-200 rounded-t-2xl">Settings</div>
+                {/* <div className="px-10 py-5 hover:bg-gray-100 NO_ROUNDED">Html</div> */}
+                <div className="px-8 py-3 hover:bg-gray-100 active:bg-gray-200 rounded-b-2xl"
+                  onClick={(e) => {
+                    firebase.auth().signOut()
+                  }}
+                >Logout</div>
+              </div>
             </div>
           ) : (
             <ItemLink title="Login" link="login" />
