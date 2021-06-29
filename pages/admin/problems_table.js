@@ -77,7 +77,7 @@ export default function ProblemsTable() {
               <td className="border">{row.id}</td>
               <td className="border"><pre>{details}</pre></td>
               <td className="border">
-                <select name={`problem_${row.id}_topic`} onChange={changeTopicHandler(row._ref)} value={row._belongTopic}>
+                <select name={`problem_${row.id}_topic`} onChange={changeTopicHandler(row._ref)} value={row._belongTopic} disabled={i !== -1}>
                   {row._belongTopic === -1 ? 
                     <option 
                       value={-1} 
