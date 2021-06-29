@@ -160,16 +160,16 @@ function LogoTopic(props) {
 
 function Link(props) {
   return (
-    <div class="flex">
+    <div className="flex">
       <a
-        class="p-4 hover:bg-gray-100"
+        className="p-4 hover:bg-gray-100"
         href={props.link ? props.link : "#"}
       >
-        <span class="flex items-center">
-          <div style={{ height: "36px", width: "36px" }} class="mr-5">
+        <span className="flex items-center">
+          <div style={{ height: "36px", width: "36px" }} className="mr-5">
             {props.img}
           </div>
-          <span style={{ fontWeight: "bold" }} class="mt-1.5">
+          <span style={{ fontWeight: "bold" }} className="mt-1.5">
             {props.title || "TBD"}
           </span>
         </span>
@@ -179,7 +179,7 @@ function Link(props) {
 }
 
 function Spacing(props) {
-  return <div class="flex-grow" />;
+  return <div className="flex-grow" />;
 }
 
 function handleSelectChallenge(i) {
@@ -188,18 +188,18 @@ function handleSelectChallenge(i) {
 
 function Topic(props) {
   return (
-    <a class="block p-5" href={props.link}>
-      <div class="grid justify-items-center">
-        <div class="relative w-20 h-20">
-          <div class="absolute w-full h-full">
+    <a className="block p-5" href={props.link}>
+      <div className="grid justify-items-center">
+        <div className="relative w-20 h-20">
+          <div className="absolute w-full h-full">
             {props.img}
             {<LogoTopic color={props.color} />}
           </div>
-          <div class="absolute flex justify-center items-center  w-full h-full">
+          <div className="absolute flex justify-center items-center  w-full h-full">
             {props.overlay}
           </div>
         </div>
-        <span style={{ fontWeight: "bold" }} class="mt-4">
+        <span style={{ fontWeight: "bold" }} className="mt-4">
           {props.name || 1}
         </span>
       </div>
@@ -235,10 +235,10 @@ export default function App() {
   //   }).start()
   // }, [])
   return (
-    <div class="h-full">
+    <div className="h-full">
       {/*Navigation*/}
-      <nav class="flex px-10 border-b-2 border-gray-100">
-        <div class="flex flex-auto">
+      <nav className="flex px-10 border-b-2 border-gray-100">
+        <div className="flex flex-auto">
           <Spacing />
           <Link title="Home" img={iconHome} />
           <Spacing />
@@ -246,7 +246,7 @@ export default function App() {
           <Spacing />
           <Spacing />
           { loggedIn ? (
-            <div class=" flex items-center">
+            <div className=" flex items-center">
               <div
                 height="100%"
                 width="100%"
@@ -255,7 +255,7 @@ export default function App() {
                     "url(https://images.unsplash.com/photo-1619218889447-95dc25727df8?crop=entropy&cs=srgb&fm=jpg&ixid=MnwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHx8MTYyMDQ2ODM1Nw&ixlib=rb-1.2.1&q=85)",
                   backgroundSize: "cover"
                 }}
-                class="w-9 h-9 rounded-full"
+                className="w-9 h-9 rounded-full"
                 src=""
               />
             </div>
@@ -268,9 +268,9 @@ export default function App() {
       </nav>
 
       {/*Body*/}
-      <div class="flex p-10 m-10 justify-center">
-        <div class="grid p-5 m-10 justify-items-center">
-          <div class="grid grid-cols-3 gap-20">
+      <div className="flex p-10 m-10 justify-center">
+        <div className="grid p-5 m-10 justify-items-center">
+          <div className="grid grid-cols-3 gap-20">
             <div>
               <Topic
                 name="Computer Science"
