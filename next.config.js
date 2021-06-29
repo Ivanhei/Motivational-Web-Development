@@ -1,5 +1,7 @@
 module.exports = {
   reactStrictMode: true,
+  basePath: '/Motivational-Web-Development',
+  trailingSlash: true,
 }
 
 /* {info on Image Optimization for statice next.js pages.}

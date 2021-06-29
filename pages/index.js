@@ -1,5 +1,6 @@
 // import Head from 'next/head'
 // import Image from 'next/image'
+import Link from 'next/link'
 /*
 import styles from '../styles/Home.module.css'
 */
@@ -158,10 +159,10 @@ function LogoTopic(props) {
   );
 }
 
-function Link(props) {
+function ItemLink(props) {
   return (
     <div className="flex">
-      <a
+      <Link passHref
         className="p-4 hover:bg-gray-100"
         href={props.link ? props.link : "#"}
       >
@@ -173,7 +174,7 @@ function Link(props) {
             {props.title || "TBD"}
           </span>
         </span>
-      </a>
+      </Link>
     </div>
   );
 }
@@ -240,9 +241,9 @@ export default function App() {
       <nav className="flex px-10 border-b-2 border-gray-100">
         <div className="flex flex-auto">
           <Spacing />
-          <Link title="Home" img={iconHome} />
+          <ItemLink title="Home" img={iconHome} />
           <Spacing />
-          <Link title="Challenge" img={iconChallenge} />
+          <ItemLink title="Challenge" img={iconChallenge} />
           <Spacing />
           <Spacing />
           { loggedIn ? (
@@ -260,7 +261,7 @@ export default function App() {
               />
             </div>
           ) : (
-            <Link title="Login" link="login" />
+            <ItemLink title="Login" link="login" />
           )}
 
           <Spacing />
