@@ -1,10 +1,13 @@
 import Link from 'next/link';
 
 import styles from '@/styles/quiz.module.css'
+import {getRandomFromArray} from '@/common/utils';
 
 import correctAudioFile from '@/assets/sounds/correct_2.mp3'
 import incorrectAudioFile from '@/assets/sounds/incorrect_2.mp3'
 import celebrationAudioFile from '@/assets/sounds/finish.wav'
+
+import { Cross as CrossIcon, Play as PlayIcon } from '@/assets/Icons'
 
 import firebase from '@/common/firebase_init';
 import "firebase/firestore";
@@ -16,7 +19,7 @@ import {
   Fragment,
 } from "react";
 
-import * as rxjs from "rxjs";
+import {from} from 'rxjs'
 import {
   map,
   mergeMap,
@@ -25,61 +28,49 @@ import {
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// https://stackoverflow.com/a/19270021
-function getRandomFromArray(arr, n) {
-  var result = new Array(n),
-    len = arr.length,
-    taken = new Array(len);
-  if (n > len)
-    throw new RangeError("getRandom: more elements taken than available");
-  while (n--) {
-    var x = Math.floor(Math.random() * len);
-    result[n] = arr[x in taken ? taken[x] : x];
-    taken[x] = --len in taken ? taken[len] : len;
-  }
-  return result;
-}
-const iconCross = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    height="100%"
-    viewBox="0 0 30.708 30.708"
-  >
-    <path
-      id="Icon_material-close"
-      data-name="Icon material-close"
-      d="M38.208,10.593,35.115,7.5,22.854,19.761,10.593,7.5,7.5,10.593,19.761,22.854,7.5,35.115l3.093,3.093L22.854,25.947,35.115,38.208l3.093-3.093L25.947,22.854Z"
-      transform="translate(-7.5 -7.5)"
-      fill="#707070"
-    />
-  </svg>
+// operators for transforming incoming questions
+const operatorConvertQuerySnapshotToDocs = map((querySnapshot) =>
+  querySnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id
+  }))
 );
-const useObservable = (observable) => {
-  const [value, setValue] = useState();
 
-  useEffect(() => {
-    const subscription = observable.subscribe((v) => {
-      setValue(v);
-    });
+const operatorRandomSelectNFromArray = (n) =>
+  map((array) => array.length > n ? getRandomFromArray(array, n) : array)
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [observable]);
+const operatorFetchAudioURLForDocs = mergeMap(async (docs) => 
+  Promise.all(
+    docs.map((doc) =>
+      storage
+        .ref()
+        .child(doc.audio)
+        .getDownloadURL()
+        .then((url) => ({
+          ...doc,
+          audio_url: url
+        }))
+        .catch((err) => {
+          console.error("Error while getting Audio URL. ", err.code);
 
-  return value;
-};
+          // still return the doc without the audio url
+          return doc;
+        })
+    )
+  )
+)
+
+const subscribe10RandomQuestions = () => {
+  return from(db.collection('problems').get())
+    .pipe(operatorConvertQuerySnapshotToDocs)
+    .pipe(operatorRandomSelectNFromArray(10))
+    .pipe(operatorFetchAudioURLForDocs);
+}
 
 // state
 const NOT_ANSWERED_YET = -1;
 const ANSWER_INCORRECT = 0;
 const ANSWER_CORRECT = 1;
-
-function PlayIcon() {
-  return <svg viewBox="0 0 47 47" fill="#FFDD63" xmlns="http://www.w3.org/2000/svg">
-    <path fillRule="evenodd" clipRule="evenodd" d="M23.4667 46.9333C36.4269 46.9333 46.9333 36.4269 46.9333 23.4667C46.9333 10.5064 36.4269 0 23.4667 0C10.5064 0 0 10.5064 0 23.4667C0 36.4269 10.5064 46.9333 23.4667 46.9333ZM16.5 34.9965L35.2 24.2L16.5 13.4036V34.9965Z"/>
-  </svg>;
-}
 
 const Challenge = (props, ref) => {
   const challenge = props.challenge;
@@ -198,9 +189,7 @@ const Challenge = (props, ref) => {
               ) : (
                 // challenges[pageNum].type === "spelling"
                 <input
-                  onChange={(e) => {
-                    setAnswer(event.target.value);
-                  }}
+                  onChange={(e) => setAnswer(e.target.value)}
                   className={
                     "" +
                     (answer.length > 0
@@ -314,48 +303,15 @@ export default function App() {
     const [loaded, setLoaded] = useState(false);
 
     useEffect(() => {
-      rxjs
-        .from(db.collection("problems").get())
-        .pipe(
-          map((querySnapshot) =>
-            querySnapshot.docs.map((doc) => ({
-              ...doc.data(),
-              id: doc.id
-            }))
-          )
-        )
-        .pipe(
-          mergeMap(async (docs) => {
-            // random select 10 questions
-            const selectedDocs = docs.length > 10 ? getRandomFromArray(docs, 10) : docs
-
-            // pass those question in to find the audio's url, and send it out
-            return Promise.all(
-              selectedDocs.map((doc) =>
-                storage
-                  .ref()
-                  .child(doc.audio)
-                  .getDownloadURL()
-                  .then((url) => ({
-                    ...doc,
-                    audio_url: url
-                  }))
-                  .catch((err) => {
-                    console.error("Error while getting Audio URL. ", err.code);
-
-                    // still return the doc without the audio url
-                    return doc;
-                  })
-              )
-            )
-          })
-        )
+      const subscriptions = subscribe10RandomQuestions()
         .subscribe((challenges) => {
           setChallenges(challenges);
           setLoaded(true);
         });
 
-      return () => {};
+      return () => {
+        subscriptions.unsubscribe();
+      };
     }, []);
 
     return (
@@ -383,7 +339,7 @@ export default function App() {
             }}
           >
             <Link href="/">
-              <a>{iconCross}</a>
+              <a><CrossIcon/></a>
             </Link>
           </div>
         </nav>
