@@ -62,6 +62,8 @@ export default function ProblemsTable() {
           }),
         ]).then(() => {
           console.log("Done Updating!!");
+        }).catch(() => {
+          console.error("Error occurred during update.");
         })
       }
     }
