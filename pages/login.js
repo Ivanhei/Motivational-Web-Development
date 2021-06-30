@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import firebase from '../common/firebase_init';
+import firebase from '@/common/firebase_init';
 import 'firebase/auth';
 
 import { useState, useEffect } from 'react';

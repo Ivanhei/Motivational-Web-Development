@@ -1,6 +1,6 @@
 import Link from 'next/link'
 /*
-import styles from '../styles/Home.module.css'
+import styles from '@styles/Home.module.css'
 */
 
 import {
@@ -8,7 +8,7 @@ import {
   useEffect,
 } from 'react';
 
-import firebase from '../common/firebase_init';
+import firebase from '@/common/firebase_init';
 import 'firebase/auth'
 
 const iconHome = (

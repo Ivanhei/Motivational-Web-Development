@@ -1,14 +1,14 @@
 import Link from 'next/link';
 
-import correctAudioFile from '../assets/sounds/correct_2.mp3'
-import incorrectAudioFile from '../assets/sounds/incorrect_2.mp3'
-import celebrationAudioFile from '../assets/sounds/finish.wav'
+import correctAudioFile from '@/assets/sounds/correct_2.mp3'
+import incorrectAudioFile from '@/assets/sounds/incorrect_2.mp3'
+import celebrationAudioFile from '@/assets/sounds/finish.wav'
 
-// const correctAudioFile = '../assets/sounds/correct_2.mp3'
-// const incorrectAudioFile = '../assets/sounds/incorrect_2.mp3'
-// const celebrationAudioFile = '../assets/sounds/finish.wav'
+// const correctAudioFile = '@assets/sounds/correct_2.mp3'
+// const incorrectAudioFile = '@assets/sounds/incorrect_2.mp3'
+// const celebrationAudioFile = '@assets/sounds/finish.wav'
 
-import firebase from '../common/firebase_init';
+import firebase from '@/common/firebase_init';
 import "firebase/firestore";
 import "firebase/storage";
 
