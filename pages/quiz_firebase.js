@@ -4,10 +4,6 @@ import correctAudioFile from '@/assets/sounds/correct_2.mp3'
 import incorrectAudioFile from '@/assets/sounds/incorrect_2.mp3'
 import celebrationAudioFile from '@/assets/sounds/finish.wav'
 
-// const correctAudioFile = '@assets/sounds/correct_2.mp3'
-// const incorrectAudioFile = '@assets/sounds/incorrect_2.mp3'
-// const celebrationAudioFile = '@assets/sounds/finish.wav'
-
 import firebase from '@/common/firebase_init';
 import "firebase/firestore";
 import "firebase/storage";
@@ -45,8 +41,6 @@ const iconCross = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     height="100%"
-    /*width="30.708"
-    height="30.708"*/
     viewBox="0 0 30.708 30.708"
   >
     <path
@@ -135,40 +129,6 @@ const Challenge = (props, ref) => {
     props.onNext(answerState === ANSWER_CORRECT);
     setAnswerState(NOT_ANSWERED_YET);
   }
-
-  // //region answerState + setAnswerState replaced with observerable
-  // const [answerState, answerStateSetter] = useState(
-  //   NOT_ANSWERED_YET
-  // );
-
-  // useEffect(() => {
-  //   const subscription = //new rxjs.Subscription();
-  //     // subscription.add(
-  //     observables.answerState().subscribe(answerStateSetter);
-  //   // );
-
-  //   // additional: answer button press
-  //   subscription.add(
-  //     observables.answerButton().subscribe(() => {
-  //       handleAnswerClick()
-  //     })
-  //   );
-
-  //   // additional: next button press
-  //   subscription.add(
-  //     observables.nextButton().subscribe(() => {
-  //       handleHintClick()
-  //     })
-  //   );
-
-  //   return () => {
-  //     console.log("unsub");
-  //     subscription.unsubscribe();
-  //   };
-  // }, []);
-
-  // const setAnswerState = (x) => nexts.answerState(x);
-  // //endregion
 
   // word audio
   const wordAudio = new Audio(challenge.audio_url);
@@ -385,9 +345,13 @@ export default function App() {
           )
         )
         .pipe(
-          mergeMap(async (docs) =>
-            Promise.all(
-              docs.map((doc) =>
+          mergeMap(async (docs) => {
+            // random select 10 questions
+            const selectedDocs = docs.length > 10 ? getRandomFromArray(docs, 10) : docs
+
+            // pass those question in to find the audio's url, and send it out
+            return Promise.all(
+              selectedDocs.map((doc) =>
                 storage
                   .ref()
                   .child(doc.audio)
@@ -404,26 +368,10 @@ export default function App() {
                   })
               )
             )
-          )
-          // mergeMap(async (doc) => {
-          //   let url = "";
-          //   try {
-          //     url = await storage.ref().child(doc.audio).getDownloadURL();
-          //   } finally {
-          //   }
-
-          //   return {
-          //     ...doc,
-          //     audio_url: url
-          //   };
-          // })
+          })
         )
         .subscribe((challenges) => {
-          setChallenges(
-            challenges.length > 10
-              ? getRandomFromArray(challenges, 10)
-              : challenges
-          );
+          setChallenges(challenges);
           setLoaded(true);
         });
 
