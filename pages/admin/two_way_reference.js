@@ -1,4 +1,4 @@
-import firebase from '../../common/firebase_init'
+import firebase from '@/common/firebase_init'
 import 'firebase/firestore'
 
 import { useEffect, useMemo, useState } from 'react';
@@ -15,10 +15,13 @@ export default function ProblemsTable() {
     // for bettwe performance, use hashmap instead.
     for (let j = 0; j < rows_.length; j++) {
       rows_[j]._belongTopic = -1;
-      if (!rows_[j].topic) continue;
       for (let i = 0; i < topics.length; i++) {
-        if (rows_[j].topic.isEqual(topics[i]._ref))
-          rows_[j]._belongTopic = i;
+        const topic_problems = topics[i].problems;
+        for (let k = 0; k < topic_problems.length; k++) {
+          if (topic_problems[k].isEqual(rows_[j]._ref)) {
+            rows_[j]._belongTopic = i;
+          }
+        }
       }
     }
 
@@ -41,41 +44,26 @@ export default function ProblemsTable() {
     }
   }, [])
 
-  function changeTopicHandler(row) {
-    return (e) => {
-      const i = parseInt(e.target.value);
-      if (i >= 0 && i < topics.length) {
-        Promise.all ([
-          // remove from old topic
-          row.topic.update({
-            problems: firebase.firestore.FieldValue.arrayRemove(row._ref)
-          }),
-
-          // add to new topic
-          topics[i]._ref.update({
-            problems: firebase.firestore.FieldValue.arrayUnion(row._ref)
-          }),
-
-          // update topic
-          row._ref.update({
-            topic: topics[i]._ref
-          }),
-        ]).then(() => {
-          console.log("Done Updating!!");
-        })
-      }
+  function addTopicRef(problemDoc) {
+    const i = problemDoc._belongTopic;
+    if (i !== -1) {
+      problemDoc._ref.update({
+          topic: topics[i]._ref
+      })
     }
   }
   
-
   return <div>
+    <button onClick={() => {
+      for (const row of rows)
+        addTopicRef(row)
+    }}>Update problems</button>
     <h1>Problems Details</h1>
     <table className="border-collapse">
       <thead>
         <tr>
             <th>Document ID</th>
             <th>Details</th>
-            <th>Topic</th>
         </tr>
       </thead>
       <tbody>
@@ -88,30 +76,6 @@ export default function ProblemsTable() {
             <tr key={row.id}>
               <td className="border">{row.id}</td>
               <td className="border"><pre>{details}</pre></td>
-              <td className="border">
-                <select
-                  name={`problem_${row.id}_topic`}
-                  onChange={changeTopicHandler(row)}
-                  value={row._belongTopic}
-                >
-                  {row._belongTopic === -1 ? 
-                    <option 
-                      value={-1} 
-                      key={-1} 
-                    >
-                      (not selected)
-                    </option> 
-                  : null}
-                  {topics.map((topic, i) => (
-                    <option 
-                      value={i} 
-                      key={i} 
-                    >
-                      {topic.name}
-                    </option>
-                  ))}
-                </select>
-              </td>
             </tr>
           )
         })}
