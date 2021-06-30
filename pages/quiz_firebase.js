@@ -15,8 +15,6 @@ import "firebase/storage";
 import {
   useState,
   useEffect,
-  useRef,
-  forwardRef,
   Fragment,
 } from "react";
 
@@ -98,6 +96,12 @@ const observables = {
   nextButton: () => subjects.nextButton.asObservable(),
   hintButton: () => subjects.hintButton.asObservable()
 };
+
+function PlayIcon() {
+  return <svg viewBox="0 0 47 47" fill="#FFDD63" xmlns="http://www.w3.org/2000/svg">
+    <path fillRule="evenodd" clipRule="evenodd" d="M23.4667 46.9333C36.4269 46.9333 46.9333 36.4269 46.9333 23.4667C46.9333 10.5064 36.4269 0 23.4667 0C10.5064 0 0 10.5064 0 23.4667C0 36.4269 10.5064 46.9333 23.4667 46.9333ZM16.5 34.9965L35.2 24.2L16.5 13.4036V34.9965Z"/>
+  </svg>;
+}
 
 const Challenge = (props, ref) => {
   const challenge = props.challenge;
@@ -199,26 +203,16 @@ const Challenge = (props, ref) => {
         <h2>{/*challenge.prompt.main_text*/}</h2>
         <div className="mx-32">
           <div className="flex p-10 mb-10 text-3xl">
-            {challenge.type === "mc" ? "Choose" : "Spell"} the word you heard.
+            {challenge.type === "mc" ? "Select" : "Spell"} the word you heard.
           </div>
           <div>
             {challenge.audio_url ? (
-              <button
-                className="p-4 play w-20 p-4"
+              <div
+                className="w-20 mx-auto my-10"
                 onClick={(e) => playWordAudio()}
               >
-                <svg
-                  viewBox="0 0 100 100"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <rect width="100" height="100" />
-                  <path
-                    d="M100 50L25 93.3013L25 6.69873L100 50Z"
-                    fill="#FF7676"
-                  />
-                </svg>
-              </button>
+                <PlayIcon/>
+              </div>
             ) : (
               <div style={{ color: "red" }}>
                 Error while fetching audio.
@@ -285,7 +279,6 @@ const Challenge = (props, ref) => {
           {answerState === NOT_ANSWERED_YET ? (
             <button
               className="block"
-              // disabled={!challengeRef.current.answerable()}
               onClick={handleAnswerClick}
             >
               answer
@@ -308,7 +301,6 @@ const Challenge = (props, ref) => {
           {answerState === NOT_ANSWERED_YET ? (
             <button
               className="block"
-              // disabled={!challengeRef.current.answerable()}
               onClick={handleAnswerClick}
             >
               answer
@@ -331,7 +323,6 @@ const Challenge = (props, ref) => {
           {answerState === NOT_ANSWERED_YET ? (
             <button
               className="block"
-              // disabled={!challengeRef.current.answerable()}
               onClick={handleAnswerClick}
             >
               answer
@@ -373,8 +364,6 @@ const Congratulations = (function (props) {
 export default function App() {
     const [pageNum, setPageNum] = useState(0);
     const [progress, setProgress] = useState(0);
-
-    const challengeRef = useRef();
 
     const [challenges, setChallenges] = useState([]);
     const [loaded, setLoaded] = useState(false);
@@ -511,7 +500,6 @@ export default function App() {
         </nav>
         {pageNum < challenges.length ? (
           <Challenge
-            ref={challengeRef}
             challenge={challenges[pageNum]}
             isLastQuestion={pageNum === challenges.length - 1}
             onCorrect={() => {
