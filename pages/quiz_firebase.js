@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import styles from '@/styles/quiz.module.css'
+
 import correctAudioFile from '@/assets/sounds/correct_2.mp3'
 import incorrectAudioFile from '@/assets/sounds/incorrect_2.mp3'
 import celebrationAudioFile from '@/assets/sounds/finish.wav'
@@ -72,24 +74,6 @@ const useObservable = (observable) => {
 const NOT_ANSWERED_YET = -1;
 const ANSWER_INCORRECT = 0;
 const ANSWER_CORRECT = 1;
-const subjects = {
-  answerState: new rxjs.BehaviorSubject(NOT_ANSWERED_YET),
-  answerButton: new rxjs.Subject(),
-  nextButton: new rxjs.Subject(),
-  hintButton: new rxjs.Subject()
-};
-const nexts = {
-  answerState: (x) => subjects.answerState.next(x),
-  answerButton: () => subjects.answerButton.next(),
-  nextButton: () => subjects.nextButton.next(),
-  hintButton: () => subjects.hintButton.next()
-};
-const observables = {
-  answerState: () => subjects.answerState.asObservable(),
-  answerButton: () => subjects.answerButton.asObservable(),
-  nextButton: () => subjects.nextButton.asObservable(),
-  hintButton: () => subjects.hintButton.asObservable()
-};
 
 function PlayIcon() {
   return <svg viewBox="0 0 47 47" fill="#FFDD63" xmlns="http://www.w3.org/2000/svg">
@@ -304,10 +288,6 @@ const Challenge = (props, ref) => {
   );
 };
 
-function AnswerBox(props) {
-  return <div></div>;
-}
-
 const Congratulations = (function (props) {
   const celebrationAudio = new Audio(celebrationAudioFile);
   celebrationAudio.volume = 0.1;
@@ -384,22 +364,15 @@ export default function App() {
           <div className="flex-grow"></div>
           <div
             style={{
-              height: 20,
-              background: "#F1EEEE",
-              borderRadius: 10,
               opacity: loaded ? 1 : 0,
-              transition: ".5s",
-              width: "60%"
             }}
+            className={styles.progressBar}
           >
             <div
               style={{
-                background: "#7AF16C",
-                height: "100%",
                 width: progress * 100 + "%",
-                borderRadius: 10,
-                transition: ".5s"
               }}
+              className={styles.progress}
             />
           </div>
           <div
