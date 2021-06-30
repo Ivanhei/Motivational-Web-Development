@@ -174,7 +174,13 @@ const Challenge = (props, ref) => {
   const wordAudio = new Audio(challenge.audio_url);
 
   function playWordAudio() {
-    wordAudio.play();
+    wordAudio.play()
+      .catch((e) => {
+        if (e.name === "NotAllowedError")
+          console.log("This system does not allow audio to be auto-played.")
+        else
+          throw e;
+      });
   }
 
   useEffect(() => {
@@ -184,7 +190,6 @@ const Challenge = (props, ref) => {
   // sound effects
   const correctAudio = new Audio(correctAudioFile);
   const incorrectAudio = new Audio(incorrectAudioFile);
-  console.log(correctAudioFile);
   
   correctAudio.volume = 0.1;
   incorrectAudio.volume = 0.1;
@@ -368,44 +373,6 @@ export default function App() {
     const [challenges, setChallenges] = useState([]);
     const [loaded, setLoaded] = useState(false);
 
-    // useEffect(() => {
-    //   db.collection("problems")
-    //     .get()
-    //     .then((querySnapshot) =>
-    //       Promise.all(
-    //         querySnapshot.docs.map((doc) =>
-    //           storage
-    //             .ref()
-    //             .child(doc.data().audio)
-    //             .getDownloadURL()
-    //             .then((url) => ({
-    //               ...doc.data(),
-    //               id: doc.id,
-    //               audio_url: url
-    //             }))
-    //             .catch((err) => {
-    //               console.log("Error while getting Audio URL. ", err);
-
-    //               return {
-    //                 ...doc.data(),
-    //                 id: doc.id
-    //               };
-    //             })
-    //         )
-    //       )
-    //     )
-    //     .then((challenges) => {
-    //       console.log(challenges);
-    //       setChallenges(challenges);
-    //       setLoaded(true);
-    //     })
-    //     .catch((error) => {
-    //       console.error("Error ocurred while parsing challenges. ", error);
-    //     });
-
-    //   return () => {};
-    // }, []);
-
     useEffect(() => {
       rxjs
         .from(db.collection("problems").get())
@@ -430,8 +397,9 @@ export default function App() {
                     audio_url: url
                   }))
                   .catch((err) => {
-                    console.error("Error while getting Audio URL. ", err);
+                    console.error("Error while getting Audio URL. ", err.code);
 
+                    // still return the doc without the audio url
                     return doc;
                   })
               )
