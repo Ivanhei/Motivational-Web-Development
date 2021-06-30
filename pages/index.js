@@ -174,7 +174,7 @@ export default function App() {
                 name="Computer Science"
                 color="#f1f109"
                 overlay={<ComputerIcon/>}
-                link="quiz_firebase"
+                link="quiz/CSE"
               />
             </div>
             <div>
@@ -182,7 +182,7 @@ export default function App() {
                 name="Academics"
                 color="#476cff"
                 overlay={<AirplaneIcon/>}
-                link="quiz_firebase"
+                link="quiz/Academics"
               />
             </div>
             <div>
@@ -190,7 +190,7 @@ export default function App() {
                 name="Friends"
                 color="#0bac61"
                 overlay={<ChatIcon/>}
-                link="quiz_firebase"
+                link="quiz/Casual"
               />
             </div>
           </div>

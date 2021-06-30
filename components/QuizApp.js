@@ -24,11 +24,24 @@ const subscribe10RandomQuestions = () => {
     .pipe(problemOperators.fetchAudioURLForDocs);
 }
 
+import { mergeMap } from 'rxjs/operators'
+
+const getFromTopic = (topicRef) => {
+  return from(topicRef.get())
+    .pipe(problemOperators.convertDocSnapshotToDoc)
+    .pipe(mergeMap(doc => 
+      Promise.all(doc.problems.map(problemRef => problemRef.get()))
+    ))
+    .pipe(problemOperators.convertDocArraySnapshotToDocs)
+    .pipe(problemOperators.randomSelectNFromArray(10))
+    .pipe(problemOperators.fetchAudioURLForDocs);
+}
+
 import Challenge from '@/components/Challenge';
 import Congratulations from '@/components/Congratulations';
 import LoadingLayout from '@/components/LoadingLayout';
 
-export default function QuizApp() {
+export default function QuizApp(props) {
   const [pageNum, setPageNum] = useState(0);
   const [progress, setProgress] = useState(0);
 
@@ -36,7 +49,7 @@ export default function QuizApp() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const subscriptions = subscribe10RandomQuestions()
+    const subscriptions = getFromTopic(props.topic)//subscribe10RandomQuestions()
       .subscribe((challenges) => {
         setChallenges(challenges);
         setLoaded(true);

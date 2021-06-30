@@ -13,7 +13,7 @@ export default (function Congratulations(props) {
   }, []);
 
   return (
-    <div>
+    <div className="text-center">
       <h2>Congratulations!</h2>
       <div>You have completed the quiz!</div>
     </div>

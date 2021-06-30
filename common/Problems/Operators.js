@@ -14,6 +14,19 @@ import {
 
 
 // operators for transforming incoming questions
+const convertDocSnapshotToDoc = map((doc) =>({
+    ...doc.data(),
+    id: doc.id
+  })
+);
+
+const convertDocArraySnapshotToDocs = map((docArray) =>
+  docArray.map((doc) => ({
+    ...doc.data(),
+    id: doc.id
+  }))
+);
+
 const convertQuerySnapshotToDocs = map((querySnapshot) =>
   querySnapshot.docs.map((doc) => ({
     ...doc.data(),
@@ -45,6 +58,8 @@ const fetchAudioURLForDocs = mergeMap(async (docs) =>
   ));
 
 export {
+  convertDocSnapshotToDoc,
+  convertDocArraySnapshotToDocs,
   convertQuerySnapshotToDocs,
   randomSelectNFromArray,
   fetchAudioURLForDocs,
