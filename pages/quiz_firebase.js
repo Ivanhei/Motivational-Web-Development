@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import correctAudioFile from '../assets/sounds/correct_2.mp3'
 import incorrectAudioFile from '../assets/sounds/incorrect_2.mp3'
 import celebrationAudioFile from '../assets/sounds/finish.wav'
@@ -502,7 +504,9 @@ export default function App() {
               paddingLeft: 40
             }}
           >
-            <a href="../">{iconCross}</a>
+            <Link href="/">
+              <a>{iconCross}</a>
+            </Link>
           </div>
         </nav>
         {pageNum < challenges.length ? (
