@@ -20,3 +20,25 @@ import { useRouter } from 'next/router';
 export function usePath(path) {
   return `${useRouter().basePath}${path}`;
 }
+
+// Currently logged in User: react hook
+import firebase from '@/common/firebase_init';
+import 'firebase/auth';
+
+import { useState, useEffect } from 'react';
+
+export function useUser() {
+  const [userCredentials, setUserCredentials] = useState(null);
+
+  useEffect(() => {
+    const unsub_auth = firebase.auth().onAuthStateChanged(user => {
+      setUserCredentials(user);
+    });
+
+    return () => {
+      unsub_auth();
+    };
+  }, []);
+
+  return userCredentials;
+}

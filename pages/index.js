@@ -96,18 +96,8 @@ function Topic(props) {
   );
 }
 
-export default function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const unsub_auth = firebase.auth().onAuthStateChanged(user => {
-      setLoggedIn(!!user);
-    });
-
-    return () => {
-      unsub_auth();
-    };
-  }, []);
+export default function App(props) {
+  const loggedIn = !!props.user;
   
   // useEffect(() => {
   //   introJs().setOptions({

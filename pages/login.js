@@ -5,21 +5,10 @@ import { usePath } from '@/common/utils';
 import firebase from '@/common/firebase_init';
 import 'firebase/auth';
 
-import { useState, useEffect } from 'react';
-
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 
 export default function App(props) {
-  const [showLoginDialog, setShowLoginDialog] = useState(false);
-  useEffect(() => {
-    const unsub = firebase.auth().onAuthStateChanged(user => {
-      if (!user) setShowLoginDialog(true);
-    });
-
-    return () => {
-      unsub();
-    }
-  });
+  const showLoginDialog = !props.user;
 
   const uiConfig = {
     signInFlow: 'popup',
