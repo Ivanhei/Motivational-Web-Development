@@ -106,11 +106,11 @@ export default function QuizApp(props) {
 
   const router = useRouter();
 
-  // go to login page if not logged in
-  useEffect(() => {
-    if (!user)
-      router.push('/login');
-  }, [user]);
+  // // go to login page if not logged in
+  // useEffect(() => {
+  //   if (!user)
+  //     router.push('/login');
+  // }, [user]);
 
   return (
     <div className="h-screen app-container">
