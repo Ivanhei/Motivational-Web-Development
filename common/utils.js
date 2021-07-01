@@ -42,3 +42,22 @@ export function useUser() {
 
   return userCredentials;
 }
+
+// getFromTopic
+import { from } from 'rxjs'
+import { map } from 'rxjs/operators'
+import * as problemOperators from '@/common/Problems/Operators'
+
+export function getFromTopic(topicRef) {
+  return from(topicRef.get())
+    // get topic doc
+    .pipe(problemOperators.convertDocSnapshotToDoc)
+    // get problems in the topic
+    .pipe(map(topic => topic.problems))
+    .pipe(problemOperators.convertDocRefArrayToDocSnapshotArray)
+    .pipe(problemOperators.convertDocSnapshotArrayToDocs)
+    // select 10 items randomly
+    .pipe(problemOperators.randomSelectNFromArray(10))
+    // fetch audio urls
+    .pipe(problemOperators.fetchAudioURLForDocs);
+}

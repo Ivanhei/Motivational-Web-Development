@@ -12,17 +12,21 @@ import {
   mergeMap,
 } from "rxjs/operators";
 
-
-// operators for transforming incoming questions
+// helper mappings
 const docSnapshotToDoc = (doc) => ({
   ...doc.data(),
   id: doc.id,
   _ref: doc.ref
 });
 
+// operators for transforming incoming questions
 const convertDocSnapshotToDoc = map(docSnapshotToDoc);
 
-const convertDocArraySnapshotToDocs = map(
+const convertDocRefArrayToDocSnapshotArray = mergeMap(
+  (docRefs) => Promise.all(docRefs.map(problemRef => problemRef.get()))
+);
+
+const convertDocSnapshotArrayToDocs = map(
   (docArray) => docArray.map(docSnapshotToDoc)
 );
 
@@ -55,7 +59,8 @@ const fetchAudioURLForDocs = mergeMap(async (docs) =>
 
 export {
   convertDocSnapshotToDoc,
-  convertDocArraySnapshotToDocs,
+  convertDocRefArrayToDocSnapshotArray,
+  convertDocSnapshotArrayToDocs,
   convertQuerySnapshotToDocs,
   randomSelectNFromArray,
   fetchAudioURLForDocs,

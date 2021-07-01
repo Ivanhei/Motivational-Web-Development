@@ -4,39 +4,12 @@ import styles from '@/styles/quiz.module.css'
 
 import { CrossIcon } from '@/assets/Icons'
 
-import firebase from '@/common/firebase_init';
-import "firebase/firestore";
-const db = firebase.firestore();
-
 import {
   useState,
   useEffect,
 } from "react";
 
-import { from } from 'rxjs'
-
-import * as problemOperators from '@/common/Problems/Operators'
-
-const subscribe10RandomQuestions = () => {
-  return from(db.collection('problems').get())
-    .pipe(problemOperators.convertQuerySnapshotToDocs)
-    .pipe(problemOperators.randomSelectNFromArray(10))
-    .pipe(problemOperators.fetchAudioURLForDocs);
-}
-
-import { mergeMap } from 'rxjs/operators'
-
-const getFromTopic = (topicRef) => {
-  return from(topicRef.get())
-    .pipe(problemOperators.convertDocSnapshotToDoc)
-    .pipe(mergeMap(doc => 
-      Promise.all(doc.problems.map(problemRef => problemRef.get()))
-    ))
-    .pipe(problemOperators.convertDocArraySnapshotToDocs)
-    .pipe(problemOperators.randomSelectNFromArray(10))
-    .pipe(problemOperators.fetchAudioURLForDocs);
-}
-
+import { getFromTopic } from '@/common/utils';
 import Challenge from '@/components/Challenge';
 import Congratulations from '@/components/Congratulations';
 import LoadingLayout from '@/components/LoadingLayout';
@@ -49,7 +22,7 @@ export default function QuizApp(props) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const subscriptions = getFromTopic(props.topic)//subscribe10RandomQuestions()
+    const subscriptions = getFromTopic(props.topic)
       .subscribe((challenges) => {
         setChallenges(challenges);
         setLoaded(true);
