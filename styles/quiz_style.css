@@ -19,7 +19,6 @@ body {
 
 
 button,
-.button,
 input,
 input:focus,
 input.answered {
@@ -28,7 +27,6 @@ input.answered {
   padding: 0.5rem 2rem;
   margin: 0rem 0.75rem;
   border-radius: 1rem;
-  /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); */
 }
 button:focus,
 input:focus {
@@ -38,28 +36,16 @@ button[disabled],
 button.selected {
   color: rgb(91, 200, 255);
   border-color: rgb(91, 200, 255);
-  /* background: rgba(91, 200, 255, 0.03); */
-  /* box-shadow: 0 4px 6px -1px rgba(91, 200, 255, 0.1),
-    0 0px 5px rgba(91, 200, 255, 0.25);
-  text-shadow: 0 0px 5px rgba(91, 200, 255, 0.25); */
 }
 button.correct,
 input.correct {
   color: rgb(52, 212, 105);
   border-color: rgb(77, 231, 128);
-  /* background: rgba(77, 231, 128, 0.03); */
-  /* box-shadow: 0 4px 6px -1px rgba(77, 231, 128, 0.1),
-    0 0px 5px rgba(77, 231, 128, 0.25);
-  text-shadow: 0 0px 5px rgba(77, 231, 128, 0.25); */
 }
 button.incorrect,
 input.incorrect {
   color: #ff7676;
   border-color: #ff7676;
-  /* background: rgba(255, 118, 118, 0.03); */
-  /* box-shadow: 0 4px 6px -1px rgba(255, 118, 118, 0.1),
-    0 0px 5px rgba(255, 118, 118, 0.25);
-  text-shadow: 0 0px 5px rgba(255, 118, 118, 0.25); */
 }
 main {
   padding: 0 10px;
