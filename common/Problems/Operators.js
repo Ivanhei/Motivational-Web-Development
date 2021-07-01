@@ -14,24 +14,20 @@ import {
 
 
 // operators for transforming incoming questions
-const convertDocSnapshotToDoc = map((doc) =>({
-    ...doc.data(),
-    id: doc.id
-  })
+const docSnapshotToDoc = (doc) => ({
+  ...doc.data(),
+  id: doc.id,
+  _ref: doc.ref
+});
+
+const convertDocSnapshotToDoc = map(docSnapshotToDoc);
+
+const convertDocArraySnapshotToDocs = map(
+  (docArray) => docArray.map(docSnapshotToDoc)
 );
 
-const convertDocArraySnapshotToDocs = map((docArray) =>
-  docArray.map((doc) => ({
-    ...doc.data(),
-    id: doc.id
-  }))
-);
-
-const convertQuerySnapshotToDocs = map((querySnapshot) =>
-  querySnapshot.docs.map((doc) => ({
-    ...doc.data(),
-    id: doc.id
-  }))
+const convertQuerySnapshotToDocs = map(
+  (querySnapshot) => querySnapshot.docs.map(docSnapshotToDoc)
 );
 
 const randomSelectNFromArray = (n) =>
