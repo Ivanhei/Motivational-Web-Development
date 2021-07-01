@@ -13,8 +13,9 @@ import { getFromTopic } from '@/common/utils';
 import Challenge from '@/components/Challenge';
 import Congratulations from '@/components/Congratulations';
 import LoadingLayout from '@/components/LoadingLayout';
+import { useRouter } from 'next/router';
 
-export default function QuizApp(props) {
+export default function QuizApp({ user, topic }) {
   const [pageNum, setPageNum] = useState(0);
   const [progress, setProgress] = useState(0);
 
@@ -22,7 +23,7 @@ export default function QuizApp(props) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const subscriptions = getFromTopic(props.topic)
+    const subscriptions = getFromTopic(topic)
       .subscribe((challenges) => {
         setChallenges(challenges);
         setLoaded(true);
@@ -32,6 +33,14 @@ export default function QuizApp(props) {
       subscriptions.unsubscribe();
     };
   }, []);
+
+  const router = useRouter();
+
+  // go to login page if not logged in
+  useEffect(() => {
+    if (!user)
+      router.push('/login');
+  }, [user]);
 
   return (
     <div className="h-screen app-container">
