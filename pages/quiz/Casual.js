@@ -1,6 +1,6 @@
-import QuizApp from "../../components/QuizApp";
+import QuizApp from "@components/QuizApp";
 
-import firebase from '../../common/firebase_init';
+import firebase from '@/common/firebase_init';
 import "firebase/firestore";
 const db = firebase.firestore();
 

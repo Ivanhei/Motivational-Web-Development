@@ -13,3 +13,10 @@ export function getRandomFromArray(arr, n) {
   }
   return result;
 }
+
+// https://stackoverflow.com/a/68201934/8958580
+import { useRouter } from 'next/router';
+
+export function usePath(path) {
+  return `${useRouter().basePath}${path}`;
+}

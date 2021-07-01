@@ -1,4 +1,4 @@
-import firebase from '../../common/firebase_init'
+import firebase from '@/common/firebase_init'
 import 'firebase/firestore'
 
 import { useEffect, useMemo, useState } from 'react';

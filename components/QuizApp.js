@@ -15,7 +15,7 @@ import {
 
 import { from } from 'rxjs'
 
-import * as problemOperators from '../common/Problems/Operators'
+import * as problemOperators from '@/common/Problems/Operators'
 
 const subscribe10RandomQuestions = () => {
   return from(db.collection('problems').get())

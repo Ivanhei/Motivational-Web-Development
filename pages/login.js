@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { usePath } from '@/common/utils';
+
 import firebase from '@/common/firebase_init';
 import 'firebase/auth';
 
@@ -21,7 +23,7 @@ export default function App(props) {
 
   const uiConfig = {
     signInFlow: 'popup',
-    signInSuccessUrl: '../',
+    signInSuccessUrl: usePath('/'),
     signInOptions: [
       firebase.auth.EmailAuthProvider.PROVIDER_ID,
     ],
