@@ -1,12 +1,9 @@
 import Link from 'next/link'
 
-import {
-  useState,
-  useEffect,
-} from 'react';
-
 import firebase from '@/common/firebase_init';
 import 'firebase/auth'
+
+import { useAppContext } from '@/common/AppContext';
 
 import { 
   HomeIcon, 
@@ -97,7 +94,8 @@ function Topic(props) {
 }
 
 export default function App(props) {
-  const loggedIn = !!props.user;
+  const appContext = useAppContext();
+  const loggedIn = !!appContext.user;
   
   // useEffect(() => {
   //   introJs().setOptions({

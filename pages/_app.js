@@ -1,12 +1,12 @@
 import 'tailwindcss/tailwind.css'
 import '@/styles/quiz_style.css'
 
-import { useUser } from '@/common/utils';
+import { AppWrapper } from '@/common/AppContext';
 
 function MyApp({ Component, pageProps }) {
-  const userCredentials = useUser();
-
-  return <Component {...pageProps} user={userCredentials} />
+  return <AppWrapper>
+    <Component {...pageProps} />
+  </AppWrapper>
 }
 
 export default MyApp

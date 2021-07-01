@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { usePath } from '@/common/utils';
+import { useAppContext } from '@/common/AppContext';
 
 import firebase from '@/common/firebase_init';
 import 'firebase/auth';
@@ -8,7 +9,8 @@ import 'firebase/auth';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 
 export default function App(props) {
-  const showLoginDialog = !props.user;
+  const appContext = useAppContext();
+  const showLoginDialog = !appContext.user;
 
   const uiConfig = {
     signInFlow: 'popup',
