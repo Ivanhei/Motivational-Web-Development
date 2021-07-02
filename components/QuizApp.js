@@ -15,8 +15,7 @@ import Challenge from '@/components/Challenge';
 import Congratulations from '@/components/Congratulations';
 import LoadingLayout from '@/components/LoadingLayout';
 
-import { 
-  BehaviorSubject,
+import {
   combineLatest,
   from,
   ReplaySubject,
@@ -28,6 +27,8 @@ import {
   filter,
   first,
   map,
+  mergeAll,
+  mergeMap,
   tap,
 } from "rxjs/operators";
 
@@ -73,20 +74,22 @@ export default function QuizApp(props) {
     const subjectProblemsDocRefArray = new Subject();
     const subjectProblems = from(topic.get())
       .pipe(problemOperators.convertDocSnapshotToDoc)
-      .pipe(tap(topic => subjectTopicDoc.next(topic)))
+      .pipe(tap(topic => subjectTopicDoc.next(topic))) // .pipe(tap(subjectTopicDoc))
       .pipe(map(topic => topic.problems))
       .pipe(problemOperators.randomSelectNFromArray(10))
       .pipe(tap(problemRefs => subjectProblemsDocRefArray.next(problemRefs)))
-      .pipe(problemOperators.convertDocRefArrayToDocSnapshotArray)
-      .pipe(problemOperators.convertDocSnapshotArrayToDocs)
-      .pipe(problemOperators.fetchAudioURLForDocs)
+      /// flattens and fetch problems.
+      .pipe(mergeAll()) // merges them (flattens the array once)
+      .pipe(mergeMap(problemRef => problemRef.get()))
+      .pipe(problemOperators.convertDocSnapshotToDoc)
+      .pipe(problemOperators.fetchAudioURLForDoc)
       // TODO: onComplete? dispose?
 
     // subscriptions
     const subscriptions = new Subscription();
     subscriptions.add(subjectProblems
-      .subscribe((challenges) => {
-        setChallenges(challenges);
+      .subscribe((challenge) => {
+        setChallenges(challenges => [...challenges, challenge]);
         setLoaded(true);
       })
     );
@@ -143,7 +146,7 @@ export default function QuizApp(props) {
           </Link>
         </div>
       </nav>
-      {!showLogin && pageNum < challenges.length ? (
+      {showLogin ? <Login/> : pageNum < challenges.length ? (
         <Challenge
           challenge={challenges[pageNum]}
           isLastQuestion={pageNum === challenges.length - 1}
@@ -163,10 +166,6 @@ export default function QuizApp(props) {
           }}
         />
       ) : (loaded ? <Congratulations/> : <LoadingLayout/>)}
-
-      <div className={"login_dialog " + (showLogin ? "shown" : "")}>
-        {showLogin ? <Login/> : null}
-      </div>
     </div>
   );
 }

@@ -19,6 +19,19 @@ const docSnapshotToDoc = (doc) => ({
   _ref: doc.ref
 });
 
+const docWithAudioURL_promise = (doc) => 
+  storage.ref().child(doc.audio).getDownloadURL()
+    .then((url) => ({
+      ...doc,
+      audio_url: url
+    }))
+    .catch((err) => {
+      console.error("Error while getting Audio URL. ", err.code);
+
+      // still return the doc without the audio url
+      return doc;
+    });
+
 // operators for transforming incoming questions
 const convertDocSnapshotToDoc = map(docSnapshotToDoc);
 
@@ -37,25 +50,10 @@ const convertQuerySnapshotToDocs = map(
 const randomSelectNFromArray = (n) =>
   map((array) => array.length > n ? getRandomFromArray(array, n) : array)
 
-const fetchAudioURLForDocs = mergeMap(async (docs) =>
-  Promise.all(
-    docs.map((doc) =>
-      storage
-      .ref()
-      .child(doc.audio)
-      .getDownloadURL()
-      .then((url) => ({
-        ...doc,
-        audio_url: url
-      }))
-      .catch((err) => {
-        console.error("Error while getting Audio URL. ", err.code);
+const fetchAudioURLForDocs = mergeMap((docs) =>
+  Promise.all(docs.map(docWithAudioURL_promise)));
 
-        // still return the doc without the audio url
-        return doc;
-      })
-    )
-  ));
+const fetchAudioURLForDoc = mergeMap(docWithAudioURL_promise);
 
 export {
   convertDocSnapshotToDoc,
@@ -64,4 +62,5 @@ export {
   convertQuerySnapshotToDocs,
   randomSelectNFromArray,
   fetchAudioURLForDocs,
+  fetchAudioURLForDoc,
 }
