@@ -60,6 +60,7 @@ export default function QuizApp(props) {
     }
   }, [loaded, pageNum, challenges.length]);
 
+  // fetching problems
   useEffect(() => {
     // subjects
     const subjectTopicDoc = new Subject();
@@ -84,6 +85,7 @@ export default function QuizApp(props) {
       })
     );
 
+    // (for finish answering all problems: store which questions user finished)
     subscriptions.add(
       combineLatest([subjectTopicDoc, subjectProblemsDocRefArray, subjectUser, subjectFinishQuizSignal])
         .pipe(filter(([topicDoc, problemsDocRefArray, user, finish]) => !!user))
@@ -92,17 +94,17 @@ export default function QuizApp(props) {
           firebase.firestore()
             .collection('users').doc(user.uid)
             .collection('finishedProblems').doc(topicDoc.id)
-            .update({
+            .set({
               topic: topicDoc._ref,
               problems: firebase.firestore.FieldValue.arrayUnion(...problemsDocRefArray),
-            });
+            }, { merge: true });
         })
     );
 
     return () => {
       subscriptions.unsubscribe();
     };
-  }, []);
+  }, [topic]);
 
   // const router = useRouter();
 
