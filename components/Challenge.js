@@ -2,12 +2,22 @@ import { PlayIcon } from '@/assets/Icons'
 
 import correctAudioFile from '@/assets/sounds/correct_2.mp3'
 import incorrectAudioFile from '@/assets/sounds/incorrect_2.mp3'
+import { useCallback } from 'react';
 
 import {
   useState,
   useEffect,
   Fragment,
+  useMemo,
 } from "react";
+
+import {
+  fromEvent,
+} from 'rxjs';
+
+import {
+  filter,
+} from "rxjs/operators";
 
 // states
 const NOT_ANSWERED_YET = -1;
@@ -20,37 +30,45 @@ export default function Challenge(props, ref) {
   const [showHint, setShowHint] = useState(false);
   const [disabledChoice, setDisabledChoice] = useState([]);
 
-  function checkAnswer() {
-    if (challenge.type === "mc") return challenge.answer === answer;
-    else return challenge.answer.toLowerCase() === answer.toLowerCase();
-  }
   const [answerState, setAnswerState] = useState(NOT_ANSWERED_YET);
 
-  function handleAnswerClick() {
+
+  // callbacks
+  const handleAnswerClick = useCallback(function () {
+    function checkAnswer() {
+      if (challenge.type === "mc") return challenge.answer === answer;
+      else return challenge.answer.toLowerCase() === answer.toLowerCase();
+    }
+
     if (answerState !== NOT_ANSWERED_YET) return;
     const answer_state = checkAnswer()
       ? ANSWER_CORRECT
       : ANSWER_INCORRECT;
     setAnswerState(answer_state);
     if (answer_state == ANSWER_CORRECT) props.onCorrect();
-  }
+  }, [answer, answerState, challenge.answer, challenge.type, props]);
 
-  function handleHintClick() {
+  const handleHintClick = useCallback(function () {
     setShowHint((sh) => !sh);
-  }
+  }, []);
 
-  function handleNextClick() {
+  const handleNextClick = useCallback(function () {
     setAnswer("");
 
     // change to next page
     props.onNext(answerState === ANSWER_CORRECT);
     setAnswerState(NOT_ANSWERED_YET);
-  }
+  }, [answerState, props]);
+
 
   // word audio
-  const wordAudio = new Audio(challenge.audio_url);
+  const wordAudio = useMemo(() => {
+    const audio = new Audio(challenge.audio_url);
+    audio.volume = 0.1;
+    return audio;
+  }, [challenge.audio_url]);
 
-  function playWordAudio() {
+  const playWordAudio = useCallback(function () {
     wordAudio.play()
       .catch((e) => {
         if (e.name === "NotAllowedError")
@@ -58,18 +76,24 @@ export default function Challenge(props, ref) {
         else
           throw e;
       });
-  }
+  }, [wordAudio]);
 
   useEffect(() => {
     playWordAudio();
-  }, [challenge]);
+  }, [/*challenge, */playWordAudio]);
+
 
   // sound effects
-  const correctAudio = new Audio(correctAudioFile);
-  const incorrectAudio = new Audio(incorrectAudioFile);
-  
-  correctAudio.volume = 0.1;
-  incorrectAudio.volume = 0.1;
+  const correctAudio = useMemo(() => {
+    const audio = new Audio(correctAudioFile);
+    audio.volume = 0.1;
+    return audio;
+  }, []);
+  const incorrectAudio = useMemo(() => {
+    const audio = new Audio(incorrectAudioFile);
+    audio.volume = 0.1;
+    return audio;
+  }, []);
 
   useEffect(() => {
     if (answerState === ANSWER_CORRECT) {
@@ -77,7 +101,25 @@ export default function Challenge(props, ref) {
     } else if (answerState === ANSWER_INCORRECT) {
       incorrectAudio.play();
     }
-  }, [answerState]);
+  }, [answerState, correctAudio, incorrectAudio]);
+
+
+  // keyboard events
+  useEffect(() => {
+    // inspired by https://stackoverflow.com/a/44186764
+    const ENTER_KEYCODE = 13;
+
+    const enterKeyUps = fromEvent(document, "keyup")
+      .pipe(filter(e => e.keyCode === ENTER_KEYCODE))
+
+    const subscriptions = enterKeyUps.subscribe((key) => {
+      (answerState === NOT_ANSWERED_YET ? handleAnswerClick : handleNextClick)()
+    });
+
+    return () => {
+      subscriptions.unsubscribe();
+    };
+  }, [answerState, handleAnswerClick, handleNextClick]);
 
   return (
     <Fragment>

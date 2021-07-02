@@ -104,7 +104,7 @@ export default function QuizApp(props) {
     };
   }, []);
 
-  const router = useRouter();
+  // const router = useRouter();
 
   // // go to login page if not logged in
   // useEffect(() => {
