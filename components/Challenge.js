@@ -63,9 +63,7 @@ export default function Challenge(props, ref) {
 
   // word audio
   const wordAudio = useMemo(() => {
-    const audio = new Audio(challenge.audio_url);
-    audio.volume = 0.1;
-    return audio;
+    return new Audio(challenge.audio_url);
   }, [challenge.audio_url]);
 
   const playWordAudio = useCallback(function () {
