@@ -7,19 +7,19 @@ import { CrossIcon } from '@/assets/Icons'
 import {
   useState,
   useEffect,
+  useMemo,
 } from "react";
 
-import { useAppContext } from '@/common/AppContext';
-
+import Login from '@/components/Login';
 import Challenge from '@/components/Challenge';
 import Congratulations from '@/components/Congratulations';
 import LoadingLayout from '@/components/LoadingLayout';
-import { useRouter } from 'next/router';
 
 import { 
   BehaviorSubject,
   combineLatest,
   from,
+  ReplaySubject,
   Subject,
   Subscription,
 } from 'rxjs';
@@ -35,13 +35,9 @@ import * as problemOperators from '@/common/Problems/Operators'
 
 import firebase from '@/common/firebase_init';
 import 'firebase/firestore';
-
-const subjectFinishQuizSignal = new Subject();
-const subjectUser = new BehaviorSubject();
+import { observeUser } from '@/common/utils';
 
 export default function QuizApp(props) {
-  const appContext = useAppContext();
-  const user = appContext.user;
   const topic = props.topic;
 
   const [pageNum, setPageNum] = useState(0);
@@ -50,15 +46,25 @@ export default function QuizApp(props) {
   const [challenges, setChallenges] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
+  const [showLogin, setShowLogin] = useState(false);
+
+  const subjectFinishQuizSignal = useMemo(() => new Subject(), []);
+  const subjectUser = useMemo(() => new ReplaySubject(1), []);
+
   useEffect(() => {
-    subjectUser.next(user);
-  }, [user])
+    const userObservable = observeUser();
+    const subs = userObservable.subscribe(subjectUser);
+
+    return () => {
+      subs.unsubscribe();
+    };
+  }, [subjectUser]);
 
   useEffect(() => {
     if (loaded && pageNum === challenges.length) {
       subjectFinishQuizSignal.next();
     }
-  }, [loaded, pageNum, challenges.length]);
+  }, [loaded, pageNum, challenges.length, subjectFinishQuizSignal]);
 
   // fetching problems
   useEffect(() => {
@@ -85,6 +91,8 @@ export default function QuizApp(props) {
       })
     );
 
+    subjectUser.subscribe(user => setShowLogin(!user));
+
     // (for finish answering all problems: store which questions user finished)
     subscriptions.add(
       combineLatest([subjectTopicDoc, subjectProblemsDocRefArray, subjectUser, subjectFinishQuizSignal])
@@ -104,15 +112,7 @@ export default function QuizApp(props) {
     return () => {
       subscriptions.unsubscribe();
     };
-  }, [topic]);
-
-  // const router = useRouter();
-
-  // // go to login page if not logged in
-  // useEffect(() => {
-  //   if (!user)
-  //     router.push('/login');
-  // }, [user]);
+  }, [subjectFinishQuizSignal, subjectUser, topic]);
 
   return (
     <div className="h-screen app-container">
@@ -143,7 +143,7 @@ export default function QuizApp(props) {
           </Link>
         </div>
       </nav>
-      {pageNum < challenges.length ? (
+      {!showLogin && pageNum < challenges.length ? (
         <Challenge
           challenge={challenges[pageNum]}
           isLastQuestion={pageNum === challenges.length - 1}
@@ -163,6 +163,10 @@ export default function QuizApp(props) {
           }}
         />
       ) : (loaded ? <Congratulations/> : <LoadingLayout/>)}
+
+      <div className={"login_dialog " + (showLogin ? "shown" : "")}>
+        {showLogin ? <Login/> : null}
+      </div>
     </div>
   );
 }

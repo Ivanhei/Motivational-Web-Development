@@ -43,8 +43,26 @@ export function useUser() {
   return userCredentials;
 }
 
+// rx user logged in
+export function observeUser() {
+  // https://rxjs.dev/api/index/class/Observable#constructor
+  return new Observable(function(observer) {
+    const unsub_auth = firebase.auth().onAuthStateChanged(
+      user => observer.next(user),
+      error => observer.error(error),
+      () => observer.complete(), // Why is this? Does this function even get called?
+    );
+
+    return () => {
+      unsub_auth();
+      observer.complete();
+    }
+  });
+}
+
 //
 import 'firebase/firestore';
+import { Observable } from 'rxjs';
 
 export function getUserDocRef(userCredentials) {
   if (userCredentials)

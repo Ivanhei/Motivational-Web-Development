@@ -3,8 +3,6 @@ import Link from 'next/link'
 import firebase from '@/common/firebase_init';
 import 'firebase/auth'
 
-import { useAppContext } from '@/common/AppContext';
-
 import { 
   HomeIcon, 
   ChallengeIcon, 
@@ -12,6 +10,8 @@ import {
   AirplaneIcon, 
   ChatIcon 
 } from '@/assets/Icons';
+import { useEffect, useState } from 'react';
+import { observeUser } from '@/common/utils';
 
 function LogoTopic(props) {
   const color = props.color || "#333333";
@@ -94,8 +94,18 @@ function Topic(props) {
 }
 
 export default function App(props) {
-  const appContext = useAppContext();
-  const loggedIn = !!appContext.user;
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const userObservable = observeUser();
+    const subs = userObservable.subscribe((user) => {
+      setLoggedIn(!!user);
+    });
+
+    return () => {
+      subs.unsubscribe();
+    };
+  }, []);
   
   // useEffect(() => {
   //   introJs().setOptions({

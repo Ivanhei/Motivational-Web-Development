@@ -1,27 +1,25 @@
 import Link from 'next/link';
 
-import { usePath } from '@/common/utils';
-import { useAppContext } from '@/common/AppContext';
-
-import firebase from '@/common/firebase_init';
-import 'firebase/auth';
-
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import Login from '@/components/Login';
+import { useEffect, useState } from 'react';
+import { observeUser } from '@/common/utils';
 
 export default function App(props) {
-  const appContext = useAppContext();
-  const showLoginDialog = !appContext.user;
+  const [showLoginDialog, setShowLoginDialog] = useState(undefined);
 
-  const uiConfig = {
-    signInFlow: 'popup',
-    signInSuccessUrl: usePath('/'),
-    signInOptions: [
-      firebase.auth.EmailAuthProvider.PROVIDER_ID,
-    ],
-  };
+  useEffect(() => {
+    const userObservable = observeUser();
+    const subs = userObservable.subscribe((user) => {
+      setShowLoginDialog(!user);
+    });
+
+    return () => {
+      subs.unsubscribe();
+    };
+  }, []);
 
   return <div id="login-container">
-    {showLoginDialog ? <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} /> : null}
+    {showLoginDialog ? <Login signInSuccessUrl="/"/> : null}
     <Link href="/">
       <a>Go Back</a>
     </Link>
