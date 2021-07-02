@@ -95,8 +95,10 @@ export default function Challenge(props, ref) {
 
   useEffect(() => {
     if (answerState === ANSWER_CORRECT) {
+      correctAudio.currentTime = 0;
       correctAudio.play();
     } else if (answerState === ANSWER_INCORRECT) {
+      incorrectAudio.currentTime = 0;
       incorrectAudio.play();
     }
   }, [answerState, correctAudio, incorrectAudio]);
