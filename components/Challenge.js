@@ -173,6 +173,8 @@ export default function Challenge(props, ref) {
               ) : (
                 // challenges[pageNum].type === "spelling"
                 <input
+                  autoComplete="off" autoCorrect="off" // TODO: fix spelling checker
+                  autoCapitalize="off" spellCheck="false" 
                   onChange={(e) => setAnswer(e.target.value)}
                   className={
                     "" +
