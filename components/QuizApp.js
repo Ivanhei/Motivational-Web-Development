@@ -86,12 +86,14 @@ export default function QuizApp(props) {
 
     const subjectTopicDoc = new Subject();
 
-    const subjectTopicProblemRefs = subjectTopicDoc // .pipe(tap(subjectTopicDoc))
+    const subjectTopicProblemRefs = subjectTopicDoc
       .pipe(map(topic => topic.problems))
 
-    // MAIN circuit.
     const subjectProblemsDocRefArray = combineLatest([subjectAlreadyDoneProblems, subjectTopicProblemRefs])
       .pipe(map(([doneProblemRefs, allProblemRefs]) => {
+        if (!doneProblemRefs) // user did no problems on this topic whatsoever
+          return allProblemRefs;
+
         return allProblemRefs.filter(ref => !doneProblemRefs.some(doneRef => doneRef.isEqual(ref)));
       }))
       .pipe(problemOperators.randomSelectNFromArray(10))

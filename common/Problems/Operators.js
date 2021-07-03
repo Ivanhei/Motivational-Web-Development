@@ -19,7 +19,7 @@ const docSnapshotToDoc = (doc) => ({
   _ref: doc.ref
 });
 
-const docWithAudioURL_promise = (doc) => 
+const docWithAudioURL_promise = (doc) => !doc.audio ? doc :
   storage.ref().child(doc.audio).getDownloadURL()
     .then((url) => ({
       ...doc,
