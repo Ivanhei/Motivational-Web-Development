@@ -78,34 +78,6 @@ input.incorrect {
 main {
   padding: 0 10px;
 }
-/*
-.app-container {
-  display: grid;
-  grid-template-columns: 100%;
-  grid-template-rows: 100px 1fr 140px;
-}
-.footer {
-  overflow: hidden;
-  position: relative;
-}
-.footer > div {
-  top: 0%;
-  width: 100%;
-  height: 100%;
-  transition: 0.2s;
-}
-.footer > div.messageBox {
-  background: #d7ffb8;
-  position: absolute;
-  top: 100%;
-}
-.footer > div.messageBox.shown {
-  top: 0%;
-}
-.footer > div.messageBox.incorrect {
-  background: #ffcccc;
-}
-*/
 
 /* container layout */
 .app-container {
