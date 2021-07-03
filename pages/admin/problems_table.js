@@ -47,7 +47,7 @@ export default function ProblemsTable() {
       if (i >= 0 && i < topics.length) {
         Promise.all ([
           // remove from old topic
-          row.topic.update({
+          row.topic?.update({
             problems: firebase.firestore.FieldValue.arrayRemove(row._ref)
           }),
 
@@ -82,10 +82,11 @@ export default function ProblemsTable() {
       </thead>
       <tbody>
         {rows.map((row, i) => {
-          let details = '';
-          for (const property in row) {
-            details += `${property}: ${row[property]}\n`;
-          }
+          const details = JSON.stringify(row, (key, value) => {
+            if (key === '_ref') return undefined;
+            if (key === 'topic') return value.id;
+            return value;
+          }, 2);
           return (
             <tr key={row.id}>
               <td className="border">{row.id}</td>
