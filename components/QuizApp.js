@@ -41,6 +41,7 @@ import { observeUser } from '@/common/utils';
 export default function QuizApp(props) {
   const topic = props.topic;
 
+  const [numPages, setNumPages] = useState(0);
   const [pageNum, setPageNum] = useState(0);
   const [progress, setProgress] = useState(0);
 
@@ -62,10 +63,10 @@ export default function QuizApp(props) {
   }, [subjectUser]);
 
   useEffect(() => {
-    if (loaded && pageNum === challenges.length) {
+    if (loaded && pageNum === numPages) {
       subjectFinishQuizSignal.next();
     }
-  }, [loaded, pageNum, challenges.length, subjectFinishQuizSignal]);
+  }, [loaded, pageNum, numPages, subjectFinishQuizSignal]);
 
   // fetching problems
   useEffect(() => {
@@ -94,7 +95,11 @@ export default function QuizApp(props) {
       })
     );
 
-    subjectUser.subscribe(user => setShowLogin(!user));
+    // set number of pages
+    subscriptions.add(subjectProblemsDocRefArray.subscribe(problemRefs => setNumPages(problemRefs.length)));
+
+    // set login
+    subscriptions.add(subjectUser.subscribe(user => setShowLogin(!user)));
 
     // (for finish answering all problems: store which questions user finished)
     subscriptions.add(
@@ -146,12 +151,12 @@ export default function QuizApp(props) {
           </Link>
         </div>
       </nav>
-      {showLogin ? <Login/> : pageNum < challenges.length ? (
+      {showLogin ? <Login/> : loaded ? pageNum < challenges.length ? (
         <Challenge
           challenge={challenges[pageNum]}
-          isLastQuestion={pageNum === challenges.length - 1}
+          isLastQuestion={pageNum === numPages - 1}
           onCorrect={() => {
-            setProgress((progress) => progress + 1 / challenges.length);
+            setProgress((progress) => progress + 1 / numPages);
           }}
           onNext={(isCorrect) => {
             if (isCorrect)
@@ -165,7 +170,7 @@ export default function QuizApp(props) {
               });
           }}
         />
-      ) : (loaded ? <Congratulations/> : <LoadingLayout/>)}
+      ) : <Congratulations/> : <LoadingLayout/>}
     </div>
   );
 }
