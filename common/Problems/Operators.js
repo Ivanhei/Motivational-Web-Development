@@ -33,6 +33,8 @@ const docWithAudioURL_promise = (doc) =>
     });
 
 // operators for transforming incoming questions
+const convertDocRefToDocSnapshot = mergeMap(docRef => docRef.get());
+
 const convertDocSnapshotToDoc = map(docSnapshotToDoc);
 
 const convertDocRefArrayToDocSnapshotArray = mergeMap(
@@ -56,6 +58,7 @@ const fetchAudioURLForDocs = mergeMap((docs) =>
 const fetchAudioURLForDoc = mergeMap(docWithAudioURL_promise);
 
 export {
+  convertDocRefToDocSnapshot,
   convertDocSnapshotToDoc,
   convertDocRefArrayToDocSnapshotArray,
   convertDocSnapshotArrayToDocs,

@@ -30,6 +30,7 @@ import {
   mergeAll,
   mergeMap,
   tap,
+  withLatestFrom,
 } from "rxjs/operators";
 
 import * as problemOperators from '@/common/Problems/Operators'
@@ -71,26 +72,50 @@ export default function QuizApp(props) {
   // fetching problems
   useEffect(() => {
     // subjects
+    const subjectAlreadyDoneProblems = subjectUser
+      .pipe(filter(user => !!user))
+      //.pipe(first())
+      .pipe(map(user => firebase.firestore()
+        .collection('users').doc(user.uid)
+        .collection('finishedProblems').doc(topic.id)
+        .get()))
+      .pipe(mergeMap(a => a))
+      .pipe(problemOperators.convertDocSnapshotToDoc)
+      .pipe(map(doc => doc.problems))
+      // TODO: onCompelet?
+
     const subjectTopicDoc = new Subject();
     const subjectProblemsDocRefArray = new Subject();
-    const subjectProblems = from(topic.get())
+    const subjectProblems = new Subject();
+
+    const subjectTopicProblemRefs = from(topic.get())
       .pipe(problemOperators.convertDocSnapshotToDoc)
       .pipe(tap(topic => subjectTopicDoc.next(topic))) // .pipe(tap(subjectTopicDoc))
       .pipe(map(topic => topic.problems))
+
+    // MAIN circuit.
+    // const subjectMain = subjectAlreadyDoneProblems
+    //   .pipe(withLatestFrom(subjectTopicProblemRefs))
+    const subjectMain = combineLatest([subjectAlreadyDoneProblems, subjectTopicProblemRefs])
+      .pipe(map(([doneProblemRefs, allProblemRefs]) => {
+        return allProblemRefs.filter(ref => !doneProblemRefs.some(doneRef => doneRef.isEqual(ref)));
+      }))
       .pipe(problemOperators.randomSelectNFromArray(10))
       .pipe(tap(problemRefs => subjectProblemsDocRefArray.next(problemRefs)))
-      /// flattens and fetch problems.
-      .pipe(mergeAll()) // merges them (flattens the array once)
-      .pipe(mergeMap(problemRef => problemRef.get()))
-      .pipe(problemOperators.convertDocSnapshotToDoc)
-      .pipe(problemOperators.fetchAudioURLForDoc)
+      /// fetches the problems as an array
+      .pipe(problemOperators.convertDocRefArrayToDocSnapshotArray)
+      .pipe(problemOperators.convertDocSnapshotArrayToDocs)
+      .pipe(problemOperators.fetchAudioURLForDocs)
+      .pipe(tap(problems => subjectProblems.next(problems)))
       // TODO: onComplete? dispose?
 
     // subscriptions
     const subscriptions = new Subscription();
     subscriptions.add(subjectProblems
-      .subscribe((challenge) => {
-        setChallenges(challenges => [...challenges, challenge]);
+      // .subscribe((challenge) => {
+      //   setChallenges(challenges => [...challenges, challenge]);
+      .subscribe((challenges) => {
+        setChallenges(challenges);
         setLoaded(true);
       })
     );
@@ -116,6 +141,8 @@ export default function QuizApp(props) {
             }, { merge: true });
         })
     );
+
+    subscriptions.add(subjectMain.subscribe()); // make it hot after all circuitry completed.
 
     return () => {
       subscriptions.unsubscribe();
