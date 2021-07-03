@@ -74,7 +74,8 @@ export default function QuizApp(props) {
     // subjects
     const subjectAlreadyDoneProblems = subjectUser
       .pipe(filter(user => !!user))
-      //.pipe(first())
+      .pipe(first())
+      // only need user info once, will complete after 1 item ;)
       .pipe(map(user => firebase.firestore()
         .collection('users').doc(user.uid)
         .collection('finishedProblems').doc(topic.id)
@@ -82,7 +83,6 @@ export default function QuizApp(props) {
       .pipe(mergeMap(a => a))
       .pipe(problemOperators.convertDocSnapshotToDoc)
       .pipe(map(doc => doc.problems))
-      // TODO: onCompelet?
 
     const subjectTopicDoc = new Subject();
     const subjectProblemsDocRefArray = new Subject();
@@ -92,10 +92,9 @@ export default function QuizApp(props) {
       .pipe(problemOperators.convertDocSnapshotToDoc)
       .pipe(tap(topic => subjectTopicDoc.next(topic))) // .pipe(tap(subjectTopicDoc))
       .pipe(map(topic => topic.problems))
+    // since promise only has one value, this will complete after promise is resolved.
 
     // MAIN circuit.
-    // const subjectMain = subjectAlreadyDoneProblems
-    //   .pipe(withLatestFrom(subjectTopicProblemRefs))
     const subjectMain = combineLatest([subjectAlreadyDoneProblems, subjectTopicProblemRefs])
       .pipe(map(([doneProblemRefs, allProblemRefs]) => {
         return allProblemRefs.filter(ref => !doneProblemRefs.some(doneRef => doneRef.isEqual(ref)));
@@ -107,13 +106,10 @@ export default function QuizApp(props) {
       .pipe(problemOperators.convertDocSnapshotArrayToDocs)
       .pipe(problemOperators.fetchAudioURLForDocs)
       .pipe(tap(problems => subjectProblems.next(problems)))
-      // TODO: onComplete? dispose?
 
     // subscriptions
     const subscriptions = new Subscription();
     subscriptions.add(subjectProblems
-      // .subscribe((challenge) => {
-      //   setChallenges(challenges => [...challenges, challenge]);
       .subscribe((challenges) => {
         setChallenges(challenges);
         setLoaded(true);
@@ -142,7 +138,15 @@ export default function QuizApp(props) {
         })
     );
 
-    subscriptions.add(subjectMain.subscribe()); // make it hot after all circuitry completed.
+    subscriptions.add(subjectMain.subscribe({
+      complete() {
+        subjectTopicDoc.complete();
+        subjectProblemsDocRefArray.complete();
+        subjectProblems.complete();
+        // a little delayed completion ;)
+        // TODO: better implementation
+      }
+    })); // make it hot after all circuitry completed.
 
     return () => {
       subscriptions.unsubscribe();
