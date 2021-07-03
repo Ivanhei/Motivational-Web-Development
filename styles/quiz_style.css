@@ -17,6 +17,21 @@ body {
   background-color: var(--color-bg);
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap'); */
+
+html, body, #__next {
+	height: 100%;
+}
+body {
+	background: #fafafa;
+	color: #333333;
+	font-family: 
+		/* 'M PLUS Rounded 1c', */
+		'Kiwi Maru',
+		serif;
+}
+
 
 button,
 input,
@@ -28,6 +43,19 @@ input.answered {
   margin: 0rem 0.75rem;
   border-radius: 1rem;
 }
+button,
+input,
+input:focus,
+input.answered {
+	background-color: transparent;
+	border: 0.15rem solid #b4b4b4;
+	padding: 1rem .5rem;
+	min-width: 8rem;
+	margin: 0rem 0.75rem;
+	border-radius: 1.5rem;
+	font-size: 1.5rem;
+}
+
 button:focus,
 input:focus {
   outline: none;
@@ -50,6 +78,7 @@ input.incorrect {
 main {
   padding: 0 10px;
 }
+/*
 .app-container {
   display: grid;
   grid-template-columns: 100%;
@@ -75,4 +104,160 @@ main {
 }
 .footer > div.messageBox.incorrect {
   background: #ffcccc;
+}
+*/
+
+/* container layout */
+.app-container {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 100%;
+	grid-template-rows: 11.25rem 1fr 10rem;
+}
+
+.session {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 3.125rem;
+  width: 100%;
+}
+
+/* progress */
+.progressNav {
+  margin: 4rem auto 6rem;
+  display: flex;
+}
+
+.progressNav .progressBar {
+  height: 1.25rem;
+  background: rgba(51, 51, 51, 0.05);
+  border-radius: 0.625rem;
+  transition: 0.5s;
+  flex-grow: 1;
+}
+
+.progressNav .progressBar > .progress {
+  background: #7AF16C;
+  height: 100%;
+  border-radius: 0.625rem;
+  transition: 0.5s;
+}
+
+.progressNav .cross {
+  height: 1.25rem;
+  width: 1.25rem;
+  margin-left: 2.5rem;
+}
+
+/* question */
+.question_container {
+  padding-bottom: 2rem;
+}
+.question_container .instruction {
+  font-size: 1.875rem;
+}
+.question_container .question_area {
+  margin: 5rem auto 3rem;
+  text-align: center;
+}
+.question_container .question_area .primary {
+  font-size: 3rem;
+}
+.question_container .question_area .secondary {
+  font-size: 1.875rem;
+  margin-top: 1.875rem;
+}
+
+.audio {
+  text-align: center;
+}
+.audio .playbutton {
+  display: inline-block;
+  width: 115px;
+}
+.audio .playbutton svg {
+  width: 100%;
+}
+
+/* answer */
+.options {
+  padding: 1rem 0.5rem;
+  display: flex;
+}
+@media (min-width: 1000px) {
+  .options {
+    padding: 1rem 2rem;
+  }
+}
+
+.options > .option {
+  flex-grow: 1;
+  flex-basis: 0;
+}
+@media (min-width: 1000px) {
+  .options > .option {
+    margin-left: 2rem;
+    margin-right: 2rem;
+  }
+}
+
+.input_container {
+  text-align: center;
+}
+
+.input_container > .input {
+  text-align: center;
+  max-width: 16rem;
+  min-width: 16rem;
+  width: 100%;
+}
+
+.image_container {
+  text-align: center;
+}
+.image_container img {
+  max-height: 300px;
+  display: inline-block;
+}
+
+.speech {
+  text-align: center;
+}
+.speech button {
+  width: 100%;
+  max-width: 400px;
+}
+.speech svg {
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+/* footer */
+.footer {
+  position: relative;
+  overflow: hidden;
+}
+
+.advice {
+  background: #d7ffb8;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 100%;
+  transition: 0.2s;
+}
+.advice.shown {
+  top: 0;
+}
+
+.footer > .session,
+.advice > .session {
+  display: flex;
+  height: 100%;
+  align-items: center;
+}
+.footer > .session button,
+.advice > .session button {
+  padding: 1rem 2rem;
+  font-size: 1.25rem;
 }

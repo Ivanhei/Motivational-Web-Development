@@ -19,6 +19,8 @@ import {
   filter,
 } from "rxjs/operators";
 
+import { en, jp } from '@/common/Strings/quiz';
+
 // states
 const NOT_ANSWERED_YET = -1;
 const ANSWER_INCORRECT = 0;
@@ -121,10 +123,84 @@ export default function Challenge(props, ref) {
     };
   }, [answerState, handleAnswerClick, handleNextClick]);
 
+  // UI lang
+  const strings = useMemo(() => jp, [])
+
   return (
     <Fragment>
+
+      <div className="session question_container">
+        <div className="instruction">{
+          challenge.type === "mc" ? 
+          strings.instruction_mc_audio : 
+          strings.instruction_spelling_audio
+        }</div>
+        <div className="question_area audio">
+          <div className="playbutton" onClick={(e) => playWordAudio()}>
+            <PlayIcon/>
+          </div>
+        </div>
+        {challenge.type === "mc" ? 
+          <div className="answer_area options">
+            {challenge.options.map((option, i) => (
+              <button
+                className={
+                  "option " +
+                  (answer === option
+                    ? answerState === ANSWER_CORRECT
+                      ? "correct"
+                      : answerState === ANSWER_INCORRECT
+                      ? "incorrect"
+                      : "selected"
+                    : "")
+                }
+                onClick={(e) => setAnswer(option)}
+                style={{ margin: 10, width: "50%" }}
+                key={i}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        :
+          <div className="answer_area input_container">
+            <input
+              autoComplete="off" autoCorrect="off"
+              autoCapitalize="off" spellCheck="false" 
+              onChange={(e) => setAnswer(e.target.value)}
+              className={
+                "input " +
+                (answer.length > 0
+                  ? answerState === ANSWER_CORRECT
+                    ? "correct"
+                    : answerState === ANSWER_INCORRECT
+                    ? "incorrect"
+                    : "answered"
+                  : "")
+              }
+              value={answer}
+            />
+          </div>
+        }
+      </div>
+      
+      <div className="footer">
+        <div className="session">
+          <button onClick={handleHintClick}>{strings.hint_button}</button>
+          <div className="flex-grow"></div>
+          <button onClick={handleAnswerClick}>{strings.answer_button}</button>
+        </div>
+        <div className={`advice ${answerState === NOT_ANSWERED_YET ? "" : "shown"}`}>
+          <div className="session">
+            <div className="flex-grow"></div>
+            <button onClick={handleNextClick}>Next Question</button>
+          </div>
+        </div>
+      </div>
+
+
+      {/* 
       <div className="flex-grow text-center p-10 px-40 lg:px-60 xl:px-80">
-        <h2>{/*challenge.prompt.main_text*/}</h2>
         <div className="mx-32">
           <div className="flex p-10 mb-10 text-3xl">
             {challenge.type === "mc" ? "Select" : "Spell"} the word you heard.
@@ -259,6 +335,7 @@ export default function Challenge(props, ref) {
           <div className="flex-grow"></div>
         </div>
       </div>
+       */}
     </Fragment>
   );
 };

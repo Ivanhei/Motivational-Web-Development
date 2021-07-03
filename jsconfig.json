@@ -7,5 +7,6 @@
       "@/common/*": ["common/*"],
       "@/styles/*": ["styles/*"],
     },
+    "jsx": "preserve",
   },
 }
