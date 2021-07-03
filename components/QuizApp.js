@@ -85,27 +85,22 @@ export default function QuizApp(props) {
       .pipe(map(doc => doc.problems))
 
     const subjectTopicDoc = new Subject();
-    const subjectProblemsDocRefArray = new Subject();
-    const subjectProblems = new Subject();
 
-    const subjectTopicProblemRefs = from(topic.get())
-      .pipe(problemOperators.convertDocSnapshotToDoc)
-      .pipe(tap(topic => subjectTopicDoc.next(topic))) // .pipe(tap(subjectTopicDoc))
+    const subjectTopicProblemRefs = subjectTopicDoc // .pipe(tap(subjectTopicDoc))
       .pipe(map(topic => topic.problems))
-    // since promise only has one value, this will complete after promise is resolved.
 
     // MAIN circuit.
-    const subjectMain = combineLatest([subjectAlreadyDoneProblems, subjectTopicProblemRefs])
+    const subjectProblemsDocRefArray = combineLatest([subjectAlreadyDoneProblems, subjectTopicProblemRefs])
       .pipe(map(([doneProblemRefs, allProblemRefs]) => {
         return allProblemRefs.filter(ref => !doneProblemRefs.some(doneRef => doneRef.isEqual(ref)));
       }))
       .pipe(problemOperators.randomSelectNFromArray(10))
-      .pipe(tap(problemRefs => subjectProblemsDocRefArray.next(problemRefs)))
-      /// fetches the problems as an array
+
+    /// fetches the problems as an array
+    const subjectProblems = subjectProblemsDocRefArray
       .pipe(problemOperators.convertDocRefArrayToDocSnapshotArray)
       .pipe(problemOperators.convertDocSnapshotArrayToDocs)
       .pipe(problemOperators.fetchAudioURLForDocs)
-      .pipe(tap(problems => subjectProblems.next(problems)))
 
     // subscriptions
     const subscriptions = new Subscription();
@@ -138,15 +133,11 @@ export default function QuizApp(props) {
         })
     );
 
-    subscriptions.add(subjectMain.subscribe({
-      complete() {
-        subjectTopicDoc.complete();
-        subjectProblemsDocRefArray.complete();
-        subjectProblems.complete();
-        // a little delayed completion ;)
-        // TODO: better implementation
-      }
-    })); // make it hot after all circuitry completed.
+     // make it hot after all circuitry completed.
+    subscriptions.add(from(topic.get())
+      // since promise only has one value, this will complete after promise is resolved.
+      .pipe(problemOperators.convertDocSnapshotToDoc)
+      .subscribe(subjectTopicDoc));
 
     return () => {
       subscriptions.unsubscribe();
