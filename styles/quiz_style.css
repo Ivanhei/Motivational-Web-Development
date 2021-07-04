@@ -30,6 +30,17 @@ body {
 		serif;
 }
 
+/*
+// For debuggin: there is a bug in firefox, 
+// that user cannot press enter after pressing 
+// enter to submit their MC type qeustion's answer. 
+//
+// Is it my site's and chrome's, or is it firefox's bug?
+//
+*:focus {
+  outline: 2em solid #F00 !important;
+}
+*/
 
 button,
 input {
@@ -58,7 +69,7 @@ button:focus,
 input:focus {
   outline: none;
 }
-button[disabled] {
+button[disabled]:not(.correct, .incorrect) {
   --btn-color-text: rgba(var(--color-text-rgb), .25);
   --btn-color-border: rgba(var(--color-text-rgb), .25);
 }

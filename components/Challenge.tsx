@@ -13,6 +13,8 @@ import {
 
 import {
   fromEvent,
+  merge,
+  Subject,
 } from 'rxjs';
 
 import {
@@ -104,21 +106,29 @@ export default function Challenge(props, ref) {
 
 
   // keyboard events
+  const artificialEnterKeyUps = useMemo(() => new Subject<void>(), [])
   useEffect(() => {
     // inspired by https://stackoverflow.com/a/44186764
-    const ENTER_KEYCODE = 13;
+    const ENTER_KEYCODE = "Enter";
 
     const enterKeyUps = fromEvent(document, "keyup")
-      .pipe(filter(e => e.keyCode === ENTER_KEYCODE))
+      .pipe(filter((e: KeyboardEvent) => e.code === ENTER_KEYCODE))
 
-    const subscriptions = enterKeyUps.subscribe((key) => {
+    const subscriptions = merge(artificialEnterKeyUps, enterKeyUps).subscribe((key) => {
+      console.log(answer.length)
+      if (answer.length === 0) return;
+
       (answerState === AnswerState.NOT_ANSWERED_YET ? handleAnswerClick : handleNextClick)()
     });
 
     return () => {
       subscriptions.unsubscribe();
     };
-  }, [answerState, handleAnswerClick, handleNextClick]);
+  }, [answer.length, answerState, artificialEnterKeyUps, handleAnswerClick, handleNextClick]);
+  // TODO: Make it so that we don't unsubscribe and re-subscribe
+  //       everytime (the length of) the answer changes.
+  // Well, ... It already does whenever `handleAnswerClick` needs update, 
+  //           which is whenever `answer` updates.. So... No use haha
 
 
   // UI lang
@@ -140,12 +150,12 @@ export default function Challenge(props, ref) {
         <div className="session">
           <button onClick={handleHintClick}>{strings.hint_button}</button>
           <div className="flex-grow"></div>
-          <button onClick={handleAnswerClick}>{strings.answer_button}</button>
+          <button disabled={answer.length === 0} onClick={e => artificialEnterKeyUps.next()}>{strings.answer_button}</button>
         </div>
         <div className={`advice ${answerState === AnswerState.NOT_ANSWERED_YET ? "" : "shown"}`}>
           <div className="session">
             <div className="flex-grow"></div>
-            <button onClick={handleNextClick}>Next Question</button>
+            <button onClick={e => artificialEnterKeyUps.next()}>Next Question</button>
           </div>
         </div>
       </div>

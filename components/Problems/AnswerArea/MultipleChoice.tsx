@@ -15,6 +15,7 @@ export function MultipleChoiceAnswerArea({
   return <div className="answer_area options">
     {options.map((option, i) => (
       <button
+        disabled={answerState !== AnswerState.NOT_ANSWERED_YET}
         className={
           "option " +
           (selected === option
