@@ -24,8 +24,6 @@ html, body, #__next {
 	height: 100%;
 }
 body {
-	background: #fafafa;
-	color: #333333;
 	font-family: 
 		/* 'M PLUS Rounded 1c', */
 		'Kiwi Maru',
@@ -34,21 +32,16 @@ body {
 
 
 button,
-input,
-input:focus,
-input.answered {
-  background-color: transparent;
-  border: 2px solid #b4b4b4;
-  padding: 0.5rem 2rem;
-  margin: 0rem 0.75rem;
-  border-radius: 1rem;
-}
-button,
-input,
-input:focus,
-input.answered {
+input {
+  --btn-color-text-rgb: var(--color-text-rgb);
+  --btn-color-border-rgb: var(--color-text-rgb);
+
+  --btn-color-text: rgb(var(--btn-color-text-rgb));
+  --btn-color-border: rgb(var(--btn-color-border-rgb));
+
 	background-color: transparent;
-	border: 0.15rem solid #b4b4b4;
+  color: var(--btn-color-text);
+	border: 0.15rem solid var(--btn-color-border);
 	padding: 1rem .5rem;
 	min-width: 8rem;
 	margin: 0rem 0.75rem;
@@ -56,24 +49,39 @@ input.answered {
 	font-size: 1.5rem;
 }
 
+button svg path {
+  /* Use text color as fill color */
+  fill: var(--btn-color-text);
+}
+
 button:focus,
 input:focus {
   outline: none;
 }
-button[disabled],
-button.selected {
-  color: rgb(91, 200, 255);
-  border-color: rgb(91, 200, 255);
+button[disabled] {
+  --btn-color-text-rgb: rgba(var(--color-text-rgb), .5);
+  --btn-color-border-rgb: rgba(var(--color-text-rgb), .5);
+}
+button.selected,
+input:focus,
+input.answered {
+  --btn-color-text-rgb: 91, 200, 255;
+  --btn-color-border-rgb: 91, 200, 255;
+  /* Blue */
 }
 button.correct,
 input.correct {
-  color: rgb(52, 212, 105);
-  border-color: rgb(77, 231, 128);
+  --btn-color-text-rgb: 52, 212, 105;
+  --btn-color-border-rgb: 77, 231, 128;
+  /* Green */
 }
 button.incorrect,
-input.incorrect {
-  color: #ff7676;
-  border-color: #ff7676;
+input.incorrect,
+button.recording,
+input.recording {
+  --btn-color-text-rgb: 255, 118, 118;
+  --btn-color-border-rgb: 255, 118, 118;
+  /* Red (#ff7676) */
 }
 main {
   padding: 0 10px;
