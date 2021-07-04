@@ -59,8 +59,8 @@ input:focus {
   outline: none;
 }
 button[disabled] {
-  --btn-color-text-rgb: rgba(var(--color-text-rgb), .5);
-  --btn-color-border-rgb: rgba(var(--color-text-rgb), .5);
+  --btn-color-text: rgba(var(--color-text-rgb), .25);
+  --btn-color-border: rgba(var(--color-text-rgb), .25);
 }
 button.selected,
 input:focus,
