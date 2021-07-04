@@ -29,3 +29,7 @@ export function SpellingAnswerArea({
     />
   </div>
 }
+
+export function checkSpellingAnswer(current: string, reference: string) {
+  return current.toLowerCase() === reference.toLowerCase();
+}

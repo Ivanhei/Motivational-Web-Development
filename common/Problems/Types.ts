@@ -35,6 +35,8 @@ export interface TranslateProblem extends Problem {
     english: string,
     japanese: string
   }
+  image?: string
+  image_url?: string
 }
 
 export interface AudioProblem extends Problem {
@@ -49,3 +51,10 @@ export type MultipleChoiceAudioProblem = AudioProblem & MultipleChoiceProblem;
 
 export type SpellingTranslateProblem = TranslateProblem & SpellingProblem;
 export type SpellingAudioProblem = AudioProblem & SpellingProblem;
+
+export interface SpeechProblem extends Problem {
+  type: 'speech'
+
+  question: string // japanese meaning
+  word: string // english word
+}

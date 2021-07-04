@@ -1,9 +1,18 @@
-import { AnswerState } from "@/common/UI/Types";
+// Types
 import { SpellingAudioProblem } from "@/common/Problems/Types";
 import { LanguageTag } from "@/common/Strings/Types";
+import { ProblemUIArguments } from "./types";
+
+export interface SpellingAudioUIArguments extends ProblemUIArguments {
+  challenge: SpellingAudioProblem,
+}
+
+// Strings
 import { quizStringsPack } from "@/common/Strings/quiz";
+
+// SubComponents
 import { AudioQuestionArea } from "./QuestionArea/Audio";
-import { SpellingAnswerArea } from "./AnswerArea/Spelling";
+import { checkSpellingAnswer, SpellingAnswerArea } from "./AnswerArea/Spelling";
 
 export function SpellingAudioInstruction({
   lang,
@@ -21,13 +30,7 @@ export function SpellingAudioUI({
   currentAnswer,
   onAnswerChange,
   answerState,
-}: {
-  lang: LanguageTag,
-  challenge: SpellingAudioProblem,
-  currentAnswer: string,
-  onAnswerChange: (value: string) => void,
-  answerState: AnswerState,
-}) {
+}: SpellingAudioUIArguments) {
   
   return <div className="session question_container">
     <SpellingAudioInstruction lang={lang}/>
@@ -42,9 +45,7 @@ export function SpellingAudioUI({
 
 const SpellingAudio = {
   UI: SpellingAudioUI,
-  checkAnswer: function checkAnswer(current: string, reference: string) {
-    return current.toLowerCase() === reference.toLowerCase();
-  },
+  checkAnswer: checkSpellingAnswer,
 }
 
 export default SpellingAudio;

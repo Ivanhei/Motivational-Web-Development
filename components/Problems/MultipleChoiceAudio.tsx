@@ -1,9 +1,18 @@
-import { AnswerState } from "@/common/UI/Types";
+// Types
 import { MultipleChoiceAudioProblem } from "@/common/Problems/Types";
 import { LanguageTag } from "@/common/Strings/Types";
+import { ProblemUIArguments } from "./types";
+
+export interface MultipleChoiceAudioUIArguments extends ProblemUIArguments {
+  challenge: MultipleChoiceAudioProblem,
+}
+
+// Strings
 import { quizStringsPack } from "@/common/Strings/quiz";
+
+// SubComponents
 import { AudioQuestionArea } from "./QuestionArea/Audio";
-import { MultipleChoiceAnswerArea } from "./AnswerArea/MultipleChoice";
+import { checkMultipleChoiceAnswer, MultipleChoiceAnswerArea } from "./AnswerArea/MultipleChoice";
 
 export function MultipleChoiceAudioInstruction({
   lang,
@@ -21,13 +30,7 @@ export function MultipleChoiceAudioUI({
   currentAnswer,
   onAnswerChange,
   answerState,
-}: {
-  lang: LanguageTag,
-  challenge: MultipleChoiceAudioProblem,
-  currentAnswer: string,
-  onAnswerChange: (value: string) => void,
-  answerState: AnswerState,
-}) {
+}: MultipleChoiceAudioUIArguments) {
   
   return <div className="session question_container">
     <MultipleChoiceAudioInstruction lang={lang}/>
@@ -43,9 +46,7 @@ export function MultipleChoiceAudioUI({
 
 const MultipleChoiceAudio = {
   UI: MultipleChoiceAudioUI,
-  checkAnswer: function checkAnswer(current: string, reference: string) {
-    return current === reference;
-  },
+  checkAnswer: checkMultipleChoiceAnswer,
 }
 
 export default MultipleChoiceAudio;

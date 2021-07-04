@@ -1,8 +1,8 @@
-import { PlayIcon } from '@/assets/Icons'
-
+// assets
 import correctAudioFile from '@/assets/sounds/correct_2.mp3'
 import incorrectAudioFile from '@/assets/sounds/incorrect_2.mp3'
 
+// libs
 import {
   useCallback,
   useState,
@@ -19,14 +19,21 @@ import {
   filter,
 } from "rxjs/operators";
 
+// Strings
 import { quizStringsPack, QuizStrings } from '@/common/Strings/quiz';
 
+// Types
 import { AnswerState } from '@/common/UI/Types';
 import { LanguageTag } from '@/common/Strings/Types';
 
-import MultipleChoiceAudio from './Problems/MultipleChoiceAudio';
-import SpellingAudio from './Problems/SpellingAudio';
+// Problem Components
 import ProblemComponent from './Problems/types';
+import MultipleChoiceAudio from './Problems/MultipleChoiceAudio';
+import MultipleChoiceTranslate from './Problems/MultipleChoiceTranslate';
+import SpellingAudio from './Problems/SpellingAudio';
+import SpellingTranslate from './Problems/SpellingTranslate';
+import Speech from './Problems/Speech';
+
 
 export default function Challenge(props, ref) {
   const challenge = props.challenge;
@@ -37,15 +44,17 @@ export default function Challenge(props, ref) {
   const [answerState, setAnswerState] = useState(AnswerState.NOT_ANSWERED_YET);
 
 
-
   // Problem Type UI + logic
   const problemComponent: ProblemComponent = useMemo(() => {
-    if (challenge.type === "mc")
-      return MultipleChoiceAudio;
+    if (challenge.type === "mc") {
+      return (challenge?.subtype === "translate" ? MultipleChoiceTranslate : MultipleChoiceAudio);
+    }
+    else if (challenge.type === "spelling") {
+      return (challenge?.subtype === "translate" ? SpellingTranslate : SpellingAudio);
+    }
     else
-      return SpellingAudio;
-  }, [challenge.type]);
-
+      return Speech;
+  }, [challenge?.subtype, challenge.type]);
 
 
   // callbacks
@@ -69,8 +78,6 @@ export default function Challenge(props, ref) {
     props.onNext(answerState === AnswerState.ANSWER_CORRECT);
     setAnswerState(AnswerState.NOT_ANSWERED_YET);
   }, [answerState, props]);
-
-
 
 
   // sound effects
@@ -113,9 +120,11 @@ export default function Challenge(props, ref) {
     };
   }, [answerState, handleAnswerClick, handleNextClick]);
 
+
   // UI lang
   const languageTag: LanguageTag = useMemo(() => "jp" as LanguageTag, [])
   const strings: QuizStrings = useMemo(() => quizStringsPack[languageTag], [languageTag])
+
 
   return (
     <Fragment>

@@ -15,3 +15,7 @@ export function SpeechAnswerArea({
       {/* <button><MicIcon width="16" height="24"/> Playback</button> */}
   </div>
 }
+
+export function checkSpeechAnswer(current: string, reference: string) {
+  return current.toLowerCase() === reference.toLowerCase();
+}

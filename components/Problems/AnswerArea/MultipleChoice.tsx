@@ -34,3 +34,7 @@ export function MultipleChoiceAnswerArea({
     ))}
   </div>
 }
+
+export function checkMultipleChoiceAnswer(current: string, reference: string) {
+  return current === reference;
+}

@@ -32,6 +32,19 @@ const docWithAudioURL_promise = (doc) => !doc.audio ? doc :
       return doc;
     });
 
+const docWithImageURL_promise = (doc) => !doc.image ? doc :
+  storage.ref().child(doc.image).getDownloadURL()
+    .then((url) => ({
+      ...doc,
+      image_url: url
+    }))
+    .catch((err) => {
+      console.error("Error while getting Image URL. ", err.code);
+
+      // still return the doc without the image url
+      return doc;
+    });
+
 // operators for transforming incoming questions
 const convertDocRefToDocSnapshot = mergeMap(docRef => docRef.get());
 
@@ -57,6 +70,11 @@ const fetchAudioURLForDocs = mergeMap((docs) =>
 
 const fetchAudioURLForDoc = mergeMap(docWithAudioURL_promise);
 
+const fetchImageURLForDocs = mergeMap((docs) =>
+  Promise.all(docs.map(docWithImageURL_promise)));
+
+const fetchImageURLForDoc = mergeMap(docWithImageURL_promise);
+
 export {
   convertDocRefToDocSnapshot,
   convertDocSnapshotToDoc,
@@ -66,4 +84,6 @@ export {
   randomSelectNFromArray,
   fetchAudioURLForDocs,
   fetchAudioURLForDoc,
+  fetchImageURLForDocs,
+  fetchImageURLForDoc,
 }

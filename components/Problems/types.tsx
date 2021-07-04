@@ -1,7 +1,15 @@
-import { Problem } from '@/common/Problems/Types'
-import { AnswerState, ValueChangeEventHandler } from '@/common/UI/Types'
+import {
+  Problem,
+} from '@/common/Problems/Types'
 
-import { LanguageTag } from "@/common/Strings/Types";
+import {
+  AnswerState,
+  ValueChangeEventHandler,
+} from '@/common/UI/Types'
+
+import {
+  LanguageTag,
+} from "@/common/Strings/Types";
 
 export interface ProblemUIArguments {
   lang: LanguageTag,

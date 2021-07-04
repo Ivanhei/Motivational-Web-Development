@@ -70,3 +70,44 @@ export function getUserDocRef(userCredentials) {
 
   return userCredentials;
 }
+
+// TextBreakdown utilities
+export interface TextBreakdown {
+  before: string
+  inside: string
+  after: string
+}
+
+export function getTextBreakdown(text: string): TextBreakdown | null {
+  const regex = /^([^\[]*)\[([^\[]*)\]([^\[]*)$/g;
+  const matchingGroups = regex.exec(text);
+  // matches strings like `ABC[DEF]GHI`, returns `["ABC[DEF]GHI", "ABC", "DEF", "GHI"]`
+
+  if (!matchingGroups)
+    return null;
+
+  return {
+    before: matchingGroups[1],
+    inside: matchingGroups[2],
+    after: matchingGroups[3],
+  }
+}
+
+export function UnderlineTextBreakdown({before, inside, after}: TextBreakdown) {
+  return <>{before} <u>{inside}</u> {after}</>;
+}
+
+export function ReplaceBraketWithUnderlinedText({sentence, inside}: {sentence: string, inside: string}) {
+  const breakdown = getTextBreakdown(sentence);
+  if (!breakdown) return <>{sentence}</>;
+
+  return <>{breakdown.before} <u>{inside}</u> {breakdown.after}</>;
+}
+
+export function replaceBraketWithText(sentence: string, text: string, addSpace: boolean = false) {
+  const breakdown = getTextBreakdown(sentence);
+  if (!breakdown) return sentence;
+
+  const optionalSpace = addSpace ? " " : "";
+  return breakdown.before + optionalSpace + text + optionalSpace + breakdown.after;
+}

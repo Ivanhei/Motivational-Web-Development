@@ -103,6 +103,7 @@ export default function QuizApp(props) {
       .pipe(problemOperators.convertDocRefArrayToDocSnapshotArray)
       .pipe(problemOperators.convertDocSnapshotArrayToDocs)
       .pipe(problemOperators.fetchAudioURLForDocs)
+      .pipe(problemOperators.fetchImageURLForDocs)
 
     // subscriptions
     const subscriptions = new Subscription();
