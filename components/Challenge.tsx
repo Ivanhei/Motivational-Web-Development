@@ -167,7 +167,7 @@ export default function Challenge(props, ref) {
         onAnswerChange={value => setAnswer(value)}
         answerState={answerState}/>
 
-      <div className="footer">
+      <div className="footer quizStyles">
         <div className="session">
           <button onClick={handleHintClick}>{strings.hint_button}</button>
           <div className="flex-grow"></div>

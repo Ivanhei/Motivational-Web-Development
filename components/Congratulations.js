@@ -1,7 +1,9 @@
 import celebrationAudioFile from '@/assets/sounds/finish.wav'
 
 import {
+  useCallback,
   useEffect,
+  useMemo,
 } from "react";
 
 export default function Congratulations(props) {

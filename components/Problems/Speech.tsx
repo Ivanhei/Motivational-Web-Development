@@ -42,7 +42,7 @@ export function SpeechUI({
   answerState,
 }: SpeechUIArguments) {
 
-  return <div className="session question_container">
+  return <div className="session quizStyles question_container">
     <SpeechInstruction 
       lang={lang} 
       question={challenge.question} 

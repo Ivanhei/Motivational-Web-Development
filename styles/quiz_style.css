@@ -42,8 +42,8 @@ body {
 }
 */
 
-button,
-input {
+.quizStyles button,
+.quizStyles button {
   --btn-color-text-rgb: var(--color-text-rgb);
   --btn-color-border-rgb: var(--color-text-rgb);
 
@@ -60,36 +60,36 @@ input {
 	font-size: 1.5rem;
 }
 
-button svg path {
+.quizStyles button svg path {
   /* Use text color as fill color */
   fill: var(--btn-color-text);
 }
 
-button:focus,
-input:focus {
+.quizStyles button:focus,
+.quizStyles button:focus {
   outline: none;
 }
-button[disabled]:not(.correct, .incorrect) {
+.quizStyles button[disabled]:not(.correct, .incorrect) {
   --btn-color-text: rgba(var(--color-text-rgb), .25);
   --btn-color-border: rgba(var(--color-text-rgb), .25);
 }
-button.selected,
-input:focus,
-input.answered {
+.quizStyles button.selected,
+.quizStyles button:focus,
+.quizStyles button.answered {
   --btn-color-text-rgb: 91, 200, 255;
   --btn-color-border-rgb: 91, 200, 255;
   /* Blue */
 }
-button.correct,
-input.correct {
+.quizStyles button.correct,
+.quizStyles button.correct {
   --btn-color-text-rgb: 52, 212, 105;
   --btn-color-border-rgb: 77, 231, 128;
   /* Green */
 }
-button.incorrect,
-input.incorrect,
-button.recording,
-input.recording {
+.quizStyles button.incorrect,
+.quizStyles button.incorrect,
+.quizStyles button.recording,
+.quizStyles button.recording {
   --btn-color-text-rgb: 255, 118, 118;
   --btn-color-border-rgb: 255, 118, 118;
   /* Red (#ff7676) */

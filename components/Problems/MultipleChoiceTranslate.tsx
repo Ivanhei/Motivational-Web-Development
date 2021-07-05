@@ -32,7 +32,7 @@ export function MultipleChoiceTranslateUI({
   answerState,
 }: MultipleChoiceTranslateUIArguments) {
   
-  return <div className="session question_container">
+  return <div className="session quizStyles question_container">
     <MultipleChoiceTranslateInstruction lang={lang}/>
     <TranslateQuestionArea
       question={challenge.question}

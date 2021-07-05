@@ -1,7 +1,5 @@
 import Link from 'next/link';
 
-import styles from '@/styles/quiz.module.css'
-
 import { CrossIcon } from '@/assets/Icons'
 
 import {
@@ -161,7 +159,10 @@ export default function QuizApp(props) {
         </div>
       </nav>
 
-      {showLogin ? <Login/> : loaded ? pageNum < challenges.length ? (
+      {
+        showLogin                     ? <Login/> :
+        !loaded                       ? <LoadingLayout/> :
+        pageNum === challenges.length ? <Congratulations/> :
         <Challenge
           challenge={challenges[pageNum]}
           isLastQuestion={pageNum === numPages - 1}
@@ -180,7 +181,7 @@ export default function QuizApp(props) {
               });
           }}
         />
-      ) : <Congratulations/> : <LoadingLayout/>}
+      }
     </div>
   );
 }

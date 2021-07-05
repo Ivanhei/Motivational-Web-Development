@@ -32,7 +32,7 @@ export function SpellingAudioUI({
   answerState,
 }: SpellingAudioUIArguments) {
   
-  return <div className="session question_container">
+  return <div className="session quizStyles question_container">
     <SpellingAudioInstruction lang={lang}/>
     <AudioQuestionArea audio_url={challenge.audio_url} />
     <SpellingAnswerArea

@@ -37,7 +37,7 @@ export function SpellingTranslateUI({
   answerState,
 }: SpellingTranslateUIArguments) {
   
-  return <div className="session question_container">
+  return <div className="session quizStyles question_container">
     <SpellingTranslateInstruction
       lang={lang}
       question={challenge.question}/>
