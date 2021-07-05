@@ -1,6 +1,6 @@
 // assets
-import correctAudioFile from '@/assets/sounds/correct_2.mp3'
-import incorrectAudioFile from '@/assets/sounds/incorrect_2.mp3'
+// import correctAudioFile from '@/assets/sounds/correct_2.mp3'
+// import incorrectAudioFile from '@/assets/sounds/incorrect_2.mp3'
 
 // libs
 import {
@@ -35,6 +35,7 @@ import MultipleChoiceTranslate from './Problems/MultipleChoiceTranslate';
 import SpellingAudio from './Problems/SpellingAudio';
 import SpellingTranslate from './Problems/SpellingTranslate';
 import Speech from './Problems/Speech';
+import { usePath } from '@/common/utils';
 
 
 export default function Challenge(props, ref) {
@@ -83,16 +84,18 @@ export default function Challenge(props, ref) {
 
 
   // sound effects
+  const correctAudioFile = usePath("/assets/sounds/correct_2.mp3");
+  const incorrectAudioFile = usePath("/assets/sounds/incorrect_2.mp3");
   const correctAudio = useMemo(() => {
     const audio = new Audio(correctAudioFile);
     audio.volume = 0.1;
     return audio;
-  }, []);
+  }, [correctAudioFile]);
   const incorrectAudio = useMemo(() => {
     const audio = new Audio(incorrectAudioFile);
     audio.volume = 0.1;
     return audio;
-  }, []);
+  }, [incorrectAudioFile]);
 
   useEffect(() => {
     if (answerState === AnswerState.ANSWER_CORRECT) {
@@ -115,7 +118,6 @@ export default function Challenge(props, ref) {
       .pipe(filter((e: KeyboardEvent) => e.code === ENTER_KEYCODE))
 
     const subscriptions = merge(artificialEnterKeyUps, enterKeyUps).subscribe((key) => {
-      console.log(answer.length)
       if (answer.length === 0) return;
 
       (answerState === AnswerState.NOT_ANSWERED_YET ? handleAnswerClick : handleNextClick)()
