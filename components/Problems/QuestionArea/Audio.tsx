@@ -32,9 +32,11 @@ export function AudioQuestionArea({
   }, [/*challenge, */playWordAudio]);
 
   return <div className="question_area audio">
+    {!audio_url ? <h3 style={{color: "red"}}>Error: Audio not found. </h3> : 
     <div className="playbutton" onClick={(e) => playWordAudio()}>
       <PlayIcon/>
     </div>
+    }
   </div>
 }
 

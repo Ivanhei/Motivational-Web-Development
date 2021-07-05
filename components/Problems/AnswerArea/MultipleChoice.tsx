@@ -27,7 +27,6 @@ export function MultipleChoiceAnswerArea({
             : "")
         }
         onClick={(e) => onChange(option)}
-        style={{ margin: 10, width: "50%" }}
         key={i}
       >
         {option}

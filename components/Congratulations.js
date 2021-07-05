@@ -4,13 +4,28 @@ import {
   useEffect,
 } from "react";
 
-export default (function Congratulations(props) {
-  const celebrationAudio = new Audio(celebrationAudioFile);
-  celebrationAudio.volume = 0.1;
+export default function Congratulations(props) {
+
+  // word audio
+  const celebrationAudio = useMemo(() => {
+    const audio = new Audio(celebrationAudioFile);
+    audio.volume = 0.1;
+    return audio;
+  }, []);
+
+  const playCelebrationAudio = useCallback(function () {
+    celebrationAudio.play()
+      .catch((e) => {
+        if (e.name === "NotAllowedError")
+          console.log("This system does not allow audio to be auto-played.")
+        else
+          throw e;
+      });
+  }, [celebrationAudio]);
 
   useEffect(() => {
-    celebrationAudio.play();
-  }, []);
+    playCelebrationAudio();
+  }, [playCelebrationAudio]);
 
   return (
     <div className="text-center">
@@ -18,4 +33,4 @@ export default (function Congratulations(props) {
       <div>You have completed the quiz!</div>
     </div>
   );
-});
+};

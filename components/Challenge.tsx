@@ -38,6 +38,30 @@ import Speech from './Problems/Speech';
 import { usePath } from '@/common/utils';
 
 
+function useSimpleSoundEffect(url: string, { volume }: { volume?: number } = { volume: 1.0 }) {
+  const celebrationAudio = useMemo(() => {
+    const audio = new Audio(url);
+    audio.volume = volume;
+    return audio;
+  }, [url, volume]);
+
+  const playCelebrationAudio = useCallback(function () {
+    celebrationAudio.currentTime = 0;
+    return celebrationAudio.play()
+      .catch((e) => {
+        if (e.name === "NotAllowedError")
+          console.log("This system does not allow audio to be auto-played.")
+        else
+          throw e;
+      });
+  }, [celebrationAudio]);
+
+  return {
+    audio: celebrationAudio,
+    play: playCelebrationAudio,
+  }
+}
+
 export default function Challenge(props, ref) {
   const challenge = props.challenge;
   const [answer, setAnswer] = useState("");
@@ -60,6 +84,14 @@ export default function Challenge(props, ref) {
   }, [challenge?.subtype, challenge.type]);
 
 
+  // sound effects
+  const correctAudioFile = usePath("/assets/sounds/correct_2.mp3");
+  const incorrectAudioFile = usePath("/assets/sounds/incorrect_2.mp3");
+
+  const correctAudio = useSimpleSoundEffect(correctAudioFile, { volume: .1, });
+  const incorrectAudio = useSimpleSoundEffect(incorrectAudioFile, { volume: .1, });
+
+
   // callbacks
   const handleAnswerClick = useCallback(function () {
     if (answerState !== AnswerState.NOT_ANSWERED_YET) return;
@@ -67,45 +99,32 @@ export default function Challenge(props, ref) {
       ? AnswerState.ANSWER_CORRECT
       : AnswerState.ANSWER_INCORRECT;
     setAnswerState(answer_state);
+
+    // play sound effect
+    if (answer_state === AnswerState.ANSWER_CORRECT) {
+      correctAudio.play();
+    } else if (answer_state === AnswerState.ANSWER_INCORRECT) {
+      incorrectAudio.play();
+    }
+
+    // trigger event if correct
     if (answer_state == AnswerState.ANSWER_CORRECT) props.onCorrect();
-  }, [answer, answerState, challenge.answer, problemComponent, props]);
+  }, [answer, answerState, challenge.answer, correctAudio, incorrectAudio, problemComponent, props]);
 
   const handleHintClick = useCallback(function () {
     setShowHint((sh) => !sh);
   }, []);
 
   const handleNextClick = useCallback(function () {
+    // reset answer
     setAnswer("");
 
-    // change to next page
+    // trigger event for changing to next question
     props.onNext(answerState === AnswerState.ANSWER_CORRECT);
+
+    // change to next page
     setAnswerState(AnswerState.NOT_ANSWERED_YET);
   }, [answerState, props]);
-
-
-  // sound effects
-  const correctAudioFile = usePath("/assets/sounds/correct_2.mp3");
-  const incorrectAudioFile = usePath("/assets/sounds/incorrect_2.mp3");
-  const correctAudio = useMemo(() => {
-    const audio = new Audio(correctAudioFile);
-    audio.volume = 0.1;
-    return audio;
-  }, [correctAudioFile]);
-  const incorrectAudio = useMemo(() => {
-    const audio = new Audio(incorrectAudioFile);
-    audio.volume = 0.1;
-    return audio;
-  }, [incorrectAudioFile]);
-
-  useEffect(() => {
-    if (answerState === AnswerState.ANSWER_CORRECT) {
-      correctAudio.currentTime = 0;
-      correctAudio.play();
-    } else if (answerState === AnswerState.ANSWER_INCORRECT) {
-      incorrectAudio.currentTime = 0;
-      incorrectAudio.play();
-    }
-  }, [answerState, correctAudio, incorrectAudio]);
 
 
   // keyboard events
