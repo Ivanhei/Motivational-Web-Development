@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Head from 'next/head';
 
 import { CrossIcon } from '@/assets/Icons'
 
@@ -35,7 +36,7 @@ import * as problemOperators from '@/common/Problems/Operators'
 
 import firebase from '@/common/firebase_init';
 import 'firebase/firestore';
-import { observeUser } from '@/common/utils';
+import { observeUser, shuffle } from '@/common/utils';
 
 export default function QuizApp(props) {
   const topic = props.topic;
@@ -95,6 +96,7 @@ export default function QuizApp(props) {
         return allProblemRefs.filter(ref => !doneProblemRefs.some(doneRef => doneRef.isEqual(ref)));
       }))
       .pipe(problemOperators.randomSelectNFromArray(10))
+      .pipe(map(array => shuffle(array)))
 
     /// fetches the problems as an array
     const subjectProblems = subjectProblemsDocRefArray
@@ -147,6 +149,9 @@ export default function QuizApp(props) {
 
   return (
     <div className="app-container">
+      <Head>
+        <title>Quiz</title>
+      </Head>
 
       <nav className="session progressNav">
         <div style={{opacity: loaded ? 1 : 0,}} className="progressBar">

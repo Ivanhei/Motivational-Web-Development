@@ -1,33 +1,18 @@
-import celebrationAudioFile from '@/assets/sounds/finish.wav'
 
 import {
-  useCallback,
   useEffect,
-  useMemo,
 } from "react";
+
+import { usePath, useSimpleSoundEffect } from '@/common/utils';
 
 export default function Congratulations(props) {
 
-  // word audio
-  const celebrationAudio = useMemo(() => {
-    const audio = new Audio(celebrationAudioFile);
-    audio.volume = 0.1;
-    return audio;
-  }, []);
-
-  const playCelebrationAudio = useCallback(function () {
-    celebrationAudio.play()
-      .catch((e) => {
-        if (e.name === "NotAllowedError")
-          console.log("This system does not allow audio to be auto-played.")
-        else
-          throw e;
-      });
-  }, [celebrationAudio]);
+  const celebrationAudioFile = usePath("/assets/sounds/finish.wav");
+  const celebrationAudio = useSimpleSoundEffect(celebrationAudioFile, { volume: 0.1 });
 
   useEffect(() => {
-    playCelebrationAudio();
-  }, [playCelebrationAudio]);
+    celebrationAudio.play();
+  }, [celebrationAudio]);
 
   return (
     <div className="text-center">

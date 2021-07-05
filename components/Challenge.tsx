@@ -21,6 +21,9 @@ import {
   filter,
 } from "rxjs/operators";
 
+// utils
+import { usePath, useSimpleSoundEffect } from '@/common/utils';
+
 // Strings
 import { quizStringsPack, QuizStrings } from '@/common/Strings/quiz';
 
@@ -35,32 +38,7 @@ import MultipleChoiceTranslate from './Problems/MultipleChoiceTranslate';
 import SpellingAudio from './Problems/SpellingAudio';
 import SpellingTranslate from './Problems/SpellingTranslate';
 import Speech from './Problems/Speech';
-import { usePath } from '@/common/utils';
 
-
-function useSimpleSoundEffect(url: string, { volume }: { volume?: number } = { volume: 1.0 }) {
-  const celebrationAudio = useMemo(() => {
-    const audio = new Audio(url);
-    audio.volume = volume;
-    return audio;
-  }, [url, volume]);
-
-  const playCelebrationAudio = useCallback(function () {
-    celebrationAudio.currentTime = 0;
-    return celebrationAudio.play()
-      .catch((e) => {
-        if (e.name === "NotAllowedError")
-          console.log("This system does not allow audio to be auto-played.")
-        else
-          throw e;
-      });
-  }, [celebrationAudio]);
-
-  return {
-    audio: celebrationAudio,
-    play: playCelebrationAudio,
-  }
-}
 
 export default function Challenge(props, ref) {
   const challenge = props.challenge;

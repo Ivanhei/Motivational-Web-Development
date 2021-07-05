@@ -14,6 +14,25 @@ export function getRandomFromArray(arr, n) {
   return result;
 }
 
+// https://stackoverflow.com/a/2450976
+export function shuffle(array: Array<any>) {
+  let currentIndex = array.length, randomIndex: number;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
+
 // https://stackoverflow.com/a/68201934/8958580
 import { useRouter } from 'next/router';
 
@@ -110,4 +129,31 @@ export function replaceBraketWithText(sentence: string, text: string, addSpace: 
 
   const optionalSpace = addSpace ? " " : "";
   return breakdown.before + optionalSpace + text + optionalSpace + breakdown.after;
+}
+
+//
+import { useMemo, useCallback } from 'react';
+
+export function useSimpleSoundEffect(url: string, { volume }: { volume?: number } = { volume: 1.0 }) {
+  const celebrationAudio = useMemo(() => {
+    const audio = new Audio(url);
+    audio.volume = volume;
+    return audio;
+  }, [url, volume]);
+
+  const playCelebrationAudio = useCallback(function () {
+    celebrationAudio.currentTime = 0;
+    return celebrationAudio.play()
+      .catch((e) => {
+        if (e.name === "NotAllowedError")
+          console.log("This system does not allow audio to be auto-played.")
+        else
+          throw e;
+      });
+  }, [celebrationAudio]);
+
+  return {
+    audio: celebrationAudio,
+    play: playCelebrationAudio,
+  }
 }

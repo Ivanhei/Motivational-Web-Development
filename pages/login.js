@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Head from 'next/head';
 
 import Login from '@/components/Login';
 import { useEffect, useState } from 'react';
@@ -19,6 +20,9 @@ export default function App(props) {
   }, []);
 
   return <div id="login-container">
+    <Head>
+      <title>Login</title>
+    </Head>
     {showLoginDialog ? <Login signInSuccessUrl="/"/> : null}
     <Link href="/">
       <a>Go Back</a>

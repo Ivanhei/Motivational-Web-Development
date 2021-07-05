@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Head from 'next/head'
 
 import firebase from '@/common/firebase_init';
 import 'firebase/auth'
@@ -120,6 +121,9 @@ export default function App(props) {
   // }, [])
   return (
     <div className="h-full">
+      <Head>
+        <title>Motivational Web Development</title>
+      </Head>
       {/*Navigation*/}
       <nav className="flex px-10 border-b-2 border-gray-100">
         <div className="flex flex-auto">
