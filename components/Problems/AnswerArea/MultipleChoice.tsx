@@ -15,7 +15,9 @@ export function MultipleChoiceAnswerArea({
   return <div className="answer_area options">
     {options.map((option, i) => (
       <button
-        disabled={answerState !== AnswerState.NOT_ANSWERED_YET}
+        disabled={answerState !== AnswerState.NOT_ANSWERED_YET
+          /** Firefox bug hack. */ && selected !== option}
+          // Firefox does not dispatch document's `keyup` event if the focus is disabled
         className={
           "option " +
           (selected === option
