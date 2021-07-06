@@ -1,10 +1,10 @@
 
 export function SpeechQuestionArea({
-  question,
+  word,
 }: {
-  question: string,
+  word: string,
 }) {
   return <div className={`question_area speech`}>
-    <div className="primary">{question}</div>
+    <div className="primary">{word}</div>
   </div>
 }

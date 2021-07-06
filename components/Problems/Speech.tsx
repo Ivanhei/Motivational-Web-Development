@@ -47,7 +47,7 @@ export function SpeechUI({
       lang={lang} 
       question={challenge.question} 
       question_en={challenge.word}/>
-    <SpeechQuestionArea question={challenge.question}/>
+    <SpeechQuestionArea word={challenge.word}/>
     <SpeechAnswerArea
       onChange={onAnswerChange}
       answerState={answerState}
