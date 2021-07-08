@@ -157,3 +157,99 @@ export function useSimpleSoundEffect(url: string, { volume }: { volume?: number 
     play: playAudio,
   }
 }
+
+// Inspired by but not copied from: https://medium.com/@bryanjenningz/faa1b2b3e49b
+export function SimpleRecorder() {
+	let mediaRecorder: MediaRecorder;
+
+	// bytes saving
+	const audioChunks = [];
+	const saveData = (event: BlobEvent) => {
+		audioChunks.push(event.data);
+	}
+
+  // custom listeners
+  type VoidCallback = () => void;
+  let onStartListener: VoidCallback = null;
+  let onStopListener: VoidCallback = null;
+
+  // booleans
+  let starting = false;
+  let stopping = false;
+  // TODO: put these as `readonly` attributes in the returned object,
+  //       instead of using a function to return the value.
+  //       (Better readability)
+
+	// return a promise since it takes time to set up.
+	return {
+		start: async () => {
+      if (mediaRecorder)
+        throw new Error("[SimpleRecorder] Cannot start while recording.")
+
+      if (starting) return;
+      starting = true;
+
+			// start streams
+			const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+			mediaRecorder = new MediaRecorder(stream);
+
+			// start recorder
+			return new Promise<void>((resolve, reject) => {
+				const onstart = () => {
+          mediaRecorder.removeEventListener("start", onstart);
+
+          starting = false;
+          if (onStartListener) onStartListener();
+
+					resolve();
+				}
+				mediaRecorder.addEventListener("dataavailable", saveData);
+				mediaRecorder.addEventListener("start", onstart);
+				mediaRecorder.start();
+			});
+		},
+		stop: () => new Promise<Blob>((resolve, reject) => {
+      if (!mediaRecorder)
+        throw new Error("[SimpleRecorder] Cannot stop recording if not recording.")
+
+      if (stopping) return;
+      stopping = true;
+
+			// stop recorder
+			const onstop = () => {
+				mediaRecorder.removeEventListener("stop", onstop);
+				mediaRecorder.removeEventListener("dataavailable", saveData);
+
+				// stop streams
+				mediaRecorder.stream.getTracks().forEach(track => track.stop());
+				mediaRecorder = null;
+
+        stopping = false;
+        if (onStopListener) onStopListener();
+
+				const audioBlob = new Blob(audioChunks);
+				audioChunks.length = 0;
+
+				resolve(audioBlob);
+			}
+			mediaRecorder.addEventListener("stop", onstop);
+			mediaRecorder.stop();
+		}),
+
+    // extra functionalities
+    setOnStartRecordingListener(listener: () => void) {
+      onStartListener = listener;
+    },
+    setOnStopRecordingListener(listener: () => void) {
+      onStopListener = listener;
+    },
+    isRecording: () => !!mediaRecorder,
+    isStopping: () => stopping,
+    isStarting: () => starting,
+	};
+}
+
+export function audioBlobToAudio(audioBlob: Blob): HTMLAudioElement {
+  const audioUrl = URL.createObjectURL(audioBlob);
+  return new Audio(audioUrl);
+}
