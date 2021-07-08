@@ -135,25 +135,25 @@ export function replaceBraketWithText(sentence: string, text: string, addSpace: 
 import { useMemo, useCallback } from 'react';
 
 export function useSimpleSoundEffect(url: string, { volume }: { volume?: number } = { volume: 1.0 }) {
-  const celebrationAudio = useMemo(() => {
+  const audio = useMemo(() => {
     const audio = new Audio(url);
     audio.volume = volume;
     return audio;
   }, [url, volume]);
 
-  const playCelebrationAudio = useCallback(function () {
-    celebrationAudio.currentTime = 0;
-    return celebrationAudio.play()
+  const playAudio = useCallback(function () {
+    audio.currentTime = 0;
+    return audio.play()
       .catch((e) => {
         if (e.name === "NotAllowedError")
           console.log("This system does not allow audio to be auto-played.")
         else
           throw e;
       });
-  }, [celebrationAudio]);
+  }, [audio]);
 
   return {
-    audio: celebrationAudio,
-    play: playCelebrationAudio,
+    audio: audio,
+    play: playAudio,
   }
 }
