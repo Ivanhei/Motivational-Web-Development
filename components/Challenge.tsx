@@ -43,7 +43,6 @@ import Speech from './Problems/Speech';
 export default function Challenge(props, ref) {
   const challenge = props.challenge;
   const [answer, setAnswer] = useState("");
-  const [showHint, setShowHint] = useState(false);
   const [disabledChoice, setDisabledChoice] = useState([]);
 
   const [answerState, setAnswerState] = useState(AnswerState.NOT_ANSWERED_YET);
@@ -89,10 +88,6 @@ export default function Challenge(props, ref) {
     if (answer_state == AnswerState.ANSWER_CORRECT) props.onCorrect();
   }, [answer, answerState, challenge.answer, correctAudio, incorrectAudio, problemComponent, props]);
 
-  const handleHintClick = useCallback(function () {
-    setShowHint((sh) => !sh);
-  }, []);
-
   const handleNextClick = useCallback(function () {
     // reset answer
     setAnswer("");
@@ -131,7 +126,7 @@ export default function Challenge(props, ref) {
 
 
   // UI lang
-  const languageTag: LanguageTag = useMemo(() => "jp" as LanguageTag, [])
+  const languageTag: LanguageTag = useMemo(() => "en" as LanguageTag, [])
   const strings: QuizStrings = useMemo(() => quizStringsPack[languageTag], [languageTag])
 
 
@@ -142,12 +137,11 @@ export default function Challenge(props, ref) {
         lang={languageTag} 
         currentAnswer={answer} 
         challenge={challenge}
-        onAnswerChange={value => setAnswer(value)}
+        onAnswerChange={value => { if (answerState === AnswerState.NOT_ANSWERED_YET) setAnswer(value); }}
         answerState={answerState}/>
 
       <div className="footer quizStyles">
         <div className="session">
-          <button onClick={handleHintClick}>{strings.hint_button}</button>
           <div className="flex-grow"></div>
           <button disabled={answer.length === 0} onClick={e => artificialEnterKeyUps.next()}>{strings.answer_button}</button>
         </div>

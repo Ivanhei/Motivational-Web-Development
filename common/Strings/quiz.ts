@@ -7,6 +7,7 @@ interface QuizStrings {
     "instruction_spelling_translate": string,
     "instruction_mc_translate": string,
     "instruction_speech": string,
+    "recording_button": string,
 }
 
 const en: QuizStrings = {
@@ -17,6 +18,7 @@ const en: QuizStrings = {
     "instruction_spelling_translate": 'Write "[]" in English.',
     "instruction_mc_translate": "Translate the underlined word.",
     "instruction_speech": 'Read the word "[]".',
+    "recording_button": "Press to Speak"
 }
 
 const jp: QuizStrings = {
@@ -26,7 +28,8 @@ const jp: QuizStrings = {
     "instruction_mc_audio": "聞こえた単語を選んでください",
     "instruction_spelling_translate": "「[]」を英語で書いてください",
     "instruction_mc_translate": "下線付き文字を翻訳してください",
-    "instruction_speech": "「勉強」を英語で読み上げてください",
+    "instruction_speech": "「[]」を英語で読み上げてください",
+    "recording_button": "押して話す",
 }
 
 const quizStringsPack = { en, jp }

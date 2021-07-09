@@ -93,9 +93,17 @@ export default function QuizApp(props) {
         if (!doneProblemRefs) // user did no problems on this topic whatsoever
           return allProblemRefs;
 
-        return allProblemRefs.filter(ref => !doneProblemRefs.some(doneRef => doneRef.isEqual(ref)));
+        const unfinishedProblems = problemOperators.rawRandomSelectNFromArray(8)(
+          allProblemRefs.filter(ref => !doneProblemRefs.some(doneRef => doneRef.isEqual(ref)))
+        )
+
+        const finishedProblems = problemOperators.rawRandomSelectNFromArray(2)(doneProblemRefs)
+
+        console.log(finishedProblems.length, unfinishedProblems.length)
+
+        return [...unfinishedProblems, ...finishedProblems]
       }))
-      .pipe(problemOperators.randomSelectNFromArray(10))
+      //.pipe(problemOperators.randomSelectNFromArray(10))
       .pipe(map(array => shuffle(array)))
 
     /// fetches the problems as an array

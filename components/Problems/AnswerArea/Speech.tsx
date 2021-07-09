@@ -5,11 +5,15 @@ import { MicIcon } from '@/assets/Icons';
 import { useCallback, useMemo, useState } from 'react';
 
 import { audioBlobToAudio, SimpleRecorder } from '@/common/utils';
+import { LanguageTag } from '@/common/Strings/Types';
+import { quizStringsPack } from '@/common/Strings/quiz';
 
 export function SpeechAnswerArea({
+  lang,
   onChange,
   answerState
 }: {
+  lang: LanguageTag,
   onChange: (value: string) => void,
   answerState: AnswerState,
 }) {
@@ -40,9 +44,8 @@ export function SpeechAnswerArea({
 
   return <div className="answer_area speech">
       <button className={`${recording?"recording":""}`} onClick={handleRecordClick}>
-        <MicIcon width="16" height="24"/> 押してして話す
+        <MicIcon width="16" height="24"/><span>{quizStringsPack[lang].recording_button}</span>
       </button>
-      <button>Playback</button>
   </div>
 }
 

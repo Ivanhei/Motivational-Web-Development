@@ -10,6 +10,10 @@
   --color-bg-rgb: 51, 51, 51; /* #333333 */
 }
 
+:root {
+  font-size: 12px;
+}
+
 body {
   font-family: Comic Sans MS;
   font-size: 17px;
@@ -52,12 +56,12 @@ body {
 
 	background-color: transparent;
   color: var(--btn-color-text);
-	border: 0.15rem solid var(--btn-color-border);
-	padding: 1rem .5rem;
+	border: 0.1rem solid var(--btn-color-border);
+	padding: .8rem .5rem;
 	min-width: 8rem;
 	margin: 0rem 0.75rem;
 	border-radius: 1.5rem;
-	font-size: 1.5rem;
+	font-size: 1.75rem;
 }
 
 .quizStyles button svg path {
@@ -73,6 +77,7 @@ body {
   --btn-color-text: rgba(var(--color-text-rgb), .25);
   --btn-color-border: rgba(var(--color-text-rgb), .25);
 }
+.quizStyles button.recording,
 .quizStyles button.selected,
 .quizStyles input:focus,
 .quizStyles input.answered {
@@ -87,8 +92,7 @@ body {
   /* Green */
 }
 .quizStyles button.incorrect,
-.quizStyles input.incorrect,
-.quizStyles button.recording {
+.quizStyles input.incorrect {
   --btn-color-text-rgb: 255, 118, 118;
   --btn-color-border-rgb: 255, 118, 118;
   /* Red (#ff7676) */
@@ -106,7 +110,7 @@ main {
 }
 
 .session {
-  max-width: 1280px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 0 3.125rem;
   width: 100%;
@@ -116,6 +120,9 @@ main {
 .progressNav {
   margin: 4rem auto 6rem;
   display: flex;
+}
+.session.progressNav {
+  max-width: 1230px;
 }
 
 .progressNav .progressBar {
@@ -144,10 +151,10 @@ main {
   padding-bottom: 2rem;
 }
 .question_container .instruction {
-  font-size: 1.875rem;
+  font-size: 2.25rem;
 }
 .question_container .question_area {
-  margin: 5rem auto 3rem;
+  margin: 10rem auto;
   text-align: center;
 }
 .question_container .question_area .primary {
@@ -163,7 +170,7 @@ main {
 }
 .audio .playbutton {
   display: inline-block;
-  width: 115px;
+  width: 7rem;
 }
 .audio .playbutton svg {
   width: 100%;
@@ -172,6 +179,9 @@ main {
 /* answer */
 .options {
   padding: 1rem 0.5rem;
+  max-width: 720px;
+  margin: 0 auto;
+
   display: flex;
 }
 @media (min-width: 1000px) {
@@ -201,7 +211,7 @@ main {
   text-align: center;
 }
 .image_container img {
-  max-height: 300px;
+  max-height: 225px;
   display: inline-block;
 }
 
@@ -212,9 +222,15 @@ main {
   width: 100%;
   max-width: 400px;
 }
-.speech svg {
+.speech button svg {
   display: inline-block;
   margin-right: 1rem;
+  vertical-align: middle;
+}
+.speech button span {
+  vertical-align: middle;
+  margin-top: -3px;
+  display: inline-block;
 }
 
 /* footer */

@@ -45,6 +45,9 @@ const docWithImageURL_promise = (doc) => !doc.image ? doc :
       return doc;
     });
 
+const rawRandomSelectNFromArray = (n) =>
+  (array) => array.length > n ? getRandomFromArray(array, n) : array
+
 // operators for transforming incoming questions
 const convertDocRefToDocSnapshot = mergeMap(docRef => docRef.get());
 
@@ -76,6 +79,7 @@ const fetchImageURLForDocs = mergeMap((docs) =>
 const fetchImageURLForDoc = mergeMap(docWithImageURL_promise);
 
 export {
+  rawRandomSelectNFromArray,
   convertDocRefToDocSnapshot,
   convertDocSnapshotToDoc,
   convertDocRefArrayToDocSnapshotArray,

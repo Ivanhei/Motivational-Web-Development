@@ -16,6 +16,7 @@ import { checkSpeechAnswer, SpeechAnswerArea } from "./AnswerArea/Speech";
 
 // utils
 import { replaceBraketWithText } from "@/common/utils";
+import { useMemo } from "react";
 
 export function SpeechInstruction({
   lang,
@@ -42,13 +43,19 @@ export function SpeechUI({
   answerState,
 }: SpeechUIArguments) {
 
+  const word = useMemo(() => {
+    const word = challenge.answer.toLowerCase()
+    return word.charAt(0).toUpperCase() + word.slice(1)
+  }, [challenge.answer]);
+
   return <div className="session quizStyles question_container">
     <SpeechInstruction 
       lang={lang} 
       question={challenge.question} 
-      question_en={challenge.word}/>
-    <SpeechQuestionArea word={challenge.word}/>
+      question_en={word}/>
+    <SpeechQuestionArea word={word}/>
     <SpeechAnswerArea
+      lang={lang}
       onChange={onAnswerChange}
       answerState={answerState}
     />
