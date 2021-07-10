@@ -12,7 +12,6 @@ import { audioBlobToAudio, SimpleRecorder } from '@/common/utils';
 import { LanguageTag } from '@/common/Strings/Types';
 import { quizStringsPack } from '@/common/Strings/quiz';
 
-import 'regenerator-runtime/runtime' // for 'react-speech-recognition'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 export function SpeechAnswerArea({
