@@ -176,6 +176,19 @@ main {
   width: 100%;
 }
 
+.primary .playbutton {
+  display: inline-block;
+  height: 1.5em;
+  vertical-align: middle;
+  margin-right: 1.5rem;
+}
+.primary .playbutton svg {
+  height: 100%;
+}
+.primary span {
+  vertical-align: middle;
+}
+
 /* answer */
 .options {
   padding: 1rem 0.5rem;

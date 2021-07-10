@@ -99,8 +99,6 @@ export default function QuizApp(props) {
 
         const finishedProblems = problemOperators.rawRandomSelectNFromArray(2)(doneProblemRefs)
 
-        console.log(finishedProblems.length, unfinishedProblems.length)
-
         return [...unfinishedProblems, ...finishedProblems]
       }))
       //.pipe(problemOperators.randomSelectNFromArray(10))

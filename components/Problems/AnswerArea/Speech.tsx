@@ -32,8 +32,6 @@ export function SpeechAnswerArea({
   } = useSpeechRecognition();
 
   useEffect(() => {
-    console.log("!!", transcript);
-    console.log("!!", transcript.split(/[^a-zA-Z0-9]+/));
     // if the word is found
     if (transcript.split(/[^a-zA-Z0-9]+/).some(item => item?.toLowerCase() === answer?.toLowerCase())) {
       resetTranscript();
@@ -44,7 +42,6 @@ export function SpeechAnswerArea({
   useEffect(() => {
     if (!listening) {
       onNext();
-      console.log("!!", onNext)
     }
   }, [onNext, listening])
 
@@ -58,10 +55,15 @@ export function SpeechAnswerArea({
   }, [listening]);
 
   return <div className="answer_area speech">
-      <button className={`${listening?"recording":""} 
-      ${answerState === AnswerState.ANSWER_CORRECT ? "correct" : ""}
-      ${answerState === AnswerState.ANSWER_INCORRECT ? "incorrect" : ""}
-       `} onClick={handleRecordClick} disabled={!browserSupportsSpeechRecognition}>
+      <button className={`
+          ${listening?"recording":""} 
+          ${answerState === AnswerState.ANSWER_CORRECT ? "correct" : ""}
+          ${answerState === AnswerState.ANSWER_INCORRECT ? "incorrect" : ""}
+        `} 
+        onClick={handleRecordClick} 
+        disabled={!browserSupportsSpeechRecognition}
+        onFocus={(e) => { e.target.blur(); }}
+      >
         <MicIcon width="16" height="24"/><span>{quizStringsPack[lang].recording_button}</span>
       </button>
       {!browserSupportsSpeechRecognition ? 

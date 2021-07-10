@@ -24,7 +24,10 @@ export interface SpellingProblem extends Problem {
 export interface SpeechProblem extends Problem {
   type: 'speech'
 
-  // do we need to capitalize the word?
+  audio?: string
+  audio_url?: string
+  question: string // japanese meaning
+  //word: string // english word // Use answer and captialize the first character.
 }
 
 export interface TranslateProblem extends Problem {
@@ -51,10 +54,3 @@ export type MultipleChoiceAudioProblem = AudioProblem & MultipleChoiceProblem;
 
 export type SpellingTranslateProblem = TranslateProblem & SpellingProblem;
 export type SpellingAudioProblem = AudioProblem & SpellingProblem;
-
-export interface SpeechProblem extends Problem {
-  type: 'speech'
-
-  question: string // japanese meaning
-  word: string // english word
-}
