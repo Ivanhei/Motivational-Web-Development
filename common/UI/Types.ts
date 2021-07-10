@@ -6,6 +6,7 @@ enum AnswerState {
 }
 
 type ValueChangeEventHandler = (value: string) => void;
+type NextEventHandler = () => void;
 
 export { AnswerState };
-export type { ValueChangeEventHandler };
+export type { ValueChangeEventHandler, NextEventHandler };

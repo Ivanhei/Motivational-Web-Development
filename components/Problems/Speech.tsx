@@ -40,6 +40,7 @@ export function SpeechUI({
   lang,
   challenge,
   onAnswerChange,
+  onNext,
   answerState,
 }: SpeechUIArguments) {
 
@@ -56,6 +57,8 @@ export function SpeechUI({
     <SpeechQuestionArea word={word}/>
     <SpeechAnswerArea
       lang={lang}
+      answer={challenge.answer}
+      onNext={onNext}
       onChange={onAnswerChange}
       answerState={answerState}
     />

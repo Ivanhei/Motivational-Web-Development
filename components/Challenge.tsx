@@ -72,20 +72,21 @@ export default function Challenge(props, ref) {
   // callbacks
   const handleAnswerClick = useCallback(function () {
     if (answerState !== AnswerState.NOT_ANSWERED_YET) return;
-    const answer_state = problemComponent.checkAnswer(challenge.answer, answer)
-      ? AnswerState.ANSWER_CORRECT
-      : AnswerState.ANSWER_INCORRECT;
+    const correct = problemComponent.checkAnswer(challenge.answer, answer);
+
+    // update state
+    const answer_state = correct ? AnswerState.ANSWER_CORRECT : AnswerState.ANSWER_INCORRECT;
     setAnswerState(answer_state);
 
     // play sound effect
-    if (answer_state === AnswerState.ANSWER_CORRECT) {
+    if (correct) {
       correctAudio.play();
-    } else if (answer_state === AnswerState.ANSWER_INCORRECT) {
+    } else {
       incorrectAudio.play();
     }
 
     // trigger event if correct
-    if (answer_state == AnswerState.ANSWER_CORRECT) props.onCorrect();
+    if (correct) props.onCorrect();
   }, [answer, answerState, challenge.answer, correctAudio, incorrectAudio, problemComponent, props]);
 
   const handleNextClick = useCallback(function () {
@@ -99,6 +100,12 @@ export default function Challenge(props, ref) {
     setAnswerState(AnswerState.NOT_ANSWERED_YET);
   }, [answerState, props]);
 
+  const toNext = useCallback(function() {
+    if (answerState === AnswerState.NOT_ANSWERED_YET)
+      handleAnswerClick()
+    else 
+      handleNextClick()
+  }, [answerState, handleAnswerClick, handleNextClick]);
 
   // keyboard events
   const artificialEnterKeyUps = useMemo(() => new Subject<void>(), [])
@@ -112,13 +119,13 @@ export default function Challenge(props, ref) {
     const subscriptions = merge(artificialEnterKeyUps, enterKeyUps).subscribe((key) => {
       if (answer.length === 0) return;
 
-      (answerState === AnswerState.NOT_ANSWERED_YET ? handleAnswerClick : handleNextClick)()
+      toNext();
     });
 
     return () => {
       subscriptions.unsubscribe();
     };
-  }, [answer.length, answerState, artificialEnterKeyUps, handleAnswerClick, handleNextClick]);
+  }, [answer, answer.length, answerState, artificialEnterKeyUps, challenge.answer, handleAnswerClick, handleNextClick, toNext]);
   // TODO: Make it so that we don't unsubscribe and re-subscribe
   //       everytime (the length of) the answer changes.
   // Well, ... It already does whenever `handleAnswerClick` needs update, 
@@ -137,6 +144,7 @@ export default function Challenge(props, ref) {
         lang={languageTag} 
         currentAnswer={answer} 
         challenge={challenge}
+        onNext={() => artificialEnterKeyUps.next()}
         onAnswerChange={value => { if (answerState === AnswerState.NOT_ANSWERED_YET) setAnswer(value); }}
         answerState={answerState}/>
 

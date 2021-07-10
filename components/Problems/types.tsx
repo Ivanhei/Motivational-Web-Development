@@ -4,6 +4,7 @@ import {
 
 import {
   AnswerState,
+  NextEventHandler,
   ValueChangeEventHandler,
 } from '@/common/UI/Types'
 
@@ -15,6 +16,7 @@ export interface ProblemUIArguments {
   lang: LanguageTag,
   challenge: Problem,
   currentAnswer: string,
+  onNext: NextEventHandler,
   onAnswerChange: ValueChangeEventHandler,
   answerState: AnswerState,
 };

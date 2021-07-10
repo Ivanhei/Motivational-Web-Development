@@ -191,7 +191,13 @@ export function SimpleRecorder() {
 
 			// start streams
 			const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-			mediaRecorder = new MediaRecorder(stream);
+      try {
+			  mediaRecorder = new MediaRecorder(stream);
+      }
+      catch (e) {
+        stream.getTracks().forEach(track => track.stop());
+        throw e;
+      }
 
 			// start recorder
 			return new Promise<void>((resolve, reject) => {
