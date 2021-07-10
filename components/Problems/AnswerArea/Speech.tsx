@@ -1,5 +1,9 @@
 
-import { AnswerState, NextEventHandler } from '@/common/UI/Types';
+import {
+  AnswerState,
+  BooleanValueChangeEventHandler,
+  NextEventHandler,
+} from '@/common/UI/Types';
 
 import { MicIcon } from '@/assets/Icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -16,13 +20,17 @@ export function SpeechAnswerArea({
   answer,
   onChange,
   onNext,
-  answerState
+  answerState,
+  audioPlaying,
+  onListeningStateChange,
 }: {
   lang: LanguageTag,
   answer: string,
   onChange: (value: string) => void,
   onNext: NextEventHandler,
   answerState: AnswerState,
+  audioPlaying: boolean,
+  onListeningStateChange: BooleanValueChangeEventHandler,
 }) {
   const {
     transcript,
@@ -46,13 +54,27 @@ export function SpeechAnswerArea({
   }, [onNext, listening])
 
   const handleRecordClick = useCallback((e) => {
+    if (audioPlaying) return;
+
     if (!listening) {
       SpeechRecognition.startListening({ continuous: false })
     }
     else {
       SpeechRecognition.stopListening()
     }
-  }, [listening]);
+  }, [audioPlaying, listening]);
+
+  // onListeningStateChange
+  useEffect(() => {
+    onListeningStateChange(listening);
+  }, [listening, onListeningStateChange])
+
+  // stop playing if audio start
+  useEffect(() => {
+    if (audioPlaying) {
+      SpeechRecognition.stopListening()
+    }
+  }, [audioPlaying])
 
   return <div className="answer_area speech">
       <button className={`
@@ -61,7 +83,7 @@ export function SpeechAnswerArea({
           ${answerState === AnswerState.ANSWER_INCORRECT ? "incorrect" : ""}
         `} 
         onClick={handleRecordClick} 
-        disabled={!browserSupportsSpeechRecognition}
+        disabled={!browserSupportsSpeechRecognition || audioPlaying}
         onFocus={(e) => { e.target.blur(); }}
       >
         <MicIcon width="16" height="24"/><span>{quizStringsPack[lang].recording_button}</span>

@@ -16,7 +16,7 @@ import { checkSpeechAnswer, SpeechAnswerArea } from "./AnswerArea/Speech";
 
 // utils
 import { replaceBraketWithText } from "@/common/utils";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export function SpeechInstruction({
   lang,
@@ -44,6 +44,11 @@ export function SpeechUI({
   answerState,
 }: SpeechUIArguments) {
 
+  // TODO: use context (or other methods) to share data between subcomponents,
+  //       without too much involvement from the parent component.
+  const [audioPlaying, setAudioPlaying] = useState(false);
+  const [listening, setListening] = useState(false);
+
   const word = useMemo(() => {
     const word = challenge.answer.toLowerCase()
     return word.charAt(0).toUpperCase() + word.slice(1)
@@ -56,13 +61,17 @@ export function SpeechUI({
       question_en={word}/>
     <SpeechQuestionArea
       word={word}
-      audio_url={challenge.audio_url}/>
+      audio_url={challenge.audio_url}
+      listeningToSpeech={listening}
+      onPlayingStateChange={setAudioPlaying}/>
     <SpeechAnswerArea
       lang={lang}
       answer={challenge.answer}
       onNext={onNext}
       onChange={onAnswerChange}
       answerState={answerState}
+      audioPlaying={audioPlaying}
+      onListeningStateChange={setListening}
     />
   </div>
 }
