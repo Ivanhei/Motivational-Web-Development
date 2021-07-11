@@ -1,6 +1,5 @@
 import styles from '@/styles/AutoSizeButton.module.css'
 
-import { debounce_UI } from '@/common/utils';
 import { useEffect, useRef, useState } from 'react';
 
 export default function AutoSizeButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
@@ -9,22 +8,31 @@ export default function AutoSizeButton(props: React.ButtonHTMLAttributes<HTMLBut
   const [fontRatio, setFontRatio] = useState(1.0);
 
   useEffect(() => {
-    /*const debouncedHandleResize = debounce_UI(*/function handleResize() {
+    const outterEl = outter.current;
+    const innerEl = inner.current;
+    function doResize(outterWidth: number) {
       setFontRatio(fontRatio => {
-        const newRatio = fontRatio * outter.current.clientWidth / inner.current.clientWidth 
+        const newRatio = fontRatio * outterWidth / innerEl.clientWidth 
         return newRatio < 1.0 ? newRatio : 1.0;
       })
-    }//, 0);
-
-    // run it once at the beginning
-    handleResize();
-
-    window.addEventListener('resize', handleResize)
+    }
+    const resizeObserver = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        if (entry.contentBoxSize) {
+          doResize(entry.contentBoxSize[0].inlineSize)
+          // doResize(entry.contentBoxSize.inlineSize)
+        } else {
+          doResize(entry.contentRect.width)
+        }
+      }
+    });
+    resizeObserver.observe(outterEl)
 
     return () => {
-      window.removeEventListener('resize', handleResize)
+      resizeObserver.unobserve(outterEl)
+      resizeObserver.disconnect()
     }
-  }, []);
+  }, [props.children]);
 
   return <button {...props}>
     <span className={styles.outterSpan} ref={outter}>

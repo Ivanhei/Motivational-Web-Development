@@ -271,3 +271,12 @@ export function debounce_UI(fn, ms) {
     }, ms)
   };
 }
+/*
+const debouncedHandleResize = debounce_UI(function() {
+  //...
+}, 1000);
+
+element.addEventListener("click", debouncedHandleResize);
+element.removeEventListener("click", debouncedHandleResize);
+
+*/
