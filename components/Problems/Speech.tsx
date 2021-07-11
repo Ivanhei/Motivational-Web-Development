@@ -58,7 +58,7 @@ export function SpeechUI({
     <SpeechInstruction 
       lang={lang} 
       question={challenge.question} 
-      question_en={word}/>
+      question_en={challenge.answer}/>
     <SpeechQuestionArea
       word={word}
       audio_url={challenge.audio_url}
