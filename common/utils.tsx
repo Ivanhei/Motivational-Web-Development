@@ -259,3 +259,15 @@ export function audioBlobToAudio(audioBlob: Blob): HTMLAudioElement {
   const audioUrl = URL.createObjectURL(audioBlob);
   return new Audio(audioUrl);
 }
+
+// https://www.pluralsight.com/guides/re-render-react-component-on-window-resize
+export function debounce_UI(fn, ms) {
+  let timer
+  return (...args) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => {
+      timer = null
+      fn.apply(this, args)
+    }, ms)
+  };
+}

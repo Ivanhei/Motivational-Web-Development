@@ -1,5 +1,6 @@
 
 import { AnswerState } from '@/common/UI/Types';
+import AutoSizeButton from './AutoSizeButton';
 
 export function MultipleChoiceAnswerArea({
   options,
@@ -14,7 +15,7 @@ export function MultipleChoiceAnswerArea({
 }) {
   return <div className="answer_area options">
     {options.map((option, i) => (
-      <button
+      <AutoSizeButton
         disabled={answerState !== AnswerState.NOT_ANSWERED_YET
           /** Firefox bug hack. */ && selected !== option}
           // Firefox does not dispatch document's `keyup` event if the focus is disabled
@@ -32,7 +33,7 @@ export function MultipleChoiceAnswerArea({
         key={i}
       >
         {option}
-      </button>
+      </AutoSizeButton>
     ))}
   </div>
 }

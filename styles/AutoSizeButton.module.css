@@ -1,0 +1,9 @@
+
+.outterSpan {
+    display: inline-block;
+    width: 100%;
+}
+
+.innerSpan {
+    display: inline-block;
+}
