@@ -108,6 +108,10 @@ export default function QuizApp(props) {
     const subjectProblems = subjectProblemsDocRefArray
       .pipe(problemOperators.convertDocRefArrayToDocSnapshotArray)
       .pipe(problemOperators.convertDocSnapshotArrayToDocs)
+      .pipe(map(docs => docs.map(doc => { // random shuffle MC answers also
+        if (!doc.options || !Array.isArray(doc.options)) return doc;
+        return {...doc, options: shuffle(doc.options)}
+      })))
       .pipe(problemOperators.fetchAudioURLForDocs)
       .pipe(problemOperators.fetchImageURLForDocs)
 
