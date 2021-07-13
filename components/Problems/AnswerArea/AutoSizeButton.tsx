@@ -1,20 +1,27 @@
 import styles from '@/styles/AutoSizeButton.module.css'
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function AutoSizeButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const outter = useRef<HTMLSpanElement>();
   const inner = useRef<HTMLSpanElement>();
-  const [fontRatio, setFontRatio] = useState(1.0);
+  const fontRatio = useRef(1.);
+
+  const rawResize = useCallback((newRatio) => {
+    fontRatio.current = newRatio;
+    inner.current.style.fontSize = fontRatio.current + "em";
+  }, [])
 
   useEffect(() => {
     const outterEl = outter.current;
     const innerEl = inner.current;
     function doResize(outterWidth: number) {
-      setFontRatio(fontRatio => {
-        const newRatio = fontRatio * outterWidth / innerEl.clientWidth 
-        return newRatio < 1.0 ? newRatio : 1.0;
-      })
+      const newRatio = fontRatio.current * outterWidth / innerEl.clientWidth 
+
+      if (newRatio < 1.0)
+        rawResize(newRatio);
+      else if (fontRatio.current != 1.0)
+        rawResize(1.0);
     }
     const resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -32,11 +39,16 @@ export default function AutoSizeButton(props: React.ButtonHTMLAttributes<HTMLBut
       resizeObserver.unobserve(outterEl)
       resizeObserver.disconnect()
     }
-  }, [props.children]);
+  }, [rawResize]);
+
+  useEffect(() => {
+    if (fontRatio.current != 1.0)
+      rawResize(1.0);
+  }, [props.children, rawResize]);
 
   return <button {...props}>
     <span className={styles.outterSpan} ref={outter}>
-      <span className={styles.innerSpan} ref={inner} style={{fontSize: fontRatio + "em"}}>
+      <span className={styles.innerSpan} ref={inner}>
         {props.children}
       </span>
     </span>
