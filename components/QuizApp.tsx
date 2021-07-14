@@ -28,6 +28,7 @@ import {
   map,
   mergeAll,
   mergeMap,
+  share,
   tap,
   withLatestFrom,
 } from "rxjs/operators";
@@ -99,6 +100,7 @@ export default function QuizApp(props) {
       }))
       //.pipe(problemOperators.randomSelectNFromArray(10))
       .pipe(map(array => shuffle(array)))
+      .pipe(share())
 
     /// fetches the problems as an array
     const subjectProblems = subjectProblemsDocRefArray
