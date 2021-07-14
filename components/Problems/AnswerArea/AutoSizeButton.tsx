@@ -17,7 +17,7 @@ export default function AutoSizeButton(props: React.ButtonHTMLAttributes<HTMLBut
     function doResize(outterWidth: number) {
       if (!inner.current) return;
 
-      const newRatio = Math.min(fontRatio.current * outterWidth / inner.current.clientWidth, 1.0);
+      const newRatio = Math.max(Math.min(fontRatio.current * outterWidth / inner.current.clientWidth, 1.0), 0.1);
 
       if (fontRatio.current != newRatio)
         rawResize(newRatio);
