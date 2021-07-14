@@ -96,7 +96,7 @@ export default function App(props) {
           <Spacing />
           <Spacing />
           {!userLoaded ? <div className="group relative flex items-center">
-              <div className="w-9 h-9 rounded-full">
+              <div className="w-10 h-10 rounded-full">
                 <LoadingIcon 
                   style={{
                     width: "100%",
@@ -113,7 +113,7 @@ export default function App(props) {
                     "url(https://images.unsplash.com/photo-1619218889447-95dc25727df8?crop=entropy&cs=srgb&fm=jpg&ixid=MnwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHx8MTYyMDQ2ODM1Nw&ixlib=rb-1.2.1&q=85)",
                   backgroundSize: "cover"
                 }}
-                className="w-9 h-9 rounded-full"
+                className="w-10 h-10 rounded-full"
                 src=""
               />
               <div
