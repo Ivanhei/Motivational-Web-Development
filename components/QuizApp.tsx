@@ -84,14 +84,16 @@ export default function QuizApp(props) {
 
     const subjectProblemsDocRefArray = combineLatest([subjectAlreadyDoneProblems, subjectTopicProblemRefs])
       .pipe(map(([doneProblemRefs, allProblemRefs]) => {
-        if (!doneProblemRefs) // user did no problems on this topic whatsoever
-          return allProblemRefs;
+        const numberOfProblems = 10;
 
-        const unfinishedProblems = problemOperators.rawRandomSelectNFromArray(8)(
+        // select 10 problems. 
+        // new : done =  8 : 2
+        const finishedProblems = !doneProblemRefs ? [] : problemOperators.rawRandomSelectNFromArray(2)(doneProblemRefs)
+
+        const numberOfUnfinishedProblems = numberOfProblems - finishedProblems.length;
+        const unfinishedProblems = problemOperators.rawRandomSelectNFromArray(numberOfUnfinishedProblems)(
           allProblemRefs.filter(ref => !doneProblemRefs.some(doneRef => doneRef.isEqual(ref)))
         )
-
-        const finishedProblems = problemOperators.rawRandomSelectNFromArray(2)(doneProblemRefs)
 
         return [...unfinishedProblems, ...finishedProblems]
       }))

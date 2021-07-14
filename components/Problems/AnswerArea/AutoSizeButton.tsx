@@ -14,14 +14,13 @@ export default function AutoSizeButton(props: React.ButtonHTMLAttributes<HTMLBut
 
   useEffect(() => {
     const outterEl = outter.current;
-    const innerEl = inner.current;
     function doResize(outterWidth: number) {
-      const newRatio = fontRatio.current * outterWidth / innerEl.clientWidth 
+      if (!inner.current) return;
 
-      if (newRatio < 1.0)
+      const newRatio = Math.min(fontRatio.current * outterWidth / inner.current.clientWidth, 1.0);
+
+      if (fontRatio.current != newRatio)
         rawResize(newRatio);
-      else if (fontRatio.current != 1.0)
-        rawResize(1.0);
     }
     const resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
