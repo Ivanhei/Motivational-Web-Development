@@ -5,7 +5,7 @@ import 'firebase/auth';
 
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 
-export default function Login({ signInSuccessUrl }) {
+export default function Login({ signInSuccessUrl }: { signInSuccessUrl?: string }) {
   const jumpPageUrl = usePath(signInSuccessUrl || "");
   const uiConfig = {
     signInFlow: 'popup',

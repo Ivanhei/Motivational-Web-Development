@@ -272,7 +272,7 @@ import { useEffect, useState } from 'react';
 import { ReplaySubject } from 'rxjs';
 
 export function useUserSubject() {
-  const subjectUser = useMemo(() => new ReplaySubject(1), []);
+  const subjectUser = useMemo(() => new ReplaySubject<firebase.User | null>(1), []);
 
   useEffect(() => {
     const userObservable = observeUser();

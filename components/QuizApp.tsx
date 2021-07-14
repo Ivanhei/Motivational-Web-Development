@@ -53,7 +53,7 @@ export default function QuizApp(props) {
 
   const [showLogin, setShowLogin] = useState(false);
 
-  const subjectFinishQuizSignal = useMemo(() => new Subject(), []);
+  const subjectFinishQuizSignal = useMemo(() => new Subject<void>(), []);
   const subjectUser = useUserSubject();
 
   useEffect(() => {
@@ -77,10 +77,10 @@ export default function QuizApp(props) {
       .pipe(problemOperators.convertDocSnapshotToDoc)
       .pipe(map(doc => doc.problems))
 
-    const subjectTopicDoc = new Subject();
+    const subjectTopicDoc = new Subject<any>();
 
     const subjectTopicProblemRefs = subjectTopicDoc
-      .pipe(map(topic => topic.problems))
+      .pipe(map((topic: any) => topic.problems))
 
     const subjectProblemsDocRefArray = combineLatest([subjectAlreadyDoneProblems, subjectTopicProblemRefs])
       .pipe(map(([doneProblemRefs, allProblemRefs]) => {
