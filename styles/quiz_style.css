@@ -195,17 +195,36 @@ main {
   max-width: 720px;
   margin: 0 auto;
 
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  column-gap: 1.5rem;
 }
 @media (min-width: 1000px) {
   .options {
     padding: 1rem 2rem;
   }
 }
+@media (max-width: 640px) {
+  .options {
+    padding-left: 0rem;
+    padding-right: 0rem;
+    max-width: 420px;
+
+    grid-template-columns: 1fr 1fr;
+    column-gap: 0.75rem;
+    row-gap: 0.75rem;
+  }
+}
+@media (max-width: 420px) {
+  .options {
+    max-width: 300px;
+
+    grid-template-columns: 1fr;
+  }
+}
 
 .options > .option {
-  flex-grow: 1;
-  flex-basis: 0;
+  margin: 0;
 }
 
 .input_container {
@@ -234,16 +253,25 @@ main {
 .speech button {
   width: 100%;
   max-width: 400px;
+  margin: 0;
 }
 .speech button svg {
   display: inline-block;
-  margin-right: 1rem;
   vertical-align: middle;
+  margin-left: .5rem;
+  margin-right: .5rem;
 }
 .speech button span {
   vertical-align: middle;
-  margin-top: -3px;
   display: inline-block;
+  margin-top: -3px;
+  margin-left: .5rem;
+  margin-right: .5rem;
+}
+@media (max-width: 275px) {
+  .speech button span {
+    display: none;
+  }
 }
 
 /* footer */
