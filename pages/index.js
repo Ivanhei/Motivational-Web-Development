@@ -14,38 +14,12 @@ import {
 import { useEffect, useState } from 'react';
 import { observeUser } from '@/common/utils';
 
-function LogoTopic(props) {
+function TopicIconBackground(props) {
   const color = props.color || "#333333";
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      height="100%" viewBox="0 0 179 179"
-    >
-      <g
-        id="グループ_35"
-        transform="translate(-516 -297)"
-      >
-        <g
-          id="楕円形_3"
-          transform="translate(516 297)"
-          fill="rgba(255,255,255,0)"
-          stroke={color}
-          strokeWidth="10"
-        >
-          <circle cx="89.5" cy="89.5" r="89.5" stroke="none" />
-          <circle cx="89.5" cy="89.5" r="84.5" fill="none" />
-        </g>
-        <g
-          id="楕円形_4"
-          transform="translate(537 318)"
-          fill={color}
-          stroke="rgba(112,112,112,0)"
-          strokeWidth="1"
-        >
-          <circle cx="68" cy="68" r="68" stroke="none" />
-          <circle cx="68" cy="68" r="67.5" fill="none" />
-        </g>
-      </g>
+    <svg height="100%" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill={color} fillRule="evenodd" clipRule="evenodd" d="M70 35C70 54.33 54.33 70 35 70C15.67 70 0 54.33 0 35C0 15.67 15.67 0 35 0C54.33 0 70 15.67 70 35ZM66.1112 35C66.1112 52.1822 52.1822 66.1111 35 66.1111C17.8179 66.1111 3.88893 52.1822 3.88893 35C3.88893 17.8178 17.8179 3.88892 35 3.88892C52.1822 3.88892 66.1112 17.8178 66.1112 35Z"/>
+      <path fill={color} d="M35 61.4446C49.6049 61.4446 61.4444 49.605 61.4444 35.0001C61.4444 20.3952 49.6049 8.55566 35 8.55566C20.3951 8.55566 8.55554 20.3952 8.55554 35.0001C8.55554 49.605 20.3951 61.4446 35 61.4446Z"/>
     </svg>
   );
 }
@@ -79,8 +53,7 @@ function Topic(props) {
       <div className="grid justify-items-center">
         <div className="relative w-20 h-20">
           <div className="absolute w-full h-full">
-            {props.img}
-            <LogoTopic color={props.color} />
+            <TopicIconBackground color={props.color} />
           </div>
           <div className="absolute flex justify-center items-center  w-full h-full">
             {props.overlay}

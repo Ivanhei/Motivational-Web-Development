@@ -280,3 +280,8 @@ element.addEventListener("click", debouncedHandleResize);
 element.removeEventListener("click", debouncedHandleResize);
 
 */
+
+// Math.random()
+export function getRandomInt(belowInt: number): number {
+  return Math.floor(Math.random() * belowInt);
+}
