@@ -40,32 +40,13 @@ export function usePath(path) {
   return `${useRouter().basePath}${path}`;
 }
 
-// Currently logged in User: react hook
+// rx user logged in
 import firebase from '@/common/firebase_init';
 import 'firebase/auth';
 
-import { useState, useEffect } from 'react';
-
-export function useUser() {
-  const [userCredentials, setUserCredentials] = useState(null);
-
-  useEffect(() => {
-    const unsub_auth = firebase.auth().onAuthStateChanged(user => {
-      setUserCredentials(user);
-    });
-
-    return () => {
-      unsub_auth();
-    };
-  }, []);
-
-  return userCredentials;
-}
-
-// rx user logged in
 export function observeUser() {
   // https://rxjs.dev/api/index/class/Observable#constructor
-  return new Observable(function(observer) {
+  return new Observable<firebase.User | null>(function(observer) {
     const unsub_auth = firebase.auth().onAuthStateChanged(
       user => observer.next(user),
       error => observer.error(error),
@@ -284,4 +265,42 @@ element.removeEventListener("click", debouncedHandleResize);
 // Math.random()
 export function getRandomInt(belowInt: number): number {
   return Math.floor(Math.random() * belowInt);
+}
+
+// login user boilerplant
+import { useEffect, useState } from 'react';
+import { ReplaySubject } from 'rxjs';
+
+export function useUserSubject() {
+  const subjectUser = useMemo(() => new ReplaySubject(1), []);
+
+  useEffect(() => {
+    const userObservable = observeUser();
+    const subs = userObservable.subscribe(subjectUser);
+
+    return () => {
+      subs.unsubscribe();
+    };
+  }, [subjectUser]);
+
+  return subjectUser;
+}
+
+export function useLoadedUser() {
+  const [loaded, setLoaded] = useState(false);
+  const [user, setUser] = useState<firebase.User | null>(null);
+
+  useEffect(() => {
+    const userObservable = observeUser();
+    const subs = userObservable.subscribe((user) => {
+      setLoaded(true);
+      setUser(user);
+    });
+
+    return () => {
+      subs.unsubscribe();
+    };
+  }, []);
+
+  return [loaded, user];
 }

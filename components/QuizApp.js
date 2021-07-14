@@ -36,7 +36,10 @@ import * as problemOperators from '@/common/Problems/Operators'
 
 import firebase from '@/common/firebase_init';
 import 'firebase/firestore';
-import { observeUser, shuffle } from '@/common/utils';
+import {
+  shuffle,
+  useUserSubject,
+} from '@/common/utils';
 
 export default function QuizApp(props) {
   const topic = props.topic;
@@ -51,16 +54,7 @@ export default function QuizApp(props) {
   const [showLogin, setShowLogin] = useState(false);
 
   const subjectFinishQuizSignal = useMemo(() => new Subject(), []);
-  const subjectUser = useMemo(() => new ReplaySubject(1), []);
-
-  useEffect(() => {
-    const userObservable = observeUser();
-    const subs = userObservable.subscribe(subjectUser);
-
-    return () => {
-      subs.unsubscribe();
-    };
-  }, [subjectUser]);
+  const subjectUser = useUserSubject();
 
   useEffect(() => {
     if (loaded && pageNum === numPages) {

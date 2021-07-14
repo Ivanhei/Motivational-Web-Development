@@ -9,10 +9,10 @@ import {
   ChallengeIcon, 
   ComputerIcon, 
   AirplaneIcon, 
-  ChatIcon 
+  ChatIcon,
+  LoadingIcon,
 } from '@/assets/Icons';
-import { useEffect, useState } from 'react';
-import { observeUser } from '@/common/utils';
+import { useLoadedUser } from '@/common/utils';
 
 function TopicIconBackground(props) {
   const color = props.color || "#333333";
@@ -68,18 +68,7 @@ function Topic(props) {
 }
 
 export default function App(props) {
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const userObservable = observeUser();
-    const subs = userObservable.subscribe((user) => {
-      setLoggedIn(!!user);
-    });
-
-    return () => {
-      subs.unsubscribe();
-    };
-  }, []);
+  const [userLoaded, user] = useLoadedUser();
   
   // useEffect(() => {
   //   introJs().setOptions({
@@ -106,7 +95,15 @@ export default function App(props) {
           <ItemLink title="Challenge" img={<ChallengeIcon/>} />
           <Spacing />
           <Spacing />
-          { loggedIn ? (
+          {!userLoaded ? <div className="group relative flex items-center">
+              <div className="w-9 h-9 rounded-full">
+                <LoadingIcon 
+                  style={{
+                    width: "100%",
+                  }}/>
+              </div>
+            </div> :
+          user ? (
             <div className="group relative flex items-center">
               <div
                 height="100%"
@@ -124,7 +121,6 @@ export default function App(props) {
                 className="group-hover:block absolute shadow-xl rounded-2xl hidden text-center"
               >
                 <div className="px-8 py-3 hover:bg-gray-100 active:bg-gray-200 rounded-t-2xl">Settings</div>
-                {/* <div className="px-10 py-5 hover:bg-gray-100 NO_ROUNDED">Html</div> */}
                 <div className="px-8 py-3 hover:bg-gray-100 active:bg-gray-200 rounded-b-2xl"
                   onClick={(e) => {
                     firebase.auth().signOut()
