@@ -27,7 +27,7 @@ function TopicIconBackground(props) {
 function ItemLink(props) {
   return (
     <div className="flex">
-      <Link href={props.link ? props.link : "#"}>
+      <Link href={props.link ? props.link : ""}>
         <a className="p-4 hover:bg-gray-100">
           <span className="flex items-center">
             {props.img ? <div style={{ height: "36px", width: "36px" }} className="mr-5">
