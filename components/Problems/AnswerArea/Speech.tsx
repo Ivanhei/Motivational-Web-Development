@@ -59,6 +59,7 @@ export function SpeechAnswerArea({
 
   const handleRecordClick = useCallback((e) => {
     if (audioPlaying) return;
+    if (answerState !== AnswerState.NOT_ANSWERED_YET) return;
 
     if (!listening) {
       SpeechRecognition.startListening({ continuous: false })
@@ -66,7 +67,7 @@ export function SpeechAnswerArea({
     else {
       SpeechRecognition.stopListening()
     }
-  }, [audioPlaying, listening]);
+  }, [answerState, audioPlaying, listening]);
 
   // onListeningStateChange
   useEffect(() => {
@@ -79,6 +80,13 @@ export function SpeechAnswerArea({
       SpeechRecognition.stopListening()
     }
   }, [audioPlaying])
+
+  // stop playing if answered
+  useEffect(() => {
+    if (answerState !== AnswerState.NOT_ANSWERED_YET) {
+      SpeechRecognition.stopListening()
+    }
+  }, [answerState])
 
   return <div className="answer_area speech">
       <button className={`

@@ -18,6 +18,7 @@ import {
 } from 'rxjs';
 
 import {
+  debounceTime,
   filter,
 } from "rxjs/operators";
 
@@ -116,7 +117,9 @@ export default function Challenge(props, ref) {
     const enterKeyUps = fromEvent(document, "keyup")
       .pipe(filter((e: KeyboardEvent) => e.code === ENTER_KEYCODE))
 
-    const subscriptions = merge(artificialEnterKeyUps, enterKeyUps).subscribe((key) => {
+    const subscriptions = merge(artificialEnterKeyUps, enterKeyUps)
+    .pipe(debounceTime(50))
+    .subscribe((key) => {
       if (answer.length === 0) return;
 
       toNext();
