@@ -79,6 +79,7 @@ export function SpeechUI({
 const Speech = {
   UI: SpeechUI,
   checkAnswer: checkSpeechAnswer,
+  checkAnswerUponUpdate: true,
 }
 
 export default Speech;

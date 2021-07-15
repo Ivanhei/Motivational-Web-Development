@@ -2,6 +2,7 @@
 interface QuizStrings {
     "hint_button": string,
     "answer_button": string,
+    "next_button": string,
     "instruction_spelling_audio": string,
     "instruction_mc_audio": string,
     "instruction_spelling_translate": string,
@@ -13,6 +14,7 @@ interface QuizStrings {
 const en: QuizStrings = {
     "hint_button": "Hint",
     "answer_button": "Answer",
+    "next_button": "Next Question",
     "instruction_spelling_audio": "Spell the word you heard.",
     "instruction_mc_audio": "Select the word you heard.",
     "instruction_spelling_translate": 'Write "[]" in English.',
@@ -24,6 +26,7 @@ const en: QuizStrings = {
 const jp: QuizStrings = {
     "hint_button": "ヒント",
     "answer_button": "次へ",
+    "next_button": "次へ",
     "instruction_spelling_audio": "聞こえた単語を書いてください",
     "instruction_mc_audio": "聞こえた単語を選んでください",
     "instruction_spelling_translate": "「[]」を英語で書いてください",

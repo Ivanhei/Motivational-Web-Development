@@ -120,7 +120,7 @@ export default function Challenge(props, ref) {
     const subscriptions = merge(artificialEnterKeyUps, enterKeyUps)
     .pipe(debounceTime(50))
     .subscribe((key) => {
-      if (answer.length === 0) return;
+      if (answerState === AnswerState.NOT_ANSWERED_YET && answer.length === 0) return;// TODO: CHANGE!!
 
       toNext();
     });
@@ -133,6 +133,16 @@ export default function Challenge(props, ref) {
   //       everytime (the length of) the answer changes.
   // Well, ... It already does whenever `handleAnswerClick` needs update, 
   //           which is whenever `answer` updates.. So... No use haha
+
+
+  // auto check answer if question type needs it
+  useEffect(() => {
+    if (!problemComponent.checkAnswerUponUpdate) return;
+    if (answerState !== AnswerState.NOT_ANSWERED_YET) return;
+
+    if (problemComponent.checkAnswer(challenge.answer, answer))
+      artificialEnterKeyUps.next();
+  }, [answer, answerState, artificialEnterKeyUps, challenge.answer, handleAnswerClick, problemComponent]);
 
 
   // UI lang
@@ -154,12 +164,15 @@ export default function Challenge(props, ref) {
       <div className="footer quizStyles">
         <div className="session">
           <div className="flex-grow"></div>
-          <button disabled={answer.length === 0} onClick={e => artificialEnterKeyUps.next()}>{strings.answer_button}</button>
+          <button 
+            disabled={answerState === AnswerState.NOT_ANSWERED_YET && answer.length === 0}
+            onClick={e => artificialEnterKeyUps.next()}
+          >{strings.answer_button}</button>
         </div>
         <div className={`advice ${answerState === AnswerState.NOT_ANSWERED_YET ? "" : "shown"}`}>
           <div className="session">
             <div className="flex-grow"></div>
-            <button onClick={e => artificialEnterKeyUps.next()}>Next Question</button>
+            <button onClick={e => artificialEnterKeyUps.next()}>{strings.next_button}</button>
           </div>
         </div>
       </div>

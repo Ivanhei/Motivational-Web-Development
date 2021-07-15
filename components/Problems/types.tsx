@@ -27,4 +27,5 @@ export type ProblemAnswerChecker = (value: any, reference_answer: any) => boolea
 export default interface ProblemComponent {
     UI: ProblemUI,
     checkAnswer: ProblemAnswerChecker,
+    checkAnswerUponUpdate?: Boolean,
 }

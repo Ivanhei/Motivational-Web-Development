@@ -47,6 +47,7 @@ export function SpeechAnswerArea({
     // if the word is found
     if (transcript.split(/[^a-zA-Z0-9]+/).some(item => item?.toLowerCase() === answer?.toLowerCase())) {
       resetTranscript();
+      SpeechRecognition.stopListening()
       onChange(answer);
     }
   }, [answer, onChange, resetTranscript, transcript])

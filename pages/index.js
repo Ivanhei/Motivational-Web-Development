@@ -158,7 +158,7 @@ export default function App(props) {
             </div>
             <div>
               <Topic
-                name="Friends"
+                name="Testing"
                 color="#0bac61"
                 overlay={<ChatIcon/>}
                 link="quiz/Casual"
