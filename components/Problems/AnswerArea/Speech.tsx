@@ -13,6 +13,11 @@ import { LanguageTag } from '@/common/Strings/Types';
 import { quizStringsPack } from '@/common/Strings/quiz';
 
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import { createSpeechlySpeechRecognition } from '@speechly/speech-recognition-polyfill';
+
+const appId = '95d35835-5527-45aa-ba1a-0c03ad6bc160';
+const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(appId);
+SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
 
 export function SpeechAnswerArea({
   lang,
@@ -44,7 +49,7 @@ export function SpeechAnswerArea({
       resetTranscript();
       onChange(answer);
     }
-  }, [answer, browserSupportsSpeechRecognition, onChange, onNext, resetTranscript, transcript])
+  }, [answer, onChange, resetTranscript, transcript])
 
   useEffect(() => {
     if (!listening) {

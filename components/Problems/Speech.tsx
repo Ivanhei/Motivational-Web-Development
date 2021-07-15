@@ -16,7 +16,7 @@ import { checkSpeechAnswer, SpeechAnswerArea } from "./AnswerArea/Speech";
 
 // utils
 import { replaceBraketWithText } from "@/common/utils";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export function SpeechInstruction({
   lang,
