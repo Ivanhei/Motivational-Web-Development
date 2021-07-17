@@ -161,6 +161,26 @@ export default function QuizApp(props) {
     };
   }, [subjectFinishQuizSignal, subjectUser, topic]);
 
+  // timer
+  const timerStarted = useRef<boolean>(false);
+  const timeStart = useRef<number>(null);
+  const [totalTime, setTotalTime] = useState(0); // ms
+  useEffect(() => {
+    if (!loaded) return;
+    if (pageNum === 0) {
+      timeStart.current = Date.now();
+      timerStarted.current = true;
+    }
+    
+    if (pageNum === challenges.length) {
+      if (timeStart.current != null) {
+        setTotalTime(Date.now() - timeStart.current)
+        timerStarted.current = false;
+      }
+    }
+
+  },[challenges.length, loaded, pageNum])
+
   return (
     <div className="app-container">
       <Head>
@@ -181,7 +201,7 @@ export default function QuizApp(props) {
       {
         showLogin                     ? <Login/> :
         !loaded                       ? <LoadingLayout/> :
-        pageNum === challenges.length ? <Congratulations/> :
+        pageNum === challenges.length ? <Congratulations totalTime={totalTime}/> :
         <Challenge
           challenge={challenges[pageNum]}
           isLastQuestion={pageNum === numPages - 1}
