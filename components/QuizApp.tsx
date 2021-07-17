@@ -7,6 +7,7 @@ import {
   useState,
   useEffect,
   useMemo,
+  useRef,
 } from "react";
 
 import Login from '@/components/Login';
@@ -87,9 +88,14 @@ export default function QuizApp(props) {
       .pipe(map(([doneProblemRefs, allProblemRefs]) => {
         const numberOfProblems = 10;
 
+        // if user never solved a problem from this topic.
+        if (!doneProblemRefs) {
+          return problemOperators.rawRandomSelectNFromArray(numberOfProblems)(allProblemRefs);
+        }
+
         // select 10 problems. 
         // new : done =  8 : 2
-        const finishedProblems = !doneProblemRefs ? [] : problemOperators.rawRandomSelectNFromArray(2)(doneProblemRefs)
+        const finishedProblems = problemOperators.rawRandomSelectNFromArray(2)(doneProblemRefs)
 
         const numberOfUnfinishedProblems = numberOfProblems - finishedProblems.length;
         const unfinishedProblems = problemOperators.rawRandomSelectNFromArray(numberOfUnfinishedProblems)(
