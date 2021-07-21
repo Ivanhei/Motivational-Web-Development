@@ -304,3 +304,11 @@ export function useLoadedUser() {
 
   return [loaded, user];
 }
+
+// Remove Items in array from another array (For firestore document references)
+export function removeUnwantedItems(
+  original: Array<firebase.firestore.DocumentReference>, 
+  unwanted: Array<firebase.firestore.DocumentReference>
+): Array<firebase.firestore.DocumentReference> {
+  return original.filter(item => !unwanted.some(unwanted_item => item.isEqual(unwanted_item)))
+}

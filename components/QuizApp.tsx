@@ -39,6 +39,7 @@ import * as problemOperators from '@/common/Problems/Operators'
 import firebase from '@/common/firebase_init';
 import 'firebase/firestore';
 import {
+  removeUnwantedItems,
   shuffle,
   useUserSubject,
 } from '@/common/utils';
@@ -86,7 +87,9 @@ export default function QuizApp(props) {
 
     const subjectProblemsDocRefArray = combineLatest([subjectAlreadyDoneProblems, subjectTopicProblemRefs])
       .pipe(map(([doneProblemRefs, allProblemRefs]) => {
-        const numberOfProblems = 10;
+        const numberOfNewProblems = 8;
+        const numberOfDoneProblems = 2;
+        const numberOfProblems = numberOfNewProblems + numberOfDoneProblems;
 
         // if user never solved a problem from this topic.
         if (!doneProblemRefs) {
@@ -95,14 +98,22 @@ export default function QuizApp(props) {
 
         // select 10 problems. 
         // new : done =  8 : 2
-        const finishedProblems = problemOperators.rawRandomSelectNFromArray(2)(doneProblemRefs)
+        const notDoneProblemRefs = removeUnwantedItems(allProblemRefs, doneProblemRefs)
 
-        const numberOfUnfinishedProblems = numberOfProblems - finishedProblems.length;
-        const unfinishedProblems = problemOperators.rawRandomSelectNFromArray(numberOfUnfinishedProblems)(
-          allProblemRefs.filter(ref => !doneProblemRefs.some(doneRef => doneRef.isEqual(ref)))
-        )
+        const unfinishedProblems = problemOperators.rawRandomSelectNFromArray(numberOfNewProblems)(notDoneProblemRefs)
+        const   finishedProblems = problemOperators.rawRandomSelectNFromArray(numberOfDoneProblems)(  doneProblemRefs)
+        const notDoneProblemsRefsLeftOver = removeUnwantedItems(notDoneProblemRefs, unfinishedProblems)
+        const    doneProblemsRefsLeftOver = removeUnwantedItems(   doneProblemRefs,   finishedProblems)
+        const problems = [...unfinishedProblems, ...finishedProblems];
 
-        return [...unfinishedProblems, ...finishedProblems]
+        while (problems.length < numberOfProblems) {
+          if (notDoneProblemsRefsLeftOver.length > 0)
+            problems.push(notDoneProblemsRefsLeftOver.splice(0, 1)[0])
+          else
+            problems.push(doneProblemsRefsLeftOver.splice(0, 1)[0])
+        }
+
+        return problems;
       }))
       //.pipe(problemOperators.randomSelectNFromArray(10))
       .pipe(map(array => shuffle(array)))
