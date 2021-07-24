@@ -2,17 +2,31 @@ import Link from 'next/link'
 import Head from 'next/head'
 
 import firebase from '@/common/firebase_init';
+import 'firebase/storage'
 import 'firebase/auth'
 
-import { 
-  HomeIcon, 
-  ChallengeIcon, 
-  ComputerIcon, 
-  AirplaneIcon, 
+const storageRef = firebase.storage().ref();
+
+import {
+  HomeIcon,
+  ChallengeIcon,
+  ComputerIcon,
+  AirplaneIcon,
   ChatIcon,
   LoadingIcon,
+  CrossIcon,
 } from '@/assets/Icons';
+
 import { useLoadedUser } from '@/common/utils';
+
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from 'react';
+
+import ChangeAvatarDialog from '@/components/ChangeAvatarDialog'
 
 function TopicIconBackground(props) {
   const color = props.color || "#333333";
@@ -24,7 +38,7 @@ function TopicIconBackground(props) {
   );
 }
 
-function IconLink({ link, icon, title }) {
+function IconLink({ link, icon, title } : { link?, icon?, title }) {
   return (
   <div className="item">
     <Link href={link ? link : ""}>
@@ -44,10 +58,10 @@ function Topic({link, color, overlay, name}) {
       <Link href={link ? link : ""}>
         <a className="item">
           <div className="icon">
-            <icon-bg>
+            <div className="icon-bg">
               <TopicIconBackground color={color} />
-            </icon-bg>
-            <icon-main>{overlay}</icon-main>
+            </div>
+            <div className="icon-main">{overlay}</div>
           </div>
 
           <div className="name">{name}</div>
@@ -59,9 +73,33 @@ function Topic({link, color, overlay, name}) {
   );
 }
 
+
 export default function App(props) {
-  const [userLoaded, user] = useLoadedUser();
-  
+  const {userLoaded, user} = useLoadedUser();
+  const [avatarUpdateSignal, setAvatarUpdateSignal] = useState(false);
+  const triggerAvatarUpdateSignal = useCallback(() => {
+    setAvatarUpdateSignal(s => !s)
+  }, []);
+
+  const overlayContainer = useRef(null);
+  const [showChangeIconDialog, setShowChangeIconDialog] = useState(false);
+
+  const [avatarURL, setAvatarURL] = useState(null);
+  useEffect(() => {
+    setAvatarURL(null);
+    if (!user) {
+      return;
+    }
+
+    storageRef.child('UserAvatar/' + user.uid).getDownloadURL()
+      .catch((e) => {
+        return storageRef.child('UserAvatar/default_male.png').getDownloadURL()
+      })
+      .then(url => {
+        setAvatarURL(url);
+      })
+  }, [user, avatarUpdateSignal])
+
   // useEffect(() => {
   //   introJs().setOptions({
   //     steps:[{
@@ -74,6 +112,7 @@ export default function App(props) {
   //   }).start()
   // }, [])
   return (
+    <>
     <div className="home-container">
       <Head>
         <title>Motivational Web Development</title>
@@ -83,9 +122,9 @@ export default function App(props) {
           <IconLink title="Home" icon={<HomeIcon/>} />
           <IconLink title="Challenge" icon={<ChallengeIcon/>} />
           <div className="item" style={{paddingTop: "1.5rem", paddingBottom: "1.5rem"}}>
-          {!userLoaded ? <div className="group relative flex items-center">
-              <div className="w-12 h-12 rounded-full">
-                <LoadingIcon 
+          {!userLoaded || (user && !avatarURL) ? <div className="group relative flex items-center">
+              <div className="w-16 h-16 rounded-full">
+                <LoadingIcon
                   style={{
                     width: "100%",
                   }}/>
@@ -94,21 +133,23 @@ export default function App(props) {
           user ? (
             <div className="group relative flex items-center">
               <div
-                height="100%"
-                width="100%"
                 style={{
-                  background:
-                    "url(https://images.unsplash.com/photo-1619218889447-95dc25727df8?crop=entropy&cs=srgb&fm=jpg&ixid=MnwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHx8MTYyMDQ2ODM1Nw&ixlib=rb-1.2.1&q=85)",
+                  backgroundImage: `url(${avatarURL})`,
+                  backgroundColor: "rgba(var(--color-text-rgb), 0.25)",
                   backgroundSize: "cover"
                 }}
                 className="w-12 h-12 rounded-full"
-                src=""
               />
               <div
-                style={{top: "100%", right: -10, marginTop: -10, background: "#fff"}} 
+                style={{top: "100%", right: -10, marginTop: -10, background: "#fff", whiteSpace: "nowrap"}}
                 className="group-hover:block absolute shadow-xl rounded-2xl hidden text-center"
               >
-                <div className="px-8 py-3 hover:bg-gray-100 active:bg-gray-200 rounded-t-2xl">Settings</div>
+                <div className="px-8 py-3 hover:bg-gray-100 active:bg-gray-200 rounded-t-2xl"
+                  onClick={(e) => {
+                    //showChangeIcon();
+                    setShowChangeIconDialog(true);
+                  }}
+                >Change Icon</div>
                 <div className="px-8 py-3 hover:bg-gray-100 active:bg-gray-200 rounded-b-2xl"
                   onClick={(e) => {
                     firebase.auth().signOut()
@@ -122,7 +163,7 @@ export default function App(props) {
           </div>
         </div>
       </nav>
-      
+
       <div className="topics session">
         <Topic
           name="Computer Science"
@@ -143,5 +184,16 @@ export default function App(props) {
           link="quiz/Casual"
         />
       </div>
-    </div>);
+    </div>
+
+    <div className="overlay-container" ref={overlayContainer}>
+      <ChangeAvatarDialog shown={showChangeIconDialog} onSave={() => {
+        setShowChangeIconDialog(false);
+        triggerAvatarUpdateSignal(); // update avatar after save
+      }} onClose={() => {
+        setShowChangeIconDialog(false);
+      }}/>
+    </div>
+    </>
+  );
 }

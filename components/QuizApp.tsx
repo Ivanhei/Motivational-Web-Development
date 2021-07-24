@@ -91,6 +91,10 @@ export default function QuizApp(props) {
         const numberOfDoneProblems = 2;
         const numberOfProblems = numberOfNewProblems + numberOfDoneProblems;
 
+        // if no problems in the topic
+        if (!allProblemRefs)
+          return [];
+
         // if user never solved a problem from this topic.
         if (!doneProblemRefs) {
           return problemOperators.rawRandomSelectNFromArray(numberOfProblems)(allProblemRefs);

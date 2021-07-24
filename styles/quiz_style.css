@@ -373,13 +373,13 @@ main {
   width: var(--item-size);
   height: var(--item-size);
 }
-.topics .item .icon icon-bg {
+.topics .item .icon .icon-bg {
   display: block;
   position: absolute;
   inset: 0;
   margin: auto;
 }
-.topics .item .icon icon-main {
+.topics .item .icon .icon-main {
   display: block;
   position: absolute;
   inset: 0;
@@ -387,6 +387,16 @@ main {
   align-items: center;
   justify-content: center;
 }
-.topics .item .icon icon-main > svg {
+.topics .item .icon .icon-main > svg {
   width: 45%;
+}
+
+/* overlay */
+/* .overlay-container {
+} */
+
+.overlay-layout {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
 }

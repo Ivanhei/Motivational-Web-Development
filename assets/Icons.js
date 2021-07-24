@@ -66,8 +66,8 @@ export function ChallengeIcon() {
     />
   </svg>
 };
-export function ComputerIcon({color}) {
-  const fill = color || "#FF9C9C";
+export function ComputerIcon(props) {
+  const fill = props.color || "#FF9C9C";
   return <svg
     xmlns="http://www.w3.org/2000/svg"
     height="43%" viewBox="0 0 74.247 74.259"

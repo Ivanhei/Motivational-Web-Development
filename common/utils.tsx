@@ -302,7 +302,7 @@ export function useLoadedUser() {
     };
   }, []);
 
-  return [loaded, user];
+  return {userLoaded: loaded, user};
 }
 
 // Remove Items in array from another array (For firestore document references)
