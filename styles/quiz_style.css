@@ -308,3 +308,85 @@ main {
 .finishScreen {
   text-align: center;
 }
+
+/* Home page */
+.home-container {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+}
+
+.homeNav {
+  border-bottom: 1px solid rgba(var(--color-text-rgb), 0.2);
+  height: 6rem;
+}
+.homeNav > .session {
+  height: 100%;
+  max-width: 1480px;
+  display: grid;
+  grid-template-rows: 100%;
+  grid-template-columns: 3fr 4fr 3fr;
+}
+.homeNav > .session > .item {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.homeNav > .session > .item a {
+  height: 100%;
+  display: block;
+  padding: 1.75rem;
+}
+.homeNav > .session > .item a:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+.homeNav > .session > .item svg {
+  height: 100%;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 1rem;
+}
+.homeNav > .session > .item span {
+  vertical-align: middle;
+}
+
+.topics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-template-rows: 100%;
+  max-width: 1200px;
+}
+.topics .wrap {
+  display: grid;
+  grid-template-rows: repeat(auto-fit, minmax(100px, 1fr));
+}
+.topics .item {
+  text-align: center;
+  padding: 0 20px;
+}
+.topics .item .icon {
+  display: inline-block;
+  position: relative;
+  --item-size: 80px;
+  width: var(--item-size);
+  height: var(--item-size);
+}
+.topics .item .icon icon-bg {
+  display: block;
+  position: absolute;
+  inset: 0;
+  margin: auto;
+}
+.topics .item .icon icon-main {
+  display: block;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.topics .item .icon icon-main > svg {
+  width: 45%;
+}

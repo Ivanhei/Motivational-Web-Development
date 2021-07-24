@@ -66,7 +66,8 @@ export function ChallengeIcon() {
     />
   </svg>
 };
-export function ComputerIcon() {
+export function ComputerIcon({color}) {
+  const fill = color || "#FF9C9C";
   return <svg
     xmlns="http://www.w3.org/2000/svg"
     height="43%" viewBox="0 0 74.247 74.259"
@@ -75,7 +76,7 @@ export function ComputerIcon() {
       id="Icon_open-monitor"
       d="M3.158.01A4.64,4.64,0,0,0,0,4.65v46.4a4.64,4.64,0,0,0,4.64,4.64h23.2v9.28h-9.28a9.307,9.307,0,0,0-9.28,9.28h55.68a9.307,9.307,0,0,0-9.28-9.28H46.4V55.69H69.6a4.64,4.64,0,0,0,4.64-4.64V4.65A4.64,4.64,0,0,0,69.6.01H4.643a4.64,4.64,0,0,0-.835,0,4.64,4.64,0,0,0-.557,0ZM9.283,9.29h55.68V46.41H9.283Z"
       transform="translate(0.003 0.009)"
-      fill="#ffff97"
+      fill={fill}
     />
   </svg>
 };

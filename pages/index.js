@@ -24,46 +24,38 @@ function TopicIconBackground(props) {
   );
 }
 
-function ItemLink(props) {
+function IconLink({ link, icon, title }) {
   return (
-    <div className="flex">
-      <Link href={props.link ? props.link : ""}>
-        <a className="p-4 hover:bg-gray-100">
-          <span className="flex items-center">
-            {props.img ? <div style={{ height: "36px", width: "36px" }} className="mr-5">
-              {props.img}
-            </div> : null}
-            <span style={{ fontWeight: "bold" }} className="mt-1.5">
-              {props.title || "TBD"}
-            </span>
-          </span>
-        </a>
-      </Link>
-    </div>
+  <div className="item">
+    <Link href={link ? link : ""}>
+    <a>
+      {icon || null}
+      <span>{title}</span>
+    </a>
+    </Link>
+  </div>
   );
 }
 
-function Spacing() {
-  return <div className="flex-grow" />;
-}
-
-function Topic(props) {
+function Topic({link, color, overlay, name}) {
   return (
-    <a className="block p-5" href={props.link}>
-      <div className="grid justify-items-center">
-        <div className="relative w-20 h-20">
-          <div className="absolute w-full h-full">
-            <TopicIconBackground color={props.color} />
+    <div className="wrap">
+      <div></div>
+      <Link href={link ? link : ""}>
+        <a className="item">
+          <div className="icon">
+            <icon-bg>
+              <TopicIconBackground color={color} />
+            </icon-bg>
+            <icon-main>{overlay}</icon-main>
           </div>
-          <div className="absolute flex justify-center items-center  w-full h-full">
-            {props.overlay}
-          </div>
-        </div>
-        <span style={{ fontWeight: "bold" }} className="mt-4">
-          {props.name || 1}
-        </span>
-      </div>
-    </a>
+
+          <div className="name">{name}</div>
+        </a>
+      </Link>
+      <div></div>
+      <div></div>
+    </div>
   );
 }
 
@@ -82,21 +74,17 @@ export default function App(props) {
   //   }).start()
   // }, [])
   return (
-    <div className="h-full">
+    <div className="home-container">
       <Head>
         <title>Motivational Web Development</title>
       </Head>
-      {/*Navigation*/}
-      <nav className="flex px-10 border-b-2 border-gray-100">
-        <div className="flex flex-auto">
-          <Spacing />
-          <ItemLink title="Home" img={<HomeIcon/>} />
-          <Spacing />
-          <ItemLink title="Challenge" img={<ChallengeIcon/>} />
-          <Spacing />
-          <Spacing />
+      <nav className="homeNav">
+        <div className="session">
+          <IconLink title="Home" icon={<HomeIcon/>} />
+          <IconLink title="Challenge" icon={<ChallengeIcon/>} />
+          <div className="item" style={{paddingTop: "1.5rem", paddingBottom: "1.5rem"}}>
           {!userLoaded ? <div className="group relative flex items-center">
-              <div className="w-10 h-10 rounded-full">
+              <div className="w-12 h-12 rounded-full">
                 <LoadingIcon 
                   style={{
                     width: "100%",
@@ -113,7 +101,7 @@ export default function App(props) {
                     "url(https://images.unsplash.com/photo-1619218889447-95dc25727df8?crop=entropy&cs=srgb&fm=jpg&ixid=MnwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHx8MTYyMDQ2ODM1Nw&ixlib=rb-1.2.1&q=85)",
                   backgroundSize: "cover"
                 }}
-                className="w-10 h-10 rounded-full"
+                className="w-12 h-12 rounded-full"
                 src=""
               />
               <div
@@ -129,44 +117,31 @@ export default function App(props) {
               </div>
             </div>
           ) : (
-            <ItemLink title="Login" link="login" />
+            <IconLink title="Login" link="login" />
           )}
-
-          <Spacing />
-        </div>
-      </nav>
-
-      {/*Body*/}
-      <div className="flex p-10 m-10 justify-center">
-        <div className="grid p-5 m-10 justify-items-center">
-          <div className="grid grid-cols-3 gap-20">
-            <div>
-              <Topic
-                name="Computer Science"
-                color="#f1f109"
-                overlay={<ComputerIcon/>}
-                link="quiz/CSE"
-              />
-            </div>
-            <div>
-              <Topic
-                name="Academics"
-                color="#476cff"
-                overlay={<AirplaneIcon/>}
-                link="quiz/Academics"
-              />
-            </div>
-            <div>
-              <Topic
-                name="Testing"
-                color="#0bac61"
-                overlay={<ChatIcon/>}
-                link="quiz/Casual"
-              />
-            </div>
           </div>
         </div>
+      </nav>
+      
+      <div className="topics session">
+        <Topic
+          name="Computer Science"
+          color="#EE2E22"
+          overlay={<ComputerIcon/>}
+          link="quiz/CSE"
+        />
+        <Topic
+          name="Academics"
+          color="#476cff"
+          overlay={<AirplaneIcon/>}
+          link="quiz/Academics"
+        />
+        <Topic
+          name="Texting"
+          color="#0bac61"
+          overlay={<ChatIcon/>}
+          link="quiz/Casual"
+        />
       </div>
-    </div>
-  );
+    </div>);
 }
