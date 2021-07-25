@@ -146,6 +146,10 @@ main {
   margin-left: 2.5rem;
 }
 
+.progressNav .cross svg {
+  fill: #707070;
+}
+
 /* question */
 .question_container {
   padding-bottom: 2rem;
@@ -286,10 +290,11 @@ main {
   height: 100%;
   width: 100%;
   top: 100%;
-  transition: 0.2s;
+  transition: top 0.2s, background 0s 0.2s;
 }
 .advice.shown {
   top: 0;
+  transition: top 0.2s, background 0s;
 }
 
 .footer > .session,
@@ -302,6 +307,74 @@ main {
 .advice > .session button {
   padding: 1rem 2rem;
   font-size: 1.25rem;
+}
+
+.advice > .session .primary {
+  font-size: 2rem;
+}
+
+.advice > .session .secondary {
+  font-size: 1rem;
+}
+
+.advice > .session button {
+  /* background-color: #00e1ff;
+  padding: 0.5rem 0.5rem;
+  font-size: 1.25rem; */
+  border: none;
+  padding: 0.5rem 1.25rem;
+  /* border-width: 3px; */
+  background-color:rgb(0, 255, 170);
+  width: 6rem;
+  height: 4rem;
+  transition: background 0s 0.2s;
+}
+.advice > .session button svg path {
+  fill: #FAFAFA;
+  transition: background 0s 0.2s;
+}
+
+.advice > .session .indicator {
+  margin-right: 3.5rem;
+  padding: 1rem;
+  border-radius: 9rem;
+  background-color: rgb(0, 255, 170);
+  height: 5rem;
+  width: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0s 0.2s;
+}
+.advice > .session .indicator svg {
+  max-height: 100%;
+  max-width: 100%;
+  /* fill:#d7ffb8; */
+  fill: #FAFAFA;
+}
+
+.advice.incorrect {
+  background: #ff7676;
+}
+.advice.incorrect > .session button {
+  background-color:rgb(223, 26, 69);
+  transition: background 0s;
+}
+.advice.incorrect > .session button svg path {
+  fill: #FAFAFA;
+  transition: background 0s;
+}
+.advice.incorrect > .session .indicator {
+  padding: 1.2rem;
+  background-color:rgb(223, 26, 69);
+  transition: 0s;
+}
+.advice.incorrect > .session .primary {
+  font-size: 2rem;
+}
+
+.advice.incorrect > .session .secondary {
+  font-size: 1rem;
 }
 
 /* finish screen */

@@ -40,6 +40,7 @@ import SpellingAudio from './Problems/SpellingAudio';
 import SpellingTranslate from './Problems/SpellingTranslate';
 import Speech from './Problems/Speech';
 import MultipleChoiceAbbreviation from "./Problems/MultipleChoiceAbbreviation";
+import { ArrowIcon, CrossIcon, TickIcon } from "@/assets/Icons";
 
 
 export default function Challenge(props, ref) {
@@ -170,10 +171,20 @@ export default function Challenge(props, ref) {
             onClick={e => artificialEnterKeyUps.next()}
           >{strings.answer_button}</button>
         </div>
-        <div className={`advice ${answerState === AnswerState.NOT_ANSWERED_YET ? "" : "shown"}`}>
+        <div className={`advice ${answerState === AnswerState.NOT_ANSWERED_YET ? "" : "shown"} ${answerState === AnswerState.ANSWER_INCORRECT ? "incorrect" : ""}`}>
           <div className="session">
-            <div className="flex-grow"></div>
-            <button onClick={e => artificialEnterKeyUps.next()}>{strings.next_button}</button>
+            <div className="indicator">
+              {answerState === AnswerState.ANSWER_CORRECT ? <TickIcon/> : <CrossIcon/>}
+            </div>
+            <div className="flex-grow">
+              <div className="primary">
+              正解例
+              </div>
+              <div className="secondary">
+              You're going great!
+              </div>
+            </div>
+            <button onClick={e => artificialEnterKeyUps.next()}><ArrowIcon/></button>
           </div>
         </div>
       </div>
