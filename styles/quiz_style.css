@@ -439,6 +439,9 @@ main {
   text-align: center;
   padding: 0 20px;
 }
+.topics .item a {
+  display: block;
+}
 .topics .item .icon {
   display: inline-block;
   position: relative;

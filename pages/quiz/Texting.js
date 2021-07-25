@@ -4,6 +4,6 @@ import firebase from '@/common/firebase_init';
 import "firebase/firestore";
 const db = firebase.firestore();
 
-export default function Quiz_CSE() {
-    return <QuizApp topic={db.collection('topic').doc('Casual')}/>
+export default function Quiz_CSE(props) {
+    return <QuizApp topic={db.collection('topic').doc('Casual')} {...props}/>
 }

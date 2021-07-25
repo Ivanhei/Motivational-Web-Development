@@ -48,9 +48,8 @@ import {
   useUserSubject,
 } from '@/common/utils';
 
-import { SessionResult, TopicDocRefNoMiss, Tropy, TropyInterface } from '@/common/Tropies/Types';
-
-const db = firebase.firestore();
+import { SessionResult, TopicDocRefNoMiss } from '@/common/Tropies/Types';
+import { useTrophiesSubject } from '@/common/Tropies/hooks';
 
 export default function QuizApp(props) {
   const topic = props.topic;
@@ -69,8 +68,7 @@ export default function QuizApp(props) {
   const subjectUserDoc = useMemo(() => new ReplaySubject<any>(1), []);
   const subjectClearedTopicRefs = useMemo(() => new Subject<Array<TopicDocRefNoMiss>>(), []);
 
-  //const [tropies, setTropies] = useState<Array<Tropy> | null>(null);
-  const subjectTrophies = useMemo(() => new Subject<Array<Tropy>>(), []);
+  const subjectTrophies = useTrophiesSubject();
   const noMiss = useRef(true);
 
   useEffect(() => {
@@ -258,16 +256,10 @@ export default function QuizApp(props) {
       .pipe(problemOperators.convertDocSnapshotToDoc)
       .subscribe(subjectTopicDoc));
 
-    // make it hot after all circuitry completed.
-    subscriptions.add(from(db.collection('trophies').get())
-      .pipe(problemOperators.convertQuerySnapshotToDocs)
-      .pipe(tropyOperators.convertTropyDocsToTropies)
-      .subscribe(subjectTrophies));
-
     return () => {
       subscriptions.unsubscribe();
     };
-  }, [subjectClearedTopicRefs, subjectFinishQuizSignal, subjectTrophies, subjectUser, subjectUserDoc, topic]);
+  }, [subjectClearedTopicRefs, subjectFinishQuizSignal, subjectUser, subjectUserDoc, topic]);
 
   // timer
   const timeStart = useRef<number>(null);
@@ -361,6 +353,7 @@ export default function QuizApp(props) {
         pageNum === challenges.length ? <Congratulations totalTime={totalTime}/> :
         <Challenge
           challenge={challenges[pageNum]}
+          language={props.language}
           isLastQuestion={pageNum === numPages - 1}
           onCorrect={() => {
             setProgress((progress) => progress + 1 / numPages);

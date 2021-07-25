@@ -4,8 +4,13 @@ import 'regenerator-runtime/runtime' // for 'react-speech-recognition'
 
 import { AppProps } from 'next/app'
 
+import { LanguageTag } from '@/common/Strings/Types'
+import { useMemo } from 'react'
+
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+  const languageTag: LanguageTag = useMemo(() => "jp" as LanguageTag, [])
+
+  return <Component {...pageProps} language={languageTag} />
 }
 
 export default MyApp

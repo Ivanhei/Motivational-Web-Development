@@ -39,6 +39,8 @@ import * as tropyOperators from '@/common/Tropies/Operators'
 import ChangeAvatarDialog from '@/components/ChangeAvatarDialog'
 import { Tropy, TropyInterface } from '@/common/Tropies/Types';
 import NotificationBanner from '@/components/NotificationBanner';
+import { LanguageTag } from '@/common/Strings/Types';
+import { HomeStrings, homeStringsPack } from '@/common/Strings/home';
 
 function TopicIconBackground(props) {
   const color = props.color || "#333333";
@@ -67,8 +69,9 @@ function Topic({link, color, overlay, name}) {
   return (
     <div className="wrap">
       <div></div>
-      <Link href={link ? link : ""}>
-        <a className="item">
+      <div className="item">
+        <Link href={link ? link : ""}>
+        <a>
           <div className="icon">
             <div className="icon-bg">
               <TopicIconBackground color={color} />
@@ -78,7 +81,8 @@ function Topic({link, color, overlay, name}) {
 
           <div className="name">{name}</div>
         </a>
-      </Link>
+        </Link>
+      </div>
       <div></div>
       <div></div>
     </div>
@@ -117,6 +121,7 @@ export default function App(props) {
   const subjectUserDoc = useMemo(() => new ReplaySubject<any>(1), [])
   //const subjectTropyNotifications = useMemo(() => new Subject<any>(), [])
   const pendingTropies = useRef<Tropy[]>([])
+  const currentTropyRef = useRef<firebase.firestore.DocumentReference>(null)
   const [pendingTropiesReady, setPendingTropiesReady] = useState(false)
   const [notificationTropy, setNotificationTropy] = useState<TropyInterface>({
     color: "string",
@@ -124,6 +129,27 @@ export default function App(props) {
     name: "string",
   })
   const [visualShowTropyNotify, setVisualShowTropyNotify] = useState(false)
+  const subjectShouldUpdate = useMemo(() => new Subject<void>(), [])
+
+  useEffect(() => {
+    const subscriptions = new Subscription();
+
+    subscriptions.add(
+      subjectShouldUpdate
+        .subscribe(function updateRecord() {
+          if (!currentTropyRef.current || !user?.uid) return;
+
+          firebase.firestore()
+            .collection('users').doc(user.uid)
+            .update({
+              queuedTropyNotifications: firebase.firestore.FieldValue.arrayRemove(currentTropyRef.current)
+            })
+        })
+    )
+    return () => {
+      subscriptions.unsubscribe()
+    }
+  }, [subjectShouldUpdate, user?.uid])
 
   
   useEffect(() => {
@@ -161,8 +187,10 @@ export default function App(props) {
     if (!pendingTropiesReady) return;
 
     let intervalHandle = null;
+    let secondaryHandle = null;
     const interval = 5000;
-    const animationInterval = 200;
+    const seenInterval = 1000; // time after shown to judge notification as "seen"
+    const animationInterval = 200; // animation length (change with css)
 
     setup();
     function setup() {
@@ -170,9 +198,11 @@ export default function App(props) {
       if (!currentItem)
         return;
 
+      currentTropyRef.current = currentItem._ref
       setNotificationTropy(currentItem)
       setVisualShowTropyNotify(true)
 
+      secondaryHandle = setTimeout(() => {subjectShouldUpdate.next()}, seenInterval);
       intervalHandle = setTimeout(teardown, interval + animationInterval);
     }
     function teardown() {
@@ -183,9 +213,15 @@ export default function App(props) {
 
     return () => {
       clearTimeout(intervalHandle)
+      clearTimeout(secondaryHandle)
     }
-  }, [pendingTropiesReady])
+  }, [pendingTropiesReady, subjectShouldUpdate])
   
+
+  // UI lang
+  const languageTag: LanguageTag = props.language
+  const strings: HomeStrings = useMemo(() => homeStringsPack[languageTag], [languageTag])
+
   // useEffect(() => {
   //   introJs().setOptions({
   //     steps:[{
@@ -205,8 +241,8 @@ export default function App(props) {
       </Head>
       <nav className="homeNav">
         <div className="session">
-          <IconLink title="Home" icon={<HomeIcon/>} />
-          <IconLink title="Challenge" icon={<ChallengeIcon/>} />
+          <IconLink title={strings.nav_home} icon={<HomeIcon/>} link="/" />
+          <IconLink title={strings.nav_trophies} icon={<ChallengeIcon/>} link="/trophies" />
           <div className="item" style={{paddingTop: "1.5rem", paddingBottom: "1.5rem"}}>
           {!userLoaded || (user && !avatarURL) ? <div className="group relative flex items-center">
               <div className="w-16 h-16 rounded-full">
@@ -235,16 +271,16 @@ export default function App(props) {
                     //showChangeIcon();
                     setShowChangeIconDialog(true);
                   }}
-                >Change Icon</div>
+                >{strings.user_change_avatar}</div>
                 <div className="px-8 py-3 hover:bg-gray-100 active:bg-gray-200 rounded-b-2xl"
                   onClick={(e) => {
                     firebase.auth().signOut()
                   }}
-                >Logout</div>
+                >{strings.user_logout}</div>
               </div>
             </div>
           ) : (
-            <IconLink title="Login" link="login" />
+            <IconLink title="Login" link={strings.user_login} />
           )}
           </div>
         </div>
@@ -267,7 +303,7 @@ export default function App(props) {
           name="Texting"
           color="#0bac61"
           overlay={<ChatIcon/>}
-          link="quiz/Casual"
+          link="quiz/Texting"
         />
       </div>
     </div>
@@ -278,7 +314,7 @@ export default function App(props) {
         triggerAvatarUpdateSignal(); // update avatar after save
       }} onClose={() => {
         setShowChangeIconDialog(false);
-      }}/>
+      }} language={languageTag}/>
       <div className="overlay-layout right transparent">
         <NotificationBanner shown={visualShowTropyNotify} message="トロフィーをゲットしました！" tropy={notificationTropy}/>
       </div>
