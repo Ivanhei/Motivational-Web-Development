@@ -44,10 +44,11 @@ export class Tropy implements TropyInterface {
 
   private checker: TropyChecker
 
-  constructor({color, condition, name}: TropyInterface) {
+  constructor({color, condition, name, _ref}: TropyInterface) {
     this.color = color
     this.condition = condition
     this.name = name
+    this._ref = _ref
     this.checker = tropyChecker(this.condition)
   }
 

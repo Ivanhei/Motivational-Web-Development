@@ -66,6 +66,7 @@ export default function QuizApp(props) {
 
   const subjectFinishQuizSignal = useMemo(() => new Subject<void>(), []);
   const subjectUser = useUserSubject();
+  const subjectUserDoc = useMemo(() => new ReplaySubject<any>(1), []);
   const subjectClearedTopicRefs = useMemo(() => new Subject<Array<TopicDocRefNoMiss>>(), []);
 
   //const [tropies, setTropies] = useState<Array<Tropy> | null>(null);
@@ -213,14 +214,24 @@ export default function QuizApp(props) {
     )
 
     subscriptions.add(
-      combineLatest([subjectTopicDoc, subjectUser, subjectFinishedTopic])
-        .pipe(mergeMap(async ([topicDoc, user, finished]) => 
-          [topicDoc, user, await firebase.firestore()
+      subjectUser
+        .pipe(mergeMap(user => 
+          firebase.firestore()
             .collection('users').doc(user.uid)
-            .get(), finished]
+            .get()
         ))
+        .pipe(problemOperators.convertDocSnapshotToDoc)
+        .subscribe(subjectUserDoc)
+    )
+
+    subscriptions.add(
+      combineLatest([subjectTopicDoc, subjectUser, subjectUserDoc, subjectFinishedTopic])
         .pipe(mergeMap(([topicDoc, user, userDoc, finished]) => {
-          const clearedTopics = (userDoc.data().finishedTopics as Array<firebase.firestore.DocumentReference>)
+          const clearedTopics = [];
+
+          if (userDoc.finishedTopics instanceof Array)
+            clearedTopics.push(...(userDoc.finishedTopics as Array<firebase.firestore.DocumentReference>))
+
           if (finished && !clearedTopics.some(topic => topic.isEqual(topicDoc._ref)))
             clearedTopics.push(topicDoc._ref)
 
@@ -256,7 +267,7 @@ export default function QuizApp(props) {
     return () => {
       subscriptions.unsubscribe();
     };
-  }, [subjectClearedTopicRefs, subjectFinishQuizSignal, subjectTrophies, subjectUser, topic]);
+  }, [subjectClearedTopicRefs, subjectFinishQuizSignal, subjectTrophies, subjectUser, subjectUserDoc, topic]);
 
   // timer
   const timeStart = useRef<number>(null);
@@ -284,13 +295,14 @@ export default function QuizApp(props) {
     subscriptions.add(
       combineLatest([
         subjectTrophies,
-        subjectTotalTime, // only have value when finished a quiz
+        subjectTotalTime, // only emit a value when finishing a quiz
         subjectUser,
-        subjectClearedTopicRefs, // TODO: no-miss logic for mutiple topics
+        subjectUserDoc.pipe(map(userDoc => userDoc.finishedTropies)),
+        subjectClearedTopicRefs,
       ])
         .pipe(filter(([tropies]) => !!tropies && (tropies.length > 0)))
         .pipe(filter(([tropies, time]) => !!time))
-        .subscribe(([tropies, clearTime, user, finishedTopicsPairs]) => {
+        .subscribe(([tropies, clearTime, user, doneTropies, finishedTopicsPairs]) => {
           const sessionResult: SessionResult = {
             clearTime,
             noMiss: noMiss.current,
@@ -300,16 +312,31 @@ export default function QuizApp(props) {
             login: !!user,
           }
 
-          tropies.forEach(tropy => {
-            console.log(tropy.check(sessionResult), tropy.color, tropy.name, tropy.condition)
-          })
+          const newlyDoneTropiesRefs = [];
+
+          tropies
+            .filter(tropy => doneTropies ? doneTropies.every(doneTropy => !tropy._ref.isEqual(doneTropy)) : true)
+            .forEach(tropy => {
+              /**/console.log(tropy.check(sessionResult), tropy.color, tropy.name, tropy.condition)
+
+              if (tropy.check(sessionResult))
+              newlyDoneTropiesRefs.push(tropy._ref)
+            })
+
+          // add finished tropies
+          firebase.firestore()
+            .collection('users').doc(user.uid)
+            .set({
+              finishedTropies: firebase.firestore.FieldValue.arrayUnion(...newlyDoneTropiesRefs),
+              queuedTropyNotifications: firebase.firestore.FieldValue.arrayUnion(...newlyDoneTropiesRefs),
+            }, { merge: true })
         })
     )
 
     return () => {
       subscriptions.unsubscribe();
     }
-  }, [subjectClearedTopicRefs, subjectFinishQuizSignal, subjectTotalTime, subjectTrophies, subjectUser])
+  }, [subjectClearedTopicRefs, subjectFinishQuizSignal, subjectTotalTime, subjectTrophies, subjectUser, subjectUserDoc])
 
   return (
     <div className="app-container">
