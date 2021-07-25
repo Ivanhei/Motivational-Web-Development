@@ -36,6 +36,8 @@ import {
 
 import * as problemOperators from '@/common/Problems/Operators'
 
+import * as tropyOperators from '@/common/Tropies/Operators'
+
 import firebase from '@/common/firebase_init';
 import 'firebase/firestore';
 import {
@@ -43,6 +45,10 @@ import {
   shuffle,
   useUserSubject,
 } from '@/common/utils';
+
+import { Tropy, TropyInterface } from '@/common/Tropies/Types';
+
+const db = firebase.firestore();
 
 export default function QuizApp(props) {
   const topic = props.topic;
@@ -58,6 +64,8 @@ export default function QuizApp(props) {
 
   const subjectFinishQuizSignal = useMemo(() => new Subject<void>(), []);
   const subjectUser = useUserSubject();
+
+  const [tropies, setTropies] = useState<Array<Tropy> | null>(null);
 
   useEffect(() => {
     if (loaded && pageNum === numPages) {
@@ -119,7 +127,6 @@ export default function QuizApp(props) {
 
         return problems;
       }))
-      //.pipe(problemOperators.randomSelectNFromArray(10))
       .pipe(map(array => shuffle(array)))
       .pipe(share())
 
@@ -133,6 +140,9 @@ export default function QuizApp(props) {
       })))
       .pipe(problemOperators.fetchAudioURLForDocs)
       .pipe(problemOperators.fetchImageURLForDocs)
+
+    /// tropies
+    const subjectTrophies = new Subject<Array<Tropy>>();
 
     // subscriptions
     const subscriptions = new Subscription();
@@ -171,6 +181,15 @@ export default function QuizApp(props) {
       .pipe(problemOperators.convertDocSnapshotToDoc)
       .subscribe(subjectTopicDoc));
 
+    // set login
+    subscriptions.add(subjectTrophies.subscribe(topies => setTropies(topies)));
+
+    // make it hot after all circuitry completed.
+    subscriptions.add(from(db.collection('trophies').get())
+      .pipe(problemOperators.convertQuerySnapshotToDocs)
+      .pipe(map(tropyOperators.convertTropyDocsToTropies))
+      .subscribe(subjectTrophies));
+
     return () => {
       subscriptions.unsubscribe();
     };
@@ -181,17 +200,28 @@ export default function QuizApp(props) {
   const [totalTime, setTotalTime] = useState<number>(null); // ms
   useEffect(() => {
     if (!loaded) return;
+    // page start
     if (pageNum === 0) {
       timeStart.current = Date.now();
     }
 
+    // page end
     if (pageNum === challenges.length) {
       if (timeStart.current != null) {
         setTotalTime(Date.now() - timeStart.current)
       }
+
+      // TODO: convert to using rxjs and emit "end quiz" signal
+      // if (tropies)
+      //   console.log(tropies)
+      //   // for (const tropy of tropies) {
+      //   //   if (tropy.check({})) {
+            
+      //   //   }
+      //   // }
     }
 
-  },[challenges.length, loaded, pageNum])
+  },[challenges.length, loaded, pageNum, tropies])
 
   return (
     <div className="app-container">
