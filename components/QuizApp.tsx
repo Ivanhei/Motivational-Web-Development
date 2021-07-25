@@ -65,8 +65,8 @@ export default function QuizApp(props) {
   const [showLogin, setShowLogin] = useState(false);
 
   const subjectFinishQuizSignal = useMemo(() => new Subject<void>(), []);
-  const subjectFinishedTopicSignal = useMemo(() => new Subject<void>(), []);
   const subjectUser = useUserSubject();
+  const subjectClearedTopicRefs = useMemo(() => new Subject<Array<firebase.firestore.DocumentReference>>(), []);
 
   //const [tropies, setTropies] = useState<Array<Tropy> | null>(null);
   const subjectTrophies = useMemo(() => new Subject<Array<Tropy>>(), []);
@@ -81,6 +81,8 @@ export default function QuizApp(props) {
   // fetching problems
   useEffect(() => {
     // subjects
+    const subjectFinishedTopic = new Subject<boolean>();
+
     const subjectAlreadyDoneProblems = subjectUser
       .pipe(filter(user => !!user))
       .pipe(first())
@@ -133,11 +135,13 @@ export default function QuizApp(props) {
         }
 
         if (notDoneProblemsRefsLeftOver.length === 0) {
-          subjectFinishedTopicSignal.next();
-          subjectFinishedTopicSignal.complete();
+          subjectFinishedTopic.next(true);
+          subjectFinishedTopic.complete();
         }
-        else
-          subjectFinishedTopicSignal.complete();
+        else {
+          subjectFinishedTopic.next(false);
+          subjectFinishedTopic.complete();
+        }
 
         return problems;
       }))
@@ -187,7 +191,8 @@ export default function QuizApp(props) {
     );
 
     subscriptions.add(
-      combineLatest([subjectTopicDoc, subjectUser, subjectFinishedTopicSignal])
+      combineLatest([subjectTopicDoc, subjectUser, subjectFinishedTopic])
+        .pipe(filter(([topicDoc, user, finished]) => finished))
         .subscribe(([topicDoc, user]) => {
           firebase.firestore()
             .collection('users').doc(user.uid)
@@ -197,14 +202,27 @@ export default function QuizApp(props) {
         })
     )
 
+    subscriptions.add(
+      combineLatest([subjectTopicDoc, subjectUser, subjectFinishedTopic])
+        .subscribe(([topicDoc, user, finished]) => {
+          firebase.firestore()
+            .collection('users').doc(user.uid)
+            .get()
+            .then(userDoc => {
+              const clearedTopics = (userDoc.data().finishedTopics as Array<firebase.firestore.DocumentReference>)
+
+              if (finished) clearedTopics.push(topicDoc._ref)
+
+              subjectClearedTopicRefs.next(clearedTopics)
+            })
+        })
+    )
+
      // make it hot after all circuitry completed.
     subscriptions.add(from(topic.get())
       // since promise only has one value, this will complete after promise is resolved.
       .pipe(problemOperators.convertDocSnapshotToDoc)
       .subscribe(subjectTopicDoc));
-
-    // set tropies
-    //subscriptions.add(subjectTrophies.subscribe(topies => setTropies(topies)));
 
     // make it hot after all circuitry completed.
     subscriptions.add(from(db.collection('trophies').get())
@@ -215,7 +233,7 @@ export default function QuizApp(props) {
     return () => {
       subscriptions.unsubscribe();
     };
-  }, [subjectFinishQuizSignal, subjectFinishedTopicSignal, subjectTrophies, subjectUser, topic]);
+  }, [subjectClearedTopicRefs, subjectFinishQuizSignal, subjectTrophies, subjectUser, topic]);
 
   // timer
   const timeStart = useRef<number>(null);
@@ -246,18 +264,19 @@ export default function QuizApp(props) {
         subjectTrophies,
         subjectTotalTime, // only have value when finished a quiz
         subjectUser,
-        //from(db.collection('user').doc(user.uid).get()),
-        subjectNoMiss.pipe(distinctUntilChanged()),
+        subjectClearedTopicRefs,
+        subjectNoMiss.pipe(distinctUntilChanged()), // TODO: no-miss logic for mutiple topics
       ])
         .pipe(filter(([tropies]) => !!tropies && (tropies.length > 0)))
         .pipe(filter(([tropies, time]) => !!time))
-        .subscribe(([tropies, clearTime, user, noMiss]) => {
+        .subscribe(([tropies, clearTime, user, finishedTopics, noMiss]) => {
           const sessionResult: SessionResult = {
             clearTime,
             noMiss,
-            finishedTopics: [],
+            finishedTopics,
+
             sessionFinish: true,
-            login: !!user
+            login: !!user,
           }
 
           tropies.forEach(tropy => {
@@ -269,7 +288,7 @@ export default function QuizApp(props) {
     return () => {
       subscriptions.unsubscribe();
     }
-  }, [subjectFinishQuizSignal, subjectNoMiss, subjectTotalTime, subjectTrophies, subjectUser])
+  }, [subjectClearedTopicRefs, subjectFinishQuizSignal, subjectNoMiss, subjectTotalTime, subjectTrophies, subjectUser])
 
   return (
     <div className="app-container">
