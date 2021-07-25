@@ -67,8 +67,9 @@ function Topic({link, color, overlay, name}) {
   return (
     <div className="wrap">
       <div></div>
-      <Link href={link ? link : ""}>
-        <a className="item">
+      <div className="item">
+        <Link href={link ? link : ""}>
+        <a>
           <div className="icon">
             <div className="icon-bg">
               <TopicIconBackground color={color} />
@@ -78,7 +79,8 @@ function Topic({link, color, overlay, name}) {
 
           <div className="name">{name}</div>
         </a>
-      </Link>
+        </Link>
+      </div>
       <div></div>
       <div></div>
     </div>

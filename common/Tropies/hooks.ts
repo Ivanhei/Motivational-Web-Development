@@ -10,7 +10,7 @@ import * as problemOperators from '@/common/Problems/Operators'
 import * as tropyOperators from '@/common/Tropies/Operators'
 
 import { Tropy } from "./Types";
-import { map, tap } from "rxjs/operators";
+import { map } from "rxjs/operators";
 
 export function useTrophiesSubject(): Subject<Array<Tropy>> {
   const subjectTrophies = useMemo(() => new Subject<Array<Tropy>>(), []);
@@ -31,11 +31,8 @@ export function useTrophiesSubject(): Subject<Array<Tropy>> {
       .pipe(problemOperators.convertQuerySnapshotToDocs)
       .pipe(tropyOperators.convertTropyDocsToTropies)
       .pipe(map(array => array.sort((a, b) => {
-        console.log(a.color, b.color)
-        console.log(colorMap[a.color], colorMap[b.color])
         return colorMap[a.color] - colorMap[b.color];
       })))
-      .pipe(tap(a => console.log(a.map(i => i.color))))
       .subscribe(subjectTrophies));
 
     return () => {
