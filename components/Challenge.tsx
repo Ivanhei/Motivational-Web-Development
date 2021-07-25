@@ -181,7 +181,7 @@ export default function Challenge(props, ref) {
               正解例
               </div>
               <div className="secondary">
-              You're going great!
+              You&apos;re going great!
               </div>
             </div>
             <button onClick={e => artificialEnterKeyUps.next()}><ArrowIcon/></button>
