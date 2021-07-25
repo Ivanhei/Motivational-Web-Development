@@ -8,14 +8,14 @@
   height: 6rem;
   background: #f0f0f0;
   white-space: nowrap;
-  transition: 0.2s ease-in;
+  transition: 0.2s ease-in; /* animation length (change with js) */
   /* box-shadow: 0 .25rem .5rem rgba(var(--color-text-rgb), 0.1); */
   display: flex;
 }
 .notificationBanner.shown {
   right: 0;
   opacity: 1;
-  transition: 0.2s ease;
+  transition-timing-function: ease;
 }
 .notificationBanner .icon {
   height: 100%;

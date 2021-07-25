@@ -117,6 +117,7 @@ export default function App(props) {
   const subjectUserDoc = useMemo(() => new ReplaySubject<any>(1), [])
   //const subjectTropyNotifications = useMemo(() => new Subject<any>(), [])
   const pendingTropies = useRef<Tropy[]>([])
+  const currentTropyRef = useRef<firebase.firestore.DocumentReference>(null)
   const [pendingTropiesReady, setPendingTropiesReady] = useState(false)
   const [notificationTropy, setNotificationTropy] = useState<TropyInterface>({
     color: "string",
@@ -124,6 +125,27 @@ export default function App(props) {
     name: "string",
   })
   const [visualShowTropyNotify, setVisualShowTropyNotify] = useState(false)
+  const subjectShouldUpdate = useMemo(() => new Subject<void>(), [])
+
+  useEffect(() => {
+    const subscriptions = new Subscription();
+
+    subscriptions.add(
+      subjectShouldUpdate
+        .subscribe(function updateRecord() {
+          if (!currentTropyRef.current || !user?.uid) return;
+
+          firebase.firestore()
+            .collection('users').doc(user.uid)
+            .update({
+              queuedTropyNotifications: firebase.firestore.FieldValue.arrayRemove(currentTropyRef.current)
+            })
+        })
+    )
+    return () => {
+      subscriptions.unsubscribe()
+    }
+  }, [subjectShouldUpdate, user?.uid])
 
   
   useEffect(() => {
@@ -161,8 +183,10 @@ export default function App(props) {
     if (!pendingTropiesReady) return;
 
     let intervalHandle = null;
+    let secondaryHandle = null;
     const interval = 5000;
-    const animationInterval = 200;
+    const seenInterval = 1000; // time after shown to judge notification as "seen"
+    const animationInterval = 200; // animation length (change with css)
 
     setup();
     function setup() {
@@ -170,9 +194,11 @@ export default function App(props) {
       if (!currentItem)
         return;
 
+      currentTropyRef.current = currentItem._ref
       setNotificationTropy(currentItem)
       setVisualShowTropyNotify(true)
 
+      secondaryHandle = setTimeout(() => {subjectShouldUpdate.next()}, seenInterval);
       intervalHandle = setTimeout(teardown, interval + animationInterval);
     }
     function teardown() {
@@ -183,8 +209,9 @@ export default function App(props) {
 
     return () => {
       clearTimeout(intervalHandle)
+      clearTimeout(secondaryHandle)
     }
-  }, [pendingTropiesReady])
+  }, [pendingTropiesReady, subjectShouldUpdate])
   
   // useEffect(() => {
   //   introJs().setOptions({
