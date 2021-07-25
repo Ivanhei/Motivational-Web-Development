@@ -28,8 +28,8 @@ export default function Congratulations({
 
   // time parse
   const hasTime = useMemo(() => !!totalTime, [totalTime])
-  const mintues = useMemo(() => !totalTime ? null : Math.floor(totalTime / 1000 / 60), [totalTime])
-  const seconds = useMemo(() => !totalTime ? null : totalTime / 1000 % 60, [totalTime])
+  const mintues = useMemo(() => !totalTime ? null : Math.floor(totalTime / 60), [totalTime])
+  const seconds = useMemo(() => !totalTime ? null : totalTime % 60, [totalTime])
 
   return (
     <div className="finishScreen session">

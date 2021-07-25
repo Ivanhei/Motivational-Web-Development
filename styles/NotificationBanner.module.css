@@ -1,0 +1,57 @@
+
+.notificationBanner {
+  position: absolute;
+  top: 5rem;
+  right: -28rem;
+  opacity: 0;
+  width: 28rem;
+  height: 6rem;
+  background: #f0f0f0;
+  white-space: nowrap;
+  transition: 0.2s ease-in;
+  /* box-shadow: 0 .25rem .5rem rgba(var(--color-text-rgb), 0.1); */
+  display: flex;
+}
+.notificationBanner.shown {
+  right: 0;
+  opacity: 1;
+  transition: 0.2s ease;
+}
+.notificationBanner .icon {
+  height: 100%;
+  aspect-ratio: 1/1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.notificationBanner .icon svg {
+  max-height: 50%;
+  max-width: 50%;
+  fill: #CD7F32;
+}
+.notificationBanner .ruby svg {
+  fill: #FF5F5F;
+}
+.notificationBanner .diamond svg {
+  fill: #7CE7FF;
+}
+.notificationBanner .gold svg {
+  fill: #FFD700;
+}
+.notificationBanner .sliver svg {
+  fill: #C0C0C0;
+}
+.notificationBanner .bronze svg {
+  fill: #CD7F32;
+}
+.notificationBanner .detail {
+  padding: 0.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: left;
+}
+.notificationBanner .detail .name {
+  font-weight: bold;
+}

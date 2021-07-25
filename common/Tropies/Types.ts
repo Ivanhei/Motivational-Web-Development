@@ -3,13 +3,16 @@ import firebase from '@/common/firebase_init';
 import { tropyChecker } from './Operators';
 // import 'firebase/firestore';
 
+export type TopicDocRef = firebase.firestore.DocumentReference
+export type TopicDocRefNoMiss = {ref: TopicDocRef, noMiss: boolean}
+
 export interface SessionResult {
   // tropies for quizes
   clearTime: number
   noMiss: boolean
 
   // tropies for across multiple quizes
-  finishedTopics: Array<firebase.firestore.DocumentReference>
+  finishedTopics: Array<TopicDocRefNoMiss>
   sessionFinish: boolean // indicate whther it's a quiz session finishing or not
 
   // other tropies
@@ -41,10 +44,11 @@ export class Tropy implements TropyInterface {
 
   private checker: TropyChecker
 
-  constructor({color, condition, name}: TropyInterface) {
+  constructor({color, condition, name, _ref}: TropyInterface) {
     this.color = color
     this.condition = condition
     this.name = name
+    this._ref = _ref
     this.checker = tropyChecker(this.condition)
   }
 

@@ -22,14 +22,14 @@ body {
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500&display=swap');
-/* @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
 
 html, body, #__next {
 	height: 100%;
 }
 body {
 	font-family: 
-		/* 'M PLUS Rounded 1c', */
+		'M PLUS Rounded 1c',
 		'Kiwi Maru',
 		serif;
 }
@@ -399,4 +399,12 @@ main {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
+}
+
+.overlay-layout.transparent {
+  background: transparent;
+}
+
+.overlay-layout.right {
+  left: 100%;
 }

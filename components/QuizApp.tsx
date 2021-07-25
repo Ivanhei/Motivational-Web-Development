@@ -48,7 +48,7 @@ import {
   useUserSubject,
 } from '@/common/utils';
 
-import { SessionResult, Tropy, TropyInterface } from '@/common/Tropies/Types';
+import { SessionResult, TopicDocRefNoMiss, Tropy, TropyInterface } from '@/common/Tropies/Types';
 
 const db = firebase.firestore();
 
@@ -66,11 +66,12 @@ export default function QuizApp(props) {
 
   const subjectFinishQuizSignal = useMemo(() => new Subject<void>(), []);
   const subjectUser = useUserSubject();
-  const subjectClearedTopicRefs = useMemo(() => new Subject<Array<firebase.firestore.DocumentReference>>(), []);
+  const subjectUserDoc = useMemo(() => new ReplaySubject<any>(1), []);
+  const subjectClearedTopicRefs = useMemo(() => new Subject<Array<TopicDocRefNoMiss>>(), []);
 
   //const [tropies, setTropies] = useState<Array<Tropy> | null>(null);
   const subjectTrophies = useMemo(() => new Subject<Array<Tropy>>(), []);
-  const subjectNoMiss = useMemo(() => new BehaviorSubject<boolean>(true), []);
+  const noMiss = useRef(true);
 
   useEffect(() => {
     if (loaded && pageNum === numPages) {
@@ -83,24 +84,26 @@ export default function QuizApp(props) {
     // subjects
     const subjectFinishedTopic = new Subject<boolean>();
 
-    const subjectAlreadyDoneProblems = subjectUser
+    const subjectTopicFinishedProblems = subjectUser
       .pipe(filter(user => !!user))
       .pipe(first())
       // only need user info once, will complete after 1 item ;)
-      .pipe(map(user => firebase.firestore()
+      .pipe(mergeMap(user => firebase.firestore()
         .collection('users').doc(user.uid)
         .collection('finishedProblems').doc(topic.id)
         .get()))
-      .pipe(mergeMap(a => a))
       .pipe(problemOperators.convertDocSnapshotToDoc)
-      .pipe(map(doc => doc.problems))
+      .pipe(share())
 
     const subjectTopicDoc = new Subject<any>();
 
     const subjectTopicProblemRefs = subjectTopicDoc
       .pipe(map((topic: any) => topic.problems))
 
-    const subjectProblemsDocRefArray = combineLatest([subjectAlreadyDoneProblems, subjectTopicProblemRefs])
+    const subjectProblemsDocRefArray = combineLatest([
+      subjectTopicFinishedProblems.pipe(map(doc => doc.problems)),
+      subjectTopicProblemRefs
+    ])
       .pipe(map(([doneProblemRefs, allProblemRefs]) => {
         const numberOfNewProblems = 8;
         const numberOfDoneProblems = 2;
@@ -115,7 +118,7 @@ export default function QuizApp(props) {
           return problemOperators.rawRandomSelectNFromArray(numberOfProblems)(allProblemRefs);
         }
 
-        // select 10 problems. 
+        // select 10 problems.
         // new : done =  8 : 2
         const notDoneProblemRefs = removeUnwantedItems(allProblemRefs, doneProblemRefs)
 
@@ -176,16 +179,24 @@ export default function QuizApp(props) {
 
     // (for finish answering all problems: store which questions user finished)
     subscriptions.add(
-      combineLatest([subjectTopicDoc, subjectProblemsDocRefArray, subjectUser, subjectFinishQuizSignal])
-        .pipe(filter(([topicDoc, problemsDocRefArray, user, finish]) => !!user))
+      combineLatest([
+        subjectTopicDoc,
+        subjectTopicFinishedProblems
+          .pipe(map(topic => topic.noMiss === undefined || topic.noMiss === null ? true : topic.noMiss)),
+        subjectProblemsDocRefArray,
+        subjectUser,
+        subjectFinishQuizSignal,
+      ])
+        .pipe(filter(([topicDoc, topicNoMiss, problemsDocRefArray, user, finish]) => !!user))
         .pipe(first()) // only save the problems once ;)
-        .subscribe(([topicDoc, problemsDocRefArray, user, finish]) => {
+        .subscribe(([topicDoc, topicNoMiss, problemsDocRefArray, user]) => {
           firebase.firestore()
             .collection('users').doc(user.uid)
             .collection('finishedProblems').doc(topicDoc.id)
             .set({
               topic: topicDoc._ref,
               problems: firebase.firestore.FieldValue.arrayUnion(...problemsDocRefArray),
+              noMiss: topicNoMiss && noMiss.current,
             }, { merge: true });
         })
     );
@@ -203,19 +214,42 @@ export default function QuizApp(props) {
     )
 
     subscriptions.add(
-      combineLatest([subjectTopicDoc, subjectUser, subjectFinishedTopic])
-        .subscribe(([topicDoc, user, finished]) => {
+      subjectUser
+        .pipe(mergeMap(user => 
           firebase.firestore()
             .collection('users').doc(user.uid)
             .get()
-            .then(userDoc => {
-              const clearedTopics = (userDoc.data().finishedTopics as Array<firebase.firestore.DocumentReference>)
+        ))
+        .pipe(problemOperators.convertDocSnapshotToDoc)
+        .subscribe(subjectUserDoc)
+    )
 
-              if (finished) clearedTopics.push(topicDoc._ref)
+    subscriptions.add(
+      combineLatest([subjectTopicDoc, subjectUser, subjectUserDoc, subjectFinishedTopic])
+        .pipe(mergeMap(([topicDoc, user, userDoc, finished]) => {
+          const clearedTopics = [];
 
-              subjectClearedTopicRefs.next(clearedTopics)
-            })
-        })
+          if (userDoc.finishedTopics instanceof Array)
+            clearedTopics.push(...(userDoc.finishedTopics as Array<firebase.firestore.DocumentReference>))
+
+          if (finished && !clearedTopics.some(topic => topic.isEqual(topicDoc._ref)))
+            clearedTopics.push(topicDoc._ref)
+
+          // Promise.all("array of Promise of [topicRef, boolean]")
+          return Promise.all(clearedTopics.map(topicRef => 
+            firebase.firestore()
+              .collection('users').doc(user.uid)
+              .collection('finishedProblems').doc(topicRef.id)
+              .get()
+              .then(doc => {
+                return {
+                  ref: topicRef, 
+                  noMiss: doc.data() === null ? true : doc.data().noMiss
+                } as TopicDocRefNoMiss;
+              })
+          ))
+        }))
+        .subscribe(subjectClearedTopicRefs)
     )
 
      // make it hot after all circuitry completed.
@@ -227,13 +261,13 @@ export default function QuizApp(props) {
     // make it hot after all circuitry completed.
     subscriptions.add(from(db.collection('trophies').get())
       .pipe(problemOperators.convertQuerySnapshotToDocs)
-      .pipe(map(tropyOperators.convertTropyDocsToTropies))
+      .pipe(tropyOperators.convertTropyDocsToTropies)
       .subscribe(subjectTrophies));
 
     return () => {
       subscriptions.unsubscribe();
     };
-  }, [subjectClearedTopicRefs, subjectFinishQuizSignal, subjectTrophies, subjectUser, topic]);
+  }, [subjectClearedTopicRefs, subjectFinishQuizSignal, subjectTrophies, subjectUser, subjectUserDoc, topic]);
 
   // timer
   const timeStart = useRef<number>(null);
@@ -251,9 +285,8 @@ export default function QuizApp(props) {
     const subscriptions = new Subscription();
 
     subscriptions.add(subjectFinishQuizSignal.subscribe(() => {
-      subjectTotalTime.next(120)
       if (timeStart.current != null) {
-        const time = Date.now() - timeStart.current;
+        const time = (Date.now() - timeStart.current) / 1000;
         setTotalTime(time)
         subjectTotalTime.next(time)
       }
@@ -262,33 +295,48 @@ export default function QuizApp(props) {
     subscriptions.add(
       combineLatest([
         subjectTrophies,
-        subjectTotalTime, // only have value when finished a quiz
+        subjectTotalTime, // only emit a value when finishing a quiz
         subjectUser,
+        subjectUserDoc.pipe(map(userDoc => userDoc.finishedTropies)),
         subjectClearedTopicRefs,
-        subjectNoMiss.pipe(distinctUntilChanged()), // TODO: no-miss logic for mutiple topics
       ])
         .pipe(filter(([tropies]) => !!tropies && (tropies.length > 0)))
         .pipe(filter(([tropies, time]) => !!time))
-        .subscribe(([tropies, clearTime, user, finishedTopics, noMiss]) => {
+        .subscribe(([tropies, clearTime, user, doneTropies, finishedTopicsPairs]) => {
           const sessionResult: SessionResult = {
             clearTime,
-            noMiss,
-            finishedTopics,
+            noMiss: noMiss.current,
+            finishedTopics: finishedTopicsPairs,
 
             sessionFinish: true,
             login: !!user,
           }
 
-          tropies.forEach(tropy => {
-            console.log(tropy.check(sessionResult), tropy.color, tropy.name, tropy.condition)
-          })
+          const newlyDoneTropiesRefs = [];
+
+          tropies
+            .filter(tropy => doneTropies ? doneTropies.every(doneTropy => !tropy._ref.isEqual(doneTropy)) : true)
+            .forEach(tropy => {
+              /**/console.log(tropy.check(sessionResult), tropy.color, tropy.name, tropy.condition)
+
+              if (tropy.check(sessionResult))
+              newlyDoneTropiesRefs.push(tropy._ref)
+            })
+
+          // add finished tropies
+          firebase.firestore()
+            .collection('users').doc(user.uid)
+            .set({
+              finishedTropies: firebase.firestore.FieldValue.arrayUnion(...newlyDoneTropiesRefs),
+              queuedTropyNotifications: firebase.firestore.FieldValue.arrayUnion(...newlyDoneTropiesRefs),
+            }, { merge: true })
         })
     )
 
     return () => {
       subscriptions.unsubscribe();
     }
-  }, [subjectClearedTopicRefs, subjectFinishQuizSignal, subjectNoMiss, subjectTotalTime, subjectTrophies, subjectUser])
+  }, [subjectClearedTopicRefs, subjectFinishQuizSignal, subjectTotalTime, subjectTrophies, subjectUser, subjectUserDoc])
 
   return (
     <div className="app-container">
@@ -317,8 +365,8 @@ export default function QuizApp(props) {
           onCorrect={() => {
             setProgress((progress) => progress + 1 / numPages);
           }}
-          onNext={(isCorrect) => {
-            if (!isCorrect) subjectNoMiss.next(false);
+          onNext={(isCorrect: boolean) => {
+            if (!isCorrect) noMiss.current = false
 
             if (isCorrect)
               setPageNum((pageNum) => pageNum + 1);
