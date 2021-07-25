@@ -23,7 +23,7 @@ import {
 } from "rxjs/operators";
 
 // utils
-import { usePath, useSimpleSoundEffect } from '@/common/utils';
+import { getRandomInt, usePath, useSimpleSoundEffect } from '@/common/utils';
 
 // Strings
 import { quizStringsPack, QuizStrings } from '@/common/Strings/quiz';
@@ -178,10 +178,10 @@ export default function Challenge(props, ref) {
             </div>
             <div className="flex-grow">
               <div className="primary">
-              正解例
+                {answerState === AnswerState.ANSWER_CORRECT ? strings.advice_primary[getRandomInt(strings.advice_primary.length)] : "正解例："}
               </div>
               <div className="secondary">
-              You&apos;re going great!
+                {answerState === AnswerState.ANSWER_CORRECT ? strings.advice_primary[getRandomInt(strings.advice_primary.length)] : challenge.answer}
               </div>
             </div>
             <button onClick={e => artificialEnterKeyUps.next()}><ArrowIcon/></button>

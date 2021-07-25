@@ -310,11 +310,15 @@ main {
 }
 
 .advice > .session .primary {
-  font-size: 2rem;
+  color: hsl(160, 100%, 48%);
+  font-weight: bold;
+  font-size: 2.15rem;
 }
 
 .advice > .session .secondary {
-  font-size: 1rem;
+  color: hsl(160, 100%, 48%);
+  font-weight: bold;
+  font-size: 1.75rem;
 }
 
 .advice > .session button {
@@ -370,11 +374,11 @@ main {
   transition: 0s;
 }
 .advice.incorrect > .session .primary {
-  font-size: 2rem;
+  color: #FAFAFA;
 }
 
 .advice.incorrect > .session .secondary {
-  font-size: 1rem;
+  color: #FAFAFA;
 }
 
 /* finish screen */
