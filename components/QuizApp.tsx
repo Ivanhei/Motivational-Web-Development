@@ -48,7 +48,7 @@ import {
   useUserSubject,
 } from '@/common/utils';
 
-import { SessionResult, TopicDocRefPair, Tropy, TropyInterface } from '@/common/Tropies/Types';
+import { SessionResult, TopicDocRefNoMiss, Tropy, TropyInterface } from '@/common/Tropies/Types';
 
 const db = firebase.firestore();
 
@@ -66,7 +66,7 @@ export default function QuizApp(props) {
 
   const subjectFinishQuizSignal = useMemo(() => new Subject<void>(), []);
   const subjectUser = useUserSubject();
-  const subjectClearedTopicRefs = useMemo(() => new Subject<Array<TopicDocRefPair>>(), []);
+  const subjectClearedTopicRefs = useMemo(() => new Subject<Array<TopicDocRefNoMiss>>(), []);
 
   //const [tropies, setTropies] = useState<Array<Tropy> | null>(null);
   const subjectTrophies = useMemo(() => new Subject<Array<Tropy>>(), []);
@@ -231,7 +231,10 @@ export default function QuizApp(props) {
               .collection('finishedProblems').doc(topicRef.id)
               .get()
               .then(doc => {
-                return [topicRef, doc.data()?.noMiss]
+                return {
+                  ref: topicRef, 
+                  noMiss: doc.data() === null ? true : doc.data().noMiss
+                } as TopicDocRefNoMiss;
               })
           ))
         }))
@@ -271,9 +274,8 @@ export default function QuizApp(props) {
     const subscriptions = new Subscription();
 
     subscriptions.add(subjectFinishQuizSignal.subscribe(() => {
-      subjectTotalTime.next(120)
       if (timeStart.current != null) {
-        const time = Date.now() - timeStart.current;
+        const time = (Date.now() - timeStart.current) / 1000;
         setTotalTime(time)
         subjectTotalTime.next(time)
       }

@@ -3,8 +3,8 @@ import firebase from '@/common/firebase_init';
 import { tropyChecker } from './Operators';
 // import 'firebase/firestore';
 
-export type TopicDocRef = firebase.firestore.DocumentReference;
-export type TopicDocRefPair = [TopicDocRef, boolean];
+export type TopicDocRef = firebase.firestore.DocumentReference
+export type TopicDocRefNoMiss = {ref: TopicDocRef, noMiss: boolean}
 
 export interface SessionResult {
   // tropies for quizes
@@ -12,7 +12,7 @@ export interface SessionResult {
   noMiss: boolean
 
   // tropies for across multiple quizes
-  finishedTopics: Array<TopicDocRefPair>
+  finishedTopics: Array<TopicDocRefNoMiss>
   sessionFinish: boolean // indicate whther it's a quiz session finishing or not
 
   // other tropies

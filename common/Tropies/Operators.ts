@@ -1,12 +1,12 @@
 import firebase from "firebase";
-import { SessionResult, TopicDocRef, TopicDocRefPair, Tropy, TropyCondition, TropyInterface } from "./Types";
+import { SessionResult, TopicDocRef, TopicDocRefNoMiss, Tropy, TropyCondition, TropyInterface } from "./Types";
 
 
-function topicPairArrayHasTopic(pairs: Array<TopicDocRefPair>, topic: TopicDocRef, noMiss: boolean = false) {
+function topicPairArrayHasTopic(pairs: Array<TopicDocRefNoMiss>, topic: TopicDocRef, noMiss: boolean = false) {
   if (noMiss)
-    return pairs.some(topicPair => topicPair[0].isEqual(topic) && topicPair[1])
+    return pairs.some(topicPair => topicPair.ref.isEqual(topic) && topicPair.noMiss)
   else
-    return pairs.some(topicPair => topicPair[0].isEqual(topic))
+    return pairs.some(topicPair => topicPair.ref.isEqual(topic))
 }
 
 export function tropyChecker(tropyCondition: TropyCondition) {
