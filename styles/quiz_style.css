@@ -471,9 +471,22 @@ main {
   width: 45%;
 }
 
+.tropies-container {
+
+}
+
+.tropies {
+  margin-top: 12rem;
+  border: 1px solid var(--color-text);
+  border-radius: 2.5rem;
+  padding: 2.5rem;
+}
+
 /* overlay */
-/* .overlay-container {
-} */
+.overlay-container {
+  position: fixed;
+  z-index: 1;
+}
 
 .overlay-layout {
   position: fixed;
@@ -487,4 +500,14 @@ main {
 
 .overlay-layout.right {
   left: 100%;
+}
+
+/* Login */
+#login-container {
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

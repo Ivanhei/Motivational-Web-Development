@@ -41,6 +41,7 @@ import { Tropy, TropyInterface } from '@/common/Tropies/Types';
 import NotificationBanner from '@/components/NotificationBanner';
 import { LanguageTag } from '@/common/Strings/Types';
 import { HomeStrings, homeStringsPack } from '@/common/Strings/home';
+import NavgigationBar from '@/components/NavigationBar';
 
 function TopicIconBackground(props) {
   const color = props.color || "#333333";
@@ -92,29 +93,6 @@ function Topic({link, color, overlay, name}) {
 
 export default function App(props) {
   const {userLoaded, user} = useLoadedUser();
-  const [avatarUpdateSignal, setAvatarUpdateSignal] = useState(false);
-  const triggerAvatarUpdateSignal = useCallback(() => {
-    setAvatarUpdateSignal(s => !s)
-  }, []);
-
-  const overlayContainer = useRef(null);
-  const [showChangeIconDialog, setShowChangeIconDialog] = useState(false);
-
-  const [avatarURL, setAvatarURL] = useState(null);
-  useEffect(() => {
-    setAvatarURL(null);
-    if (!user) {
-      return;
-    }
-
-    storageRef.child('UserAvatar/' + user.uid).getDownloadURL()
-      .catch((e) => {
-        return storageRef.child('UserAvatar/default_male.png').getDownloadURL()
-      })
-      .then(url => {
-        setAvatarURL(url);
-      })
-  }, [user, avatarUpdateSignal])
 
   // notifications
   const subjectUser = useUserSubject()
@@ -157,10 +135,10 @@ export default function App(props) {
 
     subscriptions.add(
       subjectUser
-        .pipe(mergeMap(user => 
+        .pipe(mergeMap(user => user.uid ?
           firebase.firestore()
             .collection('users').doc(user.uid)
-            .get()
+            .get() : null
         ))
         .pipe(problemOperators.convertDocSnapshotToDoc)
         .subscribe(subjectUserDoc)
@@ -239,52 +217,7 @@ export default function App(props) {
       <Head>
         <title>Motivational Web Development</title>
       </Head>
-      <nav className="homeNav">
-        <div className="session">
-          <IconLink title={strings.nav_home} icon={<HomeIcon/>} link="/" />
-          <IconLink title={strings.nav_trophies} icon={<ChallengeIcon/>} link="/trophies" />
-          <div className="item" style={{paddingTop: "1.5rem", paddingBottom: "1.5rem"}}>
-          {!userLoaded || (user && !avatarURL) ? <div className="group relative flex items-center">
-              <div className="w-16 h-16 rounded-full">
-                <LoadingIcon
-                  style={{
-                    width: "100%",
-                  }}/>
-              </div>
-            </div> :
-          user ? (
-            <div className="group relative flex items-center">
-              <div
-                style={{
-                  backgroundImage: `url(${avatarURL})`,
-                  backgroundColor: "rgba(var(--color-text-rgb), 0.25)",
-                  backgroundSize: "cover"
-                }}
-                className="w-12 h-12 rounded-full"
-              />
-              <div
-                style={{top: "100%", right: -10, marginTop: -10, background: "#fff", whiteSpace: "nowrap"}}
-                className="group-hover:block absolute shadow-xl rounded-2xl hidden text-center"
-              >
-                <div className="px-8 py-3 hover:bg-gray-100 active:bg-gray-200 rounded-t-2xl"
-                  onClick={(e) => {
-                    //showChangeIcon();
-                    setShowChangeIconDialog(true);
-                  }}
-                >{strings.user_change_avatar}</div>
-                <div className="px-8 py-3 hover:bg-gray-100 active:bg-gray-200 rounded-b-2xl"
-                  onClick={(e) => {
-                    firebase.auth().signOut()
-                  }}
-                >{strings.user_logout}</div>
-              </div>
-            </div>
-          ) : (
-            <IconLink title="Login" link={strings.user_login} />
-          )}
-          </div>
-        </div>
-      </nav>
+      <NavgigationBar language={languageTag}/>
 
       <div className="topics session">
         <Topic
@@ -307,14 +240,7 @@ export default function App(props) {
         />
       </div>
     </div>
-
-    <div className="overlay-container" ref={overlayContainer}>
-      <ChangeAvatarDialog shown={showChangeIconDialog} onSave={() => {
-        setShowChangeIconDialog(false);
-        triggerAvatarUpdateSignal(); // update avatar after save
-      }} onClose={() => {
-        setShowChangeIconDialog(false);
-      }} language={languageTag}/>
+    <div className="overlay-container">
       <div className="overlay-layout right transparent">
         <NotificationBanner shown={visualShowTropyNotify} message="トロフィーをゲットしました！" tropy={notificationTropy}/>
       </div>
