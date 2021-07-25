@@ -5,6 +5,6 @@ export function AbbreviationQuestionArea({
 }) {
 
   return <div className="question_area abbreviation">
-    {question}
+    <div className="primary">{question}</div>
   </div>
 }
