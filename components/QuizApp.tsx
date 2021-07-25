@@ -16,6 +16,7 @@ import Congratulations from '@/components/Congratulations';
 import LoadingLayout from '@/components/LoadingLayout';
 
 import {
+  BehaviorSubject,
   combineLatest,
   from,
   ReplaySubject,
@@ -24,6 +25,7 @@ import {
 } from 'rxjs';
 
 import {
+  distinctUntilChanged,
   filter,
   first,
   map,
@@ -46,7 +48,7 @@ import {
   useUserSubject,
 } from '@/common/utils';
 
-import { Tropy, TropyInterface } from '@/common/Tropies/Types';
+import { SessionResult, Tropy, TropyInterface } from '@/common/Tropies/Types';
 
 const db = firebase.firestore();
 
@@ -63,9 +65,12 @@ export default function QuizApp(props) {
   const [showLogin, setShowLogin] = useState(false);
 
   const subjectFinishQuizSignal = useMemo(() => new Subject<void>(), []);
+  const subjectFinishedTopicSignal = useMemo(() => new Subject<void>(), []);
   const subjectUser = useUserSubject();
 
-  const [tropies, setTropies] = useState<Array<Tropy> | null>(null);
+  //const [tropies, setTropies] = useState<Array<Tropy> | null>(null);
+  const subjectTrophies = useMemo(() => new Subject<Array<Tropy>>(), []);
+  const subjectNoMiss = useMemo(() => new BehaviorSubject<boolean>(true), []);
 
   useEffect(() => {
     if (loaded && pageNum === numPages) {
@@ -121,9 +126,18 @@ export default function QuizApp(props) {
         while (problems.length < numberOfProblems) {
           if (notDoneProblemsRefsLeftOver.length > 0)
             problems.push(notDoneProblemsRefsLeftOver.splice(0, 1)[0])
-          else
+          else if (doneProblemsRefsLeftOver.length > 0)
             problems.push(doneProblemsRefsLeftOver.splice(0, 1)[0])
+          else
+            break;
         }
+
+        if (notDoneProblemsRefsLeftOver.length === 0) {
+          subjectFinishedTopicSignal.next();
+          subjectFinishedTopicSignal.complete();
+        }
+        else
+          subjectFinishedTopicSignal.complete();
 
         return problems;
       }))
@@ -140,9 +154,6 @@ export default function QuizApp(props) {
       })))
       .pipe(problemOperators.fetchAudioURLForDocs)
       .pipe(problemOperators.fetchImageURLForDocs)
-
-    /// tropies
-    const subjectTrophies = new Subject<Array<Tropy>>();
 
     // subscriptions
     const subscriptions = new Subscription();
@@ -175,14 +186,25 @@ export default function QuizApp(props) {
         })
     );
 
+    subscriptions.add(
+      combineLatest([subjectTopicDoc, subjectUser, subjectFinishedTopicSignal])
+        .subscribe(([topicDoc, user]) => {
+          firebase.firestore()
+            .collection('users').doc(user.uid)
+            .set({
+              finishedTopics: firebase.firestore.FieldValue.arrayUnion(topicDoc._ref),
+            }, { merge: true })
+        })
+    )
+
      // make it hot after all circuitry completed.
     subscriptions.add(from(topic.get())
       // since promise only has one value, this will complete after promise is resolved.
       .pipe(problemOperators.convertDocSnapshotToDoc)
       .subscribe(subjectTopicDoc));
 
-    // set login
-    subscriptions.add(subjectTrophies.subscribe(topies => setTropies(topies)));
+    // set tropies
+    //subscriptions.add(subjectTrophies.subscribe(topies => setTropies(topies)));
 
     // make it hot after all circuitry completed.
     subscriptions.add(from(db.collection('trophies').get())
@@ -193,35 +215,61 @@ export default function QuizApp(props) {
     return () => {
       subscriptions.unsubscribe();
     };
-  }, [subjectFinishQuizSignal, subjectUser, topic]);
+  }, [subjectFinishQuizSignal, subjectFinishedTopicSignal, subjectTrophies, subjectUser, topic]);
 
   // timer
   const timeStart = useRef<number>(null);
   const [totalTime, setTotalTime] = useState<number>(null); // ms
+  const subjectTotalTime = useMemo(() => new ReplaySubject<number>(1), [])
   useEffect(() => {
-    if (!loaded) return;
     // page start
-    if (pageNum === 0) {
+    if (loaded && pageNum === 0) {
       timeStart.current = Date.now();
     }
+  }, [loaded, pageNum]);
 
-    // page end
-    if (pageNum === challenges.length) {
+  useEffect(() => {
+    // subscriptions
+    const subscriptions = new Subscription();
+
+    subscriptions.add(subjectFinishQuizSignal.subscribe(() => {
+      subjectTotalTime.next(120)
       if (timeStart.current != null) {
-        setTotalTime(Date.now() - timeStart.current)
+        const time = Date.now() - timeStart.current;
+        setTotalTime(time)
+        subjectTotalTime.next(time)
       }
+    }))
 
-      // TODO: convert to using rxjs and emit "end quiz" signal
-      // if (tropies)
-      //   console.log(tropies)
-      //   // for (const tropy of tropies) {
-      //   //   if (tropy.check({})) {
-            
-      //   //   }
-      //   // }
+    subscriptions.add(
+      combineLatest([
+        subjectTrophies,
+        subjectTotalTime, // only have value when finished a quiz
+        subjectUser,
+        //from(db.collection('user').doc(user.uid).get()),
+        subjectNoMiss.pipe(distinctUntilChanged()),
+      ])
+        .pipe(filter(([tropies]) => !!tropies && (tropies.length > 0)))
+        .pipe(filter(([tropies, time]) => !!time))
+        .subscribe(([tropies, clearTime, user, noMiss]) => {
+          const sessionResult: SessionResult = {
+            clearTime,
+            noMiss,
+            finishedTopics: [],
+            sessionFinish: true,
+            login: !!user
+          }
+
+          tropies.forEach(tropy => {
+            console.log(tropy.check(sessionResult), tropy.color, tropy.name, tropy.condition)
+          })
+        })
+    )
+
+    return () => {
+      subscriptions.unsubscribe();
     }
-
-  },[challenges.length, loaded, pageNum, tropies])
+  }, [subjectFinishQuizSignal, subjectNoMiss, subjectTotalTime, subjectTrophies, subjectUser])
 
   return (
     <div className="app-container">
@@ -251,6 +299,8 @@ export default function QuizApp(props) {
             setProgress((progress) => progress + 1 / numPages);
           }}
           onNext={(isCorrect) => {
+            if (!isCorrect) subjectNoMiss.next(false);
+
             if (isCorrect)
               setPageNum((pageNum) => pageNum + 1);
             else

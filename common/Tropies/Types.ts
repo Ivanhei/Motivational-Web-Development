@@ -28,6 +28,7 @@ export interface TropyInterface {
   color: string
   condition: TropyCondition
   name: string
+  _ref: firebase.firestore.DocumentReference
 }
 
 export type TropyChecker = (sessionResult: SessionResult) => boolean;
@@ -36,6 +37,7 @@ export class Tropy implements TropyInterface {
   color: string
   condition: TropyCondition
   name: string
+  _ref: firebase.firestore.DocumentReference
 
   private checker: TropyChecker
 
