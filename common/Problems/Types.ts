@@ -1,7 +1,7 @@
 
 // challenge types
 export type ProblemType = 'mc' | 'spelling' | 'speech'; // required actions are different
-export type ProblemSubType = 'translate' | 'audio'; // provided info is different
+export type ProblemSubType = 'translate' | 'audio' | 'abbrv'; // provided info is different
 
 export interface Problem {
   type: ProblemType
@@ -49,8 +49,15 @@ export interface AudioProblem extends Problem {
   audio_url?: string
 }
 
+export interface AbbreviationProblem extends Problem {
+  subtype: 'abbrv'
+
+  question: string
+}
+
 export type MultipleChoiceTranslateProblem = TranslateProblem & MultipleChoiceProblem;
 export type MultipleChoiceAudioProblem = AudioProblem & MultipleChoiceProblem;
+export type MultipleChoiceAbbreviationProblem = AbbreviationProblem & MultipleChoiceProblem;
 
 export type SpellingTranslateProblem = TranslateProblem & SpellingProblem;
 export type SpellingAudioProblem = AudioProblem & SpellingProblem;

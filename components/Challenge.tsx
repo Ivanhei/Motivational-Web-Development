@@ -39,6 +39,7 @@ import MultipleChoiceTranslate from './Problems/MultipleChoiceTranslate';
 import SpellingAudio from './Problems/SpellingAudio';
 import SpellingTranslate from './Problems/SpellingTranslate';
 import Speech from './Problems/Speech';
+import MultipleChoiceAbbreviation from "./Problems/MultipleChoiceAbbreviation";
 
 
 export default function Challenge(props, ref) {
@@ -52,7 +53,7 @@ export default function Challenge(props, ref) {
   // Problem Type UI + logic
   const problemComponent: ProblemComponent = useMemo(() => {
     if (challenge.type === "mc") {
-      return (challenge?.subtype === "translate" ? MultipleChoiceTranslate : MultipleChoiceAudio);
+      return (challenge?.subtype === "translate" ? MultipleChoiceTranslate : (challenge?.subtype === "abbrv" ? MultipleChoiceAbbreviation : MultipleChoiceAudio));
     }
     else if (challenge.type === "spelling") {
       return (challenge?.subtype === "translate" ? SpellingTranslate : SpellingAudio);
