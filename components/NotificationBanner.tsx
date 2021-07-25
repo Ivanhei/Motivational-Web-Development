@@ -1,10 +1,10 @@
 import notificationStyles from '@/styles/NotificationBanner.module.css'
 
-import { Tropy } from "@/common/Tropies/Types";
+import { TropyInterface } from "@/common/Tropies/Types";
 
 import { TrophyIcon } from '@/assets/Icons'
 
-export default function NotificationBanner({shown, message, tropy: {name, color}}: {shown: boolean, message: string, tropy: Tropy}) {
+export default function NotificationBanner({shown, message, tropy: {name, color}}: {shown: boolean, message: string, tropy: TropyInterface}) {
   return <div className={`
     ${notificationStyles.notificationBanner}
     ${notificationStyles[color]}
