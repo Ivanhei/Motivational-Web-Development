@@ -261,7 +261,7 @@ export default function QuizApp(props) {
     // make it hot after all circuitry completed.
     subscriptions.add(from(db.collection('trophies').get())
       .pipe(problemOperators.convertQuerySnapshotToDocs)
-      .pipe(map(tropyOperators.convertTropyDocsToTropies))
+      .pipe(tropyOperators.convertTropyDocsToTropies)
       .subscribe(subjectTrophies));
 
     return () => {

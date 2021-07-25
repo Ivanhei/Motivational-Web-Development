@@ -17,16 +17,28 @@ import {
   CrossIcon,
 } from '@/assets/Icons';
 
-import { useLoadedUser } from '@/common/utils';
+import {
+  useLoadedUser,
+  useUserSubject,
+} from '@/common/utils';
 
 import React, {
   useEffect,
   useState,
   useRef,
   useCallback,
+  useMemo,
 } from 'react';
 
+import { ReplaySubject, Subject, Subscription } from 'rxjs';
+import { map, mergeMap } from 'rxjs/operators';
+
+import * as problemOperators from '@/common/Problems/Operators'
+import * as tropyOperators from '@/common/Tropies/Operators'
+
 import ChangeAvatarDialog from '@/components/ChangeAvatarDialog'
+import { Tropy, TropyInterface } from '@/common/Tropies/Types';
+import NotificationBanner from '@/components/NotificationBanner';
 
 function TopicIconBackground(props) {
   const color = props.color || "#333333";
@@ -100,6 +112,80 @@ export default function App(props) {
       })
   }, [user, avatarUpdateSignal])
 
+  // notifications
+  const subjectUser = useUserSubject()
+  const subjectUserDoc = useMemo(() => new ReplaySubject<any>(1), [])
+  //const subjectTropyNotifications = useMemo(() => new Subject<any>(), [])
+  const pendingTropies = useRef<Tropy[]>([])
+  const [pendingTropiesReady, setPendingTropiesReady] = useState(false)
+  const [notificationTropy, setNotificationTropy] = useState<TropyInterface>({
+    color: "string",
+    condition: {},
+    name: "string",
+  })
+  const [visualShowTropyNotify, setVisualShowTropyNotify] = useState(false)
+
+  
+  useEffect(() => {
+    const subscriptions = new Subscription();
+
+    subscriptions.add(
+      subjectUser
+        .pipe(mergeMap(user => 
+          firebase.firestore()
+            .collection('users').doc(user.uid)
+            .get()
+        ))
+        .pipe(problemOperators.convertDocSnapshotToDoc)
+        .subscribe(subjectUserDoc)
+    )
+
+    subscriptions.add(
+      subjectUserDoc
+        .pipe(map(userDoc => userDoc.queuedTropyNotifications))
+        .pipe(problemOperators.convertDocRefArrayToDocSnapshotArray)
+        .pipe(problemOperators.convertDocSnapshotArrayToDocs)
+        .pipe(tropyOperators.convertTropyDocsToTropies)
+        .subscribe(tropies => {
+          pendingTropies.current.push(...tropies)
+          setPendingTropiesReady(true)
+        })
+    )
+
+    return () => {
+      subscriptions.unsubscribe()
+    }
+  }, [subjectUser, subjectUserDoc])
+
+  useEffect(() => {
+    if (!pendingTropiesReady) return;
+
+    let intervalHandle = null;
+    const interval = 5000;
+    const animationInterval = 200;
+
+    setup();
+    function setup() {
+      const currentItem = pendingTropies.current.shift();
+      if (!currentItem)
+        return;
+
+      setNotificationTropy(currentItem)
+      setVisualShowTropyNotify(true)
+
+      intervalHandle = setTimeout(teardown, interval + animationInterval);
+    }
+    function teardown() {
+      setVisualShowTropyNotify(false)
+
+      intervalHandle = setTimeout(setup, animationInterval);
+    }
+
+    return () => {
+      clearTimeout(intervalHandle)
+    }
+  }, [pendingTropiesReady])
+  
   // useEffect(() => {
   //   introJs().setOptions({
   //     steps:[{
@@ -193,6 +279,9 @@ export default function App(props) {
       }} onClose={() => {
         setShowChangeIconDialog(false);
       }}/>
+      <div className="overlay-layout right transparent">
+        <NotificationBanner shown={visualShowTropyNotify} message="トロフィーをゲットしました！" tropy={notificationTropy}/>
+      </div>
     </div>
     </>
   );

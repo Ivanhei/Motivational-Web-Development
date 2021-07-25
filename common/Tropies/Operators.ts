@@ -1,5 +1,15 @@
 import firebase from "firebase";
-import { SessionResult, TopicDocRef, TopicDocRefNoMiss, Tropy, TropyCondition, TropyInterface } from "./Types";
+
+import { map } from "rxjs/operators";
+
+import {
+  SessionResult,
+  TopicDocRef,
+  TopicDocRefNoMiss,
+  Tropy,
+  TropyCondition,
+  TropyInterface,
+} from "./Types";
 
 
 function topicPairArrayHasTopic(pairs: Array<TopicDocRefNoMiss>, topic: TopicDocRef, noMiss: boolean = false) {
@@ -49,8 +59,8 @@ export function tropyChecker(tropyCondition: TropyCondition) {
 }
 
 const convertTropyDocsToTropies =
-  (tropyDocs: Array<TropyInterface>) => tropyDocs.map(tropyDoc => new Tropy(tropyDoc))
+  map((tropyDocs: Array<TropyInterface>) => tropyDocs.map(tropyDoc => new Tropy(tropyDoc)))
 
 export {
-  convertTropyDocsToTropies
+  convertTropyDocsToTropies,
 }
