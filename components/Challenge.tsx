@@ -147,7 +147,7 @@ export default function Challenge(props, ref) {
 
 
   // UI lang
-  const languageTag: LanguageTag = useMemo(() => "en" as LanguageTag, [])
+  const languageTag: LanguageTag = props.language
   const strings: QuizStrings = useMemo(() => quizStringsPack[languageTag], [languageTag])
 
 

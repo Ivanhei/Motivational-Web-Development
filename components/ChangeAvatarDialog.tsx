@@ -21,7 +21,7 @@ import { useDropzone } from 'react-dropzone';
 
 import { useUserSubject } from '@/common/utils';
 
-export default function ChangeAvatarDialog({shown, onSave, onClose}) {
+export default function ChangeAvatarDialog({shown, onSave, onClose, language: languageTag}) {
   // drop and keep the file
   const [currentFile, setCurrentFile] = useState<File>(null);
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -68,6 +68,9 @@ export default function ChangeAvatarDialog({shown, onSave, onClose}) {
       else setUid(user.uid)
     })
   }, [subjectUser])
+
+  // UI lang
+  //const strings: AvatarDialogStrings = useMemo(() => avatarDialogStringsPack[languageTag], [languageTag])
 
   return <div className="overlay-layout"
     style={{

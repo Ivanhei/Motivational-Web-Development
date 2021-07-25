@@ -39,6 +39,8 @@ import * as tropyOperators from '@/common/Tropies/Operators'
 import ChangeAvatarDialog from '@/components/ChangeAvatarDialog'
 import { Tropy, TropyInterface } from '@/common/Tropies/Types';
 import NotificationBanner from '@/components/NotificationBanner';
+import { LanguageTag } from '@/common/Strings/Types';
+import { HomeStrings, homeStringsPack } from '@/common/Strings/home';
 
 function TopicIconBackground(props) {
   const color = props.color || "#333333";
@@ -215,6 +217,11 @@ export default function App(props) {
     }
   }, [pendingTropiesReady, subjectShouldUpdate])
   
+
+  // UI lang
+  const languageTag: LanguageTag = props.language
+  const strings: HomeStrings = useMemo(() => homeStringsPack[languageTag], [languageTag])
+
   // useEffect(() => {
   //   introJs().setOptions({
   //     steps:[{
@@ -234,8 +241,8 @@ export default function App(props) {
       </Head>
       <nav className="homeNav">
         <div className="session">
-          <IconLink title="Home" icon={<HomeIcon/>} />
-          <IconLink title="Challenge" icon={<ChallengeIcon/>} />
+          <IconLink title={strings.nav_home} icon={<HomeIcon/>} link="/" />
+          <IconLink title={strings.nav_trophies} icon={<ChallengeIcon/>} link="/trophies" />
           <div className="item" style={{paddingTop: "1.5rem", paddingBottom: "1.5rem"}}>
           {!userLoaded || (user && !avatarURL) ? <div className="group relative flex items-center">
               <div className="w-16 h-16 rounded-full">
@@ -264,16 +271,16 @@ export default function App(props) {
                     //showChangeIcon();
                     setShowChangeIconDialog(true);
                   }}
-                >Change Icon</div>
+                >{strings.user_change_avatar}</div>
                 <div className="px-8 py-3 hover:bg-gray-100 active:bg-gray-200 rounded-b-2xl"
                   onClick={(e) => {
                     firebase.auth().signOut()
                   }}
-                >Logout</div>
+                >{strings.user_logout}</div>
               </div>
             </div>
           ) : (
-            <IconLink title="Login" link="login" />
+            <IconLink title="Login" link={strings.user_login} />
           )}
           </div>
         </div>
@@ -296,7 +303,7 @@ export default function App(props) {
           name="Texting"
           color="#0bac61"
           overlay={<ChatIcon/>}
-          link="quiz/Casual"
+          link="quiz/Texting"
         />
       </div>
     </div>
@@ -307,7 +314,7 @@ export default function App(props) {
         triggerAvatarUpdateSignal(); // update avatar after save
       }} onClose={() => {
         setShowChangeIconDialog(false);
-      }}/>
+      }} language={languageTag}/>
       <div className="overlay-layout right transparent">
         <NotificationBanner shown={visualShowTropyNotify} message="トロフィーをゲットしました！" tropy={notificationTropy}/>
       </div>

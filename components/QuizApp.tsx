@@ -353,6 +353,7 @@ export default function QuizApp(props) {
         pageNum === challenges.length ? <Congratulations totalTime={totalTime}/> :
         <Challenge
           challenge={challenges[pageNum]}
+          language={props.language}
           isLastQuestion={pageNum === numPages - 1}
           onCorrect={() => {
             setProgress((progress) => progress + 1 / numPages);
