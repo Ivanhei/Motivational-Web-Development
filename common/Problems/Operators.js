@@ -79,6 +79,7 @@ const fetchImageURLForDocs = mergeMap((docs) =>
 const fetchImageURLForDoc = mergeMap(docWithImageURL_promise);
 
 export {
+  docSnapshotToDoc,
   rawRandomSelectNFromArray,
   convertDocRefToDocSnapshot,
   convertDocSnapshotToDoc,

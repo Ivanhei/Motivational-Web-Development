@@ -19,7 +19,7 @@ import React, {
 
 import { useDropzone } from 'react-dropzone';
 
-import { useUserSubject } from '@/common/utils';
+import { useUserSubject } from '@/common/User/hooks';
 
 export default function ChangeAvatarDialog({shown, onSave, onClose, language: languageTag}) {
   // drop and keep the file

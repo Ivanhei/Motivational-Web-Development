@@ -12,10 +12,6 @@ import {
   LoadingIcon,
 } from '@/assets/Icons';
 
-import {
-  useLoadedUser,
-} from '@/common/utils';
-
 import React, {
   useEffect,
   useState,
@@ -24,11 +20,12 @@ import React, {
 } from 'react';
 
 import ChangeAvatarDialog from '@/components/ChangeAvatarDialog'
+import { useLoadedUser } from '@/common/User/hooks'
 import { LanguageTag } from '@/common/Strings/Types'
 import { HomeStrings, homeStringsPack } from '@/common/Strings/home'
 
 
-function IconLink({ link, icon, title } : { link?, icon?, title }) {
+function IconLink({ link, icon, title } : { link?: string, icon?: JSX.Element, title: string }) {
   return (
   <div className="item">
     <Link href={link ? link : ""}>

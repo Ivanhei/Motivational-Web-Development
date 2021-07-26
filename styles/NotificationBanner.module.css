@@ -1,10 +1,10 @@
 
 .notificationBanner {
   position: absolute;
-  top: 5rem;
-  right: -28rem;
+  top: 10rem;
   opacity: 0;
-  width: 28rem;
+  right: -40rem;
+  width: 40rem;
   height: 6rem;
   background: #f0f0f0;
   white-space: nowrap;
@@ -13,8 +13,8 @@
   display: flex;
 }
 .notificationBanner.shown {
-  right: 0;
   opacity: 1;
+  right: 0;
   transition-timing-function: ease;
 }
 .notificationBanner .icon {
@@ -29,19 +29,19 @@
   max-width: 50%;
   fill: #CD7F32;
 }
-.notificationBanner .ruby svg {
+.notificationBanner.ruby .icon svg {
   fill: #FF5F5F;
 }
-.notificationBanner .diamond svg {
+.notificationBanner.diamond .icon svg {
   fill: #7CE7FF;
 }
-.notificationBanner .gold svg {
+.notificationBanner.gold .icon svg {
   fill: #FFD700;
 }
-.notificationBanner .silver svg {
+.notificationBanner.silver .icon svg {
   fill: #C0C0C0;
 }
-.notificationBanner .bronze svg {
+.notificationBanner.bronze .icon svg {
   fill: #CD7F32;
 }
 .notificationBanner .detail {

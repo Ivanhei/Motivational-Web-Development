@@ -3,7 +3,7 @@ import Head from 'next/head';
 
 import Login from '@/components/Login';
 import { useEffect, useState } from 'react';
-import { observeUser } from '@/common/utils';
+import { observeUser } from '@/common/User/subjects';
 
 export default function App(props) {
   const [showLoginDialog, setShowLoginDialog] = useState(undefined);

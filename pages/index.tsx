@@ -3,24 +3,12 @@ import Head from 'next/head'
 
 import firebase from '@/common/firebase_init';
 import 'firebase/storage'
-import 'firebase/auth'
-
-const storageRef = firebase.storage().ref();
 
 import {
-  HomeIcon,
-  ChallengeIcon,
   ComputerIcon,
   AirplaneIcon,
   ChatIcon,
-  LoadingIcon,
-  CrossIcon,
 } from '@/assets/Icons';
-
-import {
-  useLoadedUser,
-  useUserSubject,
-} from '@/common/utils';
 
 import React, {
   useEffect,
@@ -36,11 +24,14 @@ import { map, mergeMap } from 'rxjs/operators';
 import * as problemOperators from '@/common/Problems/Operators'
 import * as tropyOperators from '@/common/Tropies/Operators'
 
-import ChangeAvatarDialog from '@/components/ChangeAvatarDialog'
+import { useLoadedUser, useUserDocSubject, useUserSubject } from '@/common/User/hooks'
+
 import { Tropy, TropyInterface } from '@/common/Tropies/Types';
-import NotificationBanner from '@/components/NotificationBanner';
+
 import { LanguageTag } from '@/common/Strings/Types';
 import { HomeStrings, homeStringsPack } from '@/common/Strings/home';
+
+import NotificationBanner from '@/components/NotificationBanner';
 import NavgigationBar from '@/components/NavigationBar';
 
 function TopicIconBackground(props) {
@@ -50,19 +41,6 @@ function TopicIconBackground(props) {
       <path fill={color} fillRule="evenodd" clipRule="evenodd" d="M70 35C70 54.33 54.33 70 35 70C15.67 70 0 54.33 0 35C0 15.67 15.67 0 35 0C54.33 0 70 15.67 70 35ZM66.1112 35C66.1112 52.1822 52.1822 66.1111 35 66.1111C17.8179 66.1111 3.88893 52.1822 3.88893 35C3.88893 17.8178 17.8179 3.88892 35 3.88892C52.1822 3.88892 66.1112 17.8178 66.1112 35Z"/>
       <path fill={color} d="M35 61.4446C49.6049 61.4446 61.4444 49.605 61.4444 35.0001C61.4444 20.3952 49.6049 8.55566 35 8.55566C20.3951 8.55566 8.55554 20.3952 8.55554 35.0001C8.55554 49.605 20.3951 61.4446 35 61.4446Z"/>
     </svg>
-  );
-}
-
-function IconLink({ link, icon, title } : { link?, icon?, title }) {
-  return (
-  <div className="item">
-    <Link href={link ? link : ""}>
-    <a>
-      {icon || null}
-      <span>{title}</span>
-    </a>
-    </Link>
-  </div>
   );
 }
 
@@ -96,7 +74,7 @@ export default function App(props) {
 
   // notifications
   const subjectUser = useUserSubject()
-  const subjectUserDoc = useMemo(() => new ReplaySubject<any>(1), [])
+  const subjectUserDoc = useUserDocSubject(subjectUser)
   //const subjectTropyNotifications = useMemo(() => new Subject<any>(), [])
   const pendingTropies = useRef<Tropy[]>([])
   const currentTropyRef = useRef<firebase.firestore.DocumentReference>(null)
@@ -132,17 +110,6 @@ export default function App(props) {
   
   useEffect(() => {
     const subscriptions = new Subscription();
-
-    subscriptions.add(
-      subjectUser
-        .pipe(mergeMap(user => user?.uid ?
-          firebase.firestore()
-            .collection('users').doc(user.uid)
-            .get() : []
-        ))
-        .pipe(problemOperators.convertDocSnapshotToDoc)
-        .subscribe(subjectUserDoc)
-    )
 
     subscriptions.add(
       subjectUserDoc

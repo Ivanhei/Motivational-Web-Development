@@ -40,37 +40,6 @@ export function usePath(path) {
   return `${useRouter().basePath}${path}`;
 }
 
-// rx user logged in
-import firebase from '@/common/firebase_init';
-import 'firebase/auth';
-
-export function observeUser() {
-  // https://rxjs.dev/api/index/class/Observable#constructor
-  return new Observable<firebase.User | null>(function(observer) {
-    const unsub_auth = firebase.auth().onAuthStateChanged(
-      user => observer.next(user),
-      error => observer.error(error),
-      () => observer.complete(), // Why is this? Does this function even get called?
-    );
-
-    return () => {
-      unsub_auth();
-      observer.complete();
-    }
-  });
-}
-
-//
-import 'firebase/firestore';
-import { Observable } from 'rxjs';
-
-export function getUserDocRef(userCredentials) {
-  if (userCredentials)
-    return firebase.firestore().collection('users').doc(userCredentials.uid);
-
-  return userCredentials;
-}
-
 // TextBreakdown utilities
 export interface TextBreakdown {
   before: string
@@ -267,45 +236,9 @@ export function getRandomInt(belowInt: number): number {
   return Math.floor(Math.random() * belowInt);
 }
 
-// login user boilerplant
-import { useEffect, useState } from 'react';
-import { ReplaySubject } from 'rxjs';
-
-export function useUserSubject() {
-  const subjectUser = useMemo(() => new ReplaySubject<firebase.User | null>(1), []);
-
-  useEffect(() => {
-    const userObservable = observeUser();
-    const subs = userObservable.subscribe(subjectUser);
-
-    return () => {
-      subs.unsubscribe();
-    };
-  }, [subjectUser]);
-
-  return subjectUser;
-}
-
-export function useLoadedUser() {
-  const [loaded, setLoaded] = useState(false);
-  const [user, setUser] = useState<firebase.User | null>(null);
-
-  useEffect(() => {
-    const userObservable = observeUser();
-    const subs = userObservable.subscribe((user) => {
-      setLoaded(true);
-      setUser(user);
-    });
-
-    return () => {
-      subs.unsubscribe();
-    };
-  }, []);
-
-  return {userLoaded: loaded, user};
-}
-
 // Remove Items in array from another array (For firestore document references)
+import firebase from 'firebase/app'
+
 export function removeUnwantedItems(
   original: Array<firebase.firestore.DocumentReference>, 
   unwanted: Array<firebase.firestore.DocumentReference>

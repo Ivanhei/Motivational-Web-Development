@@ -5,6 +5,7 @@ import { TropyInterface } from "@/common/Tropies/Types";
 import { TrophyIcon } from '@/assets/Icons'
 
 export default function NotificationBanner({shown, message, tropy: {name, color}}: {shown: boolean, message: string, tropy: TropyInterface}) {
+  console.log(notificationStyles[color]);
   return <div className={`
     ${notificationStyles.notificationBanner}
     ${notificationStyles[color]}
