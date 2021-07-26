@@ -21,6 +21,15 @@ function topicPairArrayHasTopic(pairs: Array<TopicDocRefNoMiss>, topic: TopicDoc
 
 export function tropyChecker(tropyCondition: TropyCondition) {
   return (sessionResult: SessionResult) => {
+    if (!sessionResult.sessionFinish) {
+      if (tropyCondition.login) {
+        if (!(sessionResult.login))
+          return false
+      }
+
+      return true
+    }
+
     if (tropyCondition.clearWithin) {
       if (!(sessionResult.clearTime <= tropyCondition.clearWithin))
         return false
@@ -41,11 +50,6 @@ export function tropyChecker(tropyCondition: TropyCondition) {
 
     if (tropyCondition.noMiss && !tropyCondition.clearTopics) {
       if (!(sessionResult.noMiss))
-        return false
-    }
-
-    if (tropyCondition.login) {
-      if (!(sessionResult.login))
         return false
     }
 
