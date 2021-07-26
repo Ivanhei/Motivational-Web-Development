@@ -6,6 +6,8 @@ import { useEffect, useMemo, useState } from 'react';
 const db = firebase.firestore();
 
 export default function ProblemsTable() {
+  return <></>
+
   const [problems, setProblems] = useState([]);
   const [topics, setTopics] = useState([]);
 
