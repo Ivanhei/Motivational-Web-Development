@@ -120,9 +120,11 @@ export function SpeechAnswerArea({
           {showRetryText ? quizStringsPack[lang].record_retry_button : quizStringsPack[lang].recording_button}
         </span>
       </button>
+      {/*
       {showRetryText ? <div style={{maxWidth: "560px", margin: "2rem auto", fontSize: "1.2em", color: "rgba(var(--color-text-rgb), .5)"}}>聞き取りづらい場合は、文章で読み上げてみてください。
       <div style={{marginTop: "1rem", fontSize: "0.8em"}}>例：「low」の場合は「very low level」または「running low on battery」を読み上げてみてください。</div>
       </div> : null}
+      */}
       {!browserSupportsSpeechRecognition ? 
         <div style={{color: "red", marginTop: "1rem"}}>
           This browser does not support speech. 

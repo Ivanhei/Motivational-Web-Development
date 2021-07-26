@@ -1,20 +1,20 @@
 
-.ruby svg {
+.ruby.trophy svg {
   fill: #FF5F5F;
 }
-.diamond svg {
+.diamond.trophy svg {
   fill: #7CE7FF;
 }
-.gold svg {
+.gold.trophy svg {
   fill: #FFD700;
 }
-.silver svg {
+.silver.trophy svg {
   fill: #C0C0C0;
 }
-.bronze svg {
+.bronze.trophy svg {
   fill: #CD7F32;
 }
-.hidden svg {
+.hidden.trophy svg {
   fill: #000;
   fill: var(--color-text);
 }

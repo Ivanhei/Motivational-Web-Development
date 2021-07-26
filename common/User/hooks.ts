@@ -34,7 +34,12 @@ export function useUserDocSubject(subjectUser: Observable<firebase.User | null>)
           // returns no user if not logged in
       ))
       .pipe(convertDocSnapshotToDoc)
-      .pipe(map(doc => doc as UserDoc))
+      .pipe(map(doc => {
+        if (!doc.problems)
+        return ({...doc, problems: []} as UserDoc)
+
+        return doc as UserDoc
+      }))
       .subscribe(subjectUserDoc);
 
     return () => {

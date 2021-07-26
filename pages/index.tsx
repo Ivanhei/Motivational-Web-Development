@@ -19,7 +19,7 @@ import React, {
 } from 'react';
 
 import { ReplaySubject, Subject, Subscription } from 'rxjs';
-import { map, mergeMap } from 'rxjs/operators';
+import { map, mergeMap, tap } from 'rxjs/operators';
 
 import * as problemOperators from '@/common/Problems/Operators'
 import * as tropyOperators from '@/common/Tropies/Operators'
@@ -33,6 +33,7 @@ import { HomeStrings, homeStringsPack } from '@/common/Strings/home';
 
 import NotificationBanner from '@/components/NotificationBanner';
 import NavgigationBar from '@/components/NavigationBar';
+import { timeToString } from '@/common/utils';
 
 function TopicIconBackground(props) {
   const color = props.color || "#333333";
@@ -44,10 +45,12 @@ function TopicIconBackground(props) {
   );
 }
 
-function Topic({link, color, overlay, name}) {
+function Topic({link, color, overlay, name, bestTime}: {link, color, overlay, name, bestTime?}) {
+  const bestTimeStr = useMemo(() => bestTime ? timeToString(bestTime) : null, [bestTime])
+
   return (
     <div className="wrap">
-      <div></div>
+      <div className="spacing"></div>
       <div className="item">
         <Link href={link ? link : ""}>
         <a>
@@ -61,9 +64,14 @@ function Topic({link, color, overlay, name}) {
           <div className="name">{name}</div>
         </a>
         </Link>
+
+        {bestTime ? <div className="personalBestTime">
+          <div className="title">Your Best Time</div>
+          <div>{bestTimeStr}</div>
+        </div> : <></>}
       </div>
-      <div></div>
-      <div></div>
+      <div className="spacing"></div>
+      <div className="spacing"></div>
     </div>
   );
 }
@@ -107,19 +115,28 @@ export default function App(props) {
     }
   }, [subjectShouldUpdate, user?.uid])
 
+  const [bestTimes, setBestTimes] = useState<any>(null)
   
   useEffect(() => {
     const subscriptions = new Subscription();
 
     subscriptions.add(
       subjectUserDoc
-        .pipe(map(userDoc => userDoc.queuedTropyNotifications))
+        .pipe(map(userDoc => userDoc.queuedTropyNotifications || []))
         .pipe(problemOperators.convertDocRefArrayToDocSnapshotArray)
         .pipe(problemOperators.convertDocSnapshotArrayToDocs)
         .pipe(tropyOperators.convertTropyDocsToTropies)
         .subscribe(tropies => {
           pendingTropies.current.push(...tropies)
           setPendingTropiesReady(true)
+        })
+    )
+
+    subscriptions.add(
+      subjectUserDoc
+        .pipe(map(userDoc => userDoc.bestTime))
+        .subscribe(bestTimesMap => {
+          setBestTimes(bestTimesMap)
         })
     )
 
@@ -192,18 +209,21 @@ export default function App(props) {
           color="#EE2E22"
           overlay={<ComputerIcon/>}
           link="quiz/CSE"
+          bestTime={bestTimes?.CSE}
         />
         <Topic
           name="Academics"
           color="#476cff"
           overlay={<AirplaneIcon/>}
           link="quiz/Academics"
+          bestTime={bestTimes?.Academics}
         />
         <Topic
           name="Texting"
           color="#0bac61"
           overlay={<ChatIcon/>}
           link="quiz/Texting"
+          bestTime={bestTimes?.Casual}
         />
       </div>
     </div>
