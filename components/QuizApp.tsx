@@ -53,6 +53,61 @@ import { SessionResult, TopicDocRefNoMiss, Tropy } from '@/common/Tropies/Types'
 import { useRemainingTrophiesSubject, useTrophiesSubject } from '@/common/Tropies/hooks';
 import { useUserDocSubject, useUserSubject } from '@/common/User/hooks'
 
+function useTrophyChecker(
+  subjectRemainingTrophies: Observable<Array<Tropy>>,
+  subjectSessionFinish: Observable<boolean>,
+  subjectTotalTime: Observable<number>,
+  subjectUser: Observable<firebase.User | null>,
+  subjectClearedTopicRefs: Observable<Array<TopicDocRefNoMiss>>,
+  noMiss: MutableRefObject<boolean>,
+) {
+  useEffect(() => {
+    const subscriptions = 
+      combineLatest([
+        subjectRemainingTrophies,
+        subjectSessionFinish,
+        subjectTotalTime, // only emit a value when finishing a quiz
+        subjectUser,
+        subjectClearedTopicRefs,
+      ])
+        .pipe(filter(([remainingTrophies, sessionEnd, time]) => (!!remainingTrophies && (remainingTrophies.length > 0)) || !!time))
+        .subscribe(([remainingTrophies, sessionFinish, clearTime, user, finishedTopicsPairs]) => {
+          const sessionResult: SessionResult = {
+            clearTime,
+            noMiss: noMiss.current,
+            finishedTopics: finishedTopicsPairs,
+
+            sessionFinish,
+            login: !!user,
+          }
+
+          const newlyDoneTropiesRefs = [];
+
+          remainingTrophies
+            .forEach(trophy => {
+              /**/console.log(trophy.check(sessionResult), trophy.color, trophy.name, trophy.condition)
+
+              if (trophy.check(sessionResult))
+              newlyDoneTropiesRefs.push(trophy._ref)
+            })
+
+          if (!user) return;
+
+          // add finished tropies
+          firebase.firestore()
+            .collection('users').doc(user.uid)
+            .set({
+              finishedTropies: firebase.firestore.FieldValue.arrayUnion(...newlyDoneTropiesRefs),
+              queuedTropyNotifications: firebase.firestore.FieldValue.arrayUnion(...newlyDoneTropiesRefs),
+            }, { merge: true })
+        })
+
+    return () => {
+      subscriptions.unsubscribe();
+    }
+  }, [noMiss, subjectClearedTopicRefs, subjectRemainingTrophies, subjectSessionFinish, subjectTotalTime, subjectUser])
+}
+
 export default function QuizApp(props) {
   const topic = props.topic;
 
@@ -70,8 +125,6 @@ export default function QuizApp(props) {
   const subjectUserDoc = useUserDocSubject(subjectUser);
   const subjectClearedTopicRefs = useMemo(() => new Subject<Array<TopicDocRefNoMiss>>(), []);
 
-  const subjectRemainingTrophies = useRemainingTrophiesSubject(subjectUserDoc);
-  const subjectSessionFinish = useMemo(() => new Subject<boolean>(), []);
   const noMiss = useRef(true);
 
   useEffect(() => {
@@ -264,6 +317,8 @@ export default function QuizApp(props) {
     }
   }, [loaded, pageNum]);
 
+  const subjectSessionFinish = useMemo(() => new Subject<boolean>(), []);
+
   useEffect(() => {
     // subscriptions
     const subscriptions = new Subscription();
@@ -279,51 +334,21 @@ export default function QuizApp(props) {
       }
     }))
 
-    subscriptions.add(
-      combineLatest([
-        subjectRemainingTrophies,
-        subjectSessionFinish,
-        subjectTotalTime, // only emit a value when finishing a quiz
-        subjectUser,
-        subjectClearedTopicRefs,
-      ])
-        .pipe(filter(([remainingTrophies, sessionEnd, time]) => (!!remainingTrophies && (remainingTrophies.length > 0)) || !!time))
-        .subscribe(([remainingTrophies, sessionFinish, clearTime, user, finishedTopicsPairs]) => {
-          const sessionResult: SessionResult = {
-            clearTime,
-            noMiss: noMiss.current,
-            finishedTopics: finishedTopicsPairs,
-
-            sessionFinish,
-            login: !!user,
-          }
-
-          const newlyDoneTropiesRefs = [];
-
-          remainingTrophies
-            .forEach(trophy => {
-              /**/console.log(trophy.check(sessionResult), trophy.color, trophy.name, trophy.condition)
-
-              if (trophy.check(sessionResult))
-              newlyDoneTropiesRefs.push(trophy._ref)
-            })
-
-          if (!user) return;
-
-          // add finished tropies
-          firebase.firestore()
-            .collection('users').doc(user.uid)
-            .set({
-              finishedTropies: firebase.firestore.FieldValue.arrayUnion(...newlyDoneTropiesRefs),
-              queuedTropyNotifications: firebase.firestore.FieldValue.arrayUnion(...newlyDoneTropiesRefs),
-            }, { merge: true })
-        })
-    )
-
     return () => {
       subscriptions.unsubscribe();
     }
-  }, [subjectClearedTopicRefs, subjectFinishQuizSignal, subjectRemainingTrophies, subjectSessionFinish, subjectTotalTime, subjectUser, subjectUserDoc])
+  }, [subjectFinishQuizSignal, subjectSessionFinish, subjectTotalTime])
+
+  const subjectRemainingTrophies = useRemainingTrophiesSubject(subjectUserDoc);
+
+  useTrophyChecker(
+    subjectRemainingTrophies,
+    subjectSessionFinish,
+    subjectTotalTime, // only emit a value when finishing a quiz
+    subjectUser,
+    subjectClearedTopicRefs,
+    noMiss,
+  );
 
   return (
     <div className="app-container">
