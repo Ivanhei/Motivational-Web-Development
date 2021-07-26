@@ -30,6 +30,9 @@
     width: 1rem;
     height: 1rem;
 }
+.box .head .close svg {
+    fill: var(--color-text);
+}
 
 .imageDrag {
     width: 25rem;

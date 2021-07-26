@@ -135,10 +135,10 @@ export default function App(props) {
 
     subscriptions.add(
       subjectUser
-        .pipe(mergeMap(user => user.uid ?
+        .pipe(mergeMap(user => user?.uid ?
           firebase.firestore()
             .collection('users').doc(user.uid)
-            .get() : null
+            .get() : []
         ))
         .pipe(problemOperators.convertDocSnapshotToDoc)
         .subscribe(subjectUserDoc)

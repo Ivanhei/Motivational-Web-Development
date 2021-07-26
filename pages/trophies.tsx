@@ -26,9 +26,12 @@ export default function App(props) {
       <NavgigationBar language={props.language}/>
       <div className="tropies-container session">
         <div className="tropies">
-          {trophies.map(trophy => {
+          開発途中です！もうしばらくお待ちください！
+          <br/>
+          Development in progress. Please wait for a while.
+          {/* {trophies.map(trophy => {
             return <div key={trophy._ref.id}>{trophy.name}</div>
-          })}
+          })} */}
         </div>
       </div>
     </div>
