@@ -2,14 +2,14 @@ import firebase from '@/common/firebase_init';
 
 import { useEffect, useMemo, useState } from 'react';
 import { Observable, ReplaySubject } from 'rxjs';
-import { map, mergeMap } from 'rxjs/operators';
+import { map, mergeMap, share } from 'rxjs/operators';
 import { convertDocSnapshotToDoc } from '../Problems/Operators';
 import { observeUser, observeUserDoc } from './subjects';
 import { UserDoc } from './Types';
 
 export function useUserSubject() {
   const subjectUser = useMemo(() => new ReplaySubject<firebase.User | null>(1), []);
-  const userObservable = useMemo(() => observeUser(), []);
+  const userObservable = useMemo(() => observeUser().pipe(share()), []);
 
   useEffect(() => {
     const subscriptions = userObservable.subscribe(subjectUser);

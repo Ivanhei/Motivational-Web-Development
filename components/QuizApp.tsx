@@ -350,6 +350,43 @@ export default function QuizApp(props) {
     noMiss,
   );
 
+  // best time
+  const [renewedBestTime, setRenewedBestTime] = useState(false)
+  const [bestTime, setBestTime] = useState<number>(null)
+  useEffect(() => {
+    // subscriptions
+    const subscriptions = new Subscription();
+
+    subscriptions.add(
+      combineLatest([
+        subjectTotalTime, 
+        subjectUserDoc.pipe(map(doc => doc.bestTime)), 
+        subjectUser.pipe(map(user => user?.uid))
+      ])
+        .pipe(filter(([totalTime, bestTime, uid]) => !!uid))
+        .subscribe(([totalTime, bestTime, uid]) => {
+          console.log(totalTime, bestTime, uid)
+          if (!bestTime || totalTime < bestTime) {
+            setRenewedBestTime(true)
+            setBestTime(totalTime)
+
+            firebase.firestore()
+              .collection('users').doc(uid)
+              .set({
+                bestTime: totalTime
+              }, { merge: true })
+          }
+          else {
+            setBestTime(bestTime)
+          }
+        })
+    )
+
+    return () => {
+      subscriptions.unsubscribe();
+    }
+  }, [subjectTotalTime, subjectUser, subjectUserDoc])
+
   return (
     <div className="app-container">
       <Head>
@@ -370,7 +407,7 @@ export default function QuizApp(props) {
       {
         showLogin                     ? <Login/> :
         !loaded                       ? <LoadingLayout/> :
-        pageNum === challenges.length ? <Congratulations totalTime={totalTime}/> :
+        pageNum === challenges.length ? <Congratulations totalTime={totalTime} bestTime={bestTime} bestTimeUpdated={renewedBestTime}/> :
         <Challenge
           challenge={challenges[pageNum]}
           language={props.language}
