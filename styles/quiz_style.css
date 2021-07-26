@@ -425,6 +425,8 @@ main {
   height: 100%;
   display: inline-block;
   vertical-align: middle;
+
+  fill: var(--color-text);
 }
 .homeNav > .session > .item span {
   margin-left: 1rem;

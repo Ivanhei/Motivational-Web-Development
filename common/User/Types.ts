@@ -5,4 +5,5 @@ export interface UserDoc {
     finishedTropies?: firebase.firestore.DocumentReference[]
     queuedTropyNotifications?: firebase.firestore.DocumentReference[]
     bestTime?: number
+    darkUI?: boolean
 }

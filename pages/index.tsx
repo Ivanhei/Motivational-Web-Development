@@ -34,6 +34,7 @@ import { HomeStrings, homeStringsPack } from '@/common/Strings/home';
 import NotificationBanner from '@/components/NotificationBanner';
 import NavgigationBar from '@/components/NavigationBar';
 import { timeToString } from '@/common/utils';
+import DarkModeToggler from '@/components/DarkModeToggler';
 
 function TopicIconBackground(props) {
   const color = props.color || "#333333";
@@ -225,6 +226,8 @@ export default function App(props) {
           link="quiz/Texting"
           bestTime={bestTimes?.Casual}
         />
+
+        {/* <DarkModeToggler onChange={() => {}} darkUI={}/> */}
       </div>
     </div>
     <div className="overlay-container">
