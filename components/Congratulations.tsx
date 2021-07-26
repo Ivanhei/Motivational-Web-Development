@@ -6,18 +6,12 @@ import {
 
 import {
   getRandomInt,
+  mintuesSeconds,
   usePath,
   useSimpleSoundEffect
 } from '@/common/utils';
 
 const finishMessages = ["Congratulations!", "Well done!"];
-
-function mintuesSeconds(seconds: number) {
-  return {
-    minutes: Math.floor(seconds / 60),
-    seconds: seconds % 60,
-  }
-}
 
 export default function Congratulations({
   totalTime,
@@ -49,7 +43,7 @@ export default function Congratulations({
       <h2>{finishMessage}</h2>
       <div>Let’s keep going!</div>
       <div>{hasTime ? <>Time Elapsed: {total.minutes > 0 ? `${total.minutes}m` : ``} {total.seconds}s</> : <></>}</div>
-      <div>{hasBestTime ? <>Your best time: {best.minutes > 0 ? `${best.minutes}m` : ``} {best.seconds}s</> : <></>}</div>
+      <div>{hasBestTime ? <>Your personal best time for this topic: {best.minutes > 0 ? `${best.minutes}m` : ``} {best.seconds}s</> : <></>}</div>
       <div>{bestTimeUpdated !== null && bestTimeUpdated ? <>Congradulations of updating your personal best time!</> : <></>}</div>
     </div>
   );

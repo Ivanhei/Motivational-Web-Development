@@ -49,6 +49,7 @@ import {
   shuffle,
 } from '@/common/utils';
 
+import { LanguageTag } from '@/common/Strings/Types';
 import { SessionResult, TopicDocRefNoMiss, Tropy } from '@/common/Tropies/Types';
 import { useRemainingTrophiesSubject, useTrophiesSubject } from '@/common/Tropies/hooks';
 import { useUserDocSubject, useUserSubject } from '@/common/User/hooks'
@@ -108,8 +109,10 @@ function useTrophyChecker(
   }, [noMiss, subjectClearedTopicRefs, subjectRemainingTrophies, subjectSessionFinish, subjectTotalTime, subjectUser])
 }
 
-export default function QuizApp(props) {
-  const topic = props.topic;
+export default function QuizApp({topic, language}: {
+  topic: firebase.firestore.DocumentReference,
+  language: LanguageTag,
+}) {
 
   const [numPages, setNumPages] = useState(0);
   const [pageNum, setPageNum] = useState(0);
@@ -359,25 +362,26 @@ export default function QuizApp(props) {
 
     subscriptions.add(
       combineLatest([
-        subjectTotalTime, 
+        subjectTotalTime,
         subjectUserDoc.pipe(map(doc => doc.bestTime)), 
-        subjectUser.pipe(map(user => user?.uid))
+        subjectUser.pipe(map(user => user?.uid)),
       ])
         .pipe(filter(([totalTime, bestTime, uid]) => !!uid))
         .subscribe(([totalTime, bestTime, uid]) => {
-          console.log(totalTime, bestTime, uid)
-          if (!bestTime || totalTime < bestTime) {
+          if (!bestTime || !bestTime[topic.id] || totalTime < bestTime[topic.id]) {
             setRenewedBestTime(true)
             setBestTime(totalTime)
 
             firebase.firestore()
               .collection('users').doc(uid)
               .set({
-                bestTime: totalTime
+                bestTime: {
+                  [topic.id]: totalTime
+                }
               }, { merge: true })
           }
-          else {
-            setBestTime(bestTime)
+          else if (bestTime && bestTime[topic.id]) {
+            setBestTime(bestTime[topic.id])
           }
         })
     )
@@ -385,7 +389,7 @@ export default function QuizApp(props) {
     return () => {
       subscriptions.unsubscribe();
     }
-  }, [subjectTotalTime, subjectUser, subjectUserDoc])
+  }, [subjectTotalTime, subjectUser, subjectUserDoc, topic.id])
 
   return (
     <div className="app-container">
@@ -410,7 +414,7 @@ export default function QuizApp(props) {
         pageNum === challenges.length ? <Congratulations totalTime={totalTime} bestTime={bestTime} bestTimeUpdated={renewedBestTime}/> :
         <Challenge
           challenge={challenges[pageNum]}
-          language={props.language}
+          language={language}
           isLastQuestion={pageNum === numPages - 1}
           onCorrect={() => {
             setProgress((progress) => progress + 1 / numPages);

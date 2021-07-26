@@ -245,3 +245,19 @@ export function removeUnwantedItems(
 ): Array<firebase.firestore.DocumentReference> {
   return original.filter(item => !unwanted.some(unwanted_item => item.isEqual(unwanted_item)))
 }
+
+//
+export function mintuesSeconds(seconds: number) {
+  return {
+    minutes: Math.floor(seconds / 60),
+    seconds: Math.round(seconds % 60 * 100) / 100,
+  }
+}
+
+export function mintuesSecondsToString(time: { minutes: number, seconds: number, }) {
+  return time.minutes > 0 ? `${time.minutes}m` : `` + " " + `${time.seconds}s`
+}
+
+export function timeToString(seconds: number) {
+  return mintuesSecondsToString(mintuesSeconds(seconds))
+}

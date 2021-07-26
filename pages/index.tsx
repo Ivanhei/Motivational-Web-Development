@@ -33,6 +33,7 @@ import { HomeStrings, homeStringsPack } from '@/common/Strings/home';
 
 import NotificationBanner from '@/components/NotificationBanner';
 import NavgigationBar from '@/components/NavigationBar';
+import { timeToString } from '@/common/utils';
 
 function TopicIconBackground(props) {
   const color = props.color || "#333333";
@@ -44,7 +45,9 @@ function TopicIconBackground(props) {
   );
 }
 
-function Topic({link, color, overlay, name}) {
+function Topic({link, color, overlay, name, bestTime}: {link, color, overlay, name, bestTime?}) {
+  const bestTimeStr = useMemo(() => bestTime ? timeToString(bestTime) : null, [bestTime])
+
   return (
     <div className="wrap">
       <div></div>
@@ -61,6 +64,8 @@ function Topic({link, color, overlay, name}) {
           <div className="name">{name}</div>
         </a>
         </Link>
+
+        {bestTime ? <div>{bestTimeStr}</div> : <></>}
       </div>
       <div></div>
       <div></div>
@@ -192,18 +197,21 @@ export default function App(props) {
           color="#EE2E22"
           overlay={<ComputerIcon/>}
           link="quiz/CSE"
+          //bestTime={}
         />
         <Topic
           name="Academics"
           color="#476cff"
           overlay={<AirplaneIcon/>}
           link="quiz/Academics"
+          //bestTime={}
         />
         <Topic
           name="Texting"
           color="#0bac61"
           overlay={<ChatIcon/>}
           link="quiz/Texting"
+          //bestTime={}
         />
       </div>
     </div>
