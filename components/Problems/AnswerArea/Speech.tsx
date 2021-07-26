@@ -43,12 +43,21 @@ export function SpeechAnswerArea({
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
 
+  const [showRetryText, setShowRetryText] = useState(false)
+
   useEffect(() => {
     // if the word is found
-    if (transcript.split(/[^a-zA-Z0-9]+/).some(item => item?.toLowerCase() === answer?.toLowerCase())) {
+    const tokenList = transcript.split(/[^a-zA-Z0-9]+/).filter((item: string) => item.length > 0);
+    if (tokenList.some((item?: string) => item?.toLowerCase() === answer?.toLowerCase())) {
       resetTranscript();
       SpeechRecognition.stopListening()
       onChange(answer);
+    }
+    else if (tokenList.length > 0) {
+      setShowRetryText(true)
+    }
+    else {
+      setShowRetryText(false)
     }
   }, [answer, onChange, resetTranscript, transcript])
 
@@ -99,7 +108,10 @@ export function SpeechAnswerArea({
         disabled={!browserSupportsSpeechRecognition || audioPlaying}
         onFocus={(e) => { e.target.blur(); }}
       >
-        <MicIcon width="16" height="24"/><span>{quizStringsPack[lang].recording_button}</span>
+        <MicIcon width="16" height="24"/>
+        <span>
+          {showRetryText ? quizStringsPack[lang].record_retry_button : quizStringsPack[lang].recording_button}
+        </span>
       </button>
       {!browserSupportsSpeechRecognition ? 
         <div style={{color: "red", marginTop: "1rem"}}>
