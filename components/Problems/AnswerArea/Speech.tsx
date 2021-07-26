@@ -50,6 +50,7 @@ export function SpeechAnswerArea({
     const tokenList = transcript.split(/[^a-zA-Z0-9]+/).filter((item: string) => item.length > 0);
     if (tokenList.some((item?: string) => item?.toLowerCase() === answer?.toLowerCase())) {
       resetTranscript();
+      setShowRetryText(false)
       SpeechRecognition.stopListening()
       onChange(answer);
     }
@@ -57,9 +58,15 @@ export function SpeechAnswerArea({
       setShowRetryText(true)
     }
     else {
-      setShowRetryText(false)
     }
   }, [answer, onChange, resetTranscript, transcript])
+
+  // reset show retry once new question comes
+  useEffect(() => {
+    if (answerState === AnswerState.NOT_ANSWERED_YET) {
+      setShowRetryText(false)
+    }
+  }, [answerState])
 
   useEffect(() => {
     if (!listening) {
@@ -113,6 +120,9 @@ export function SpeechAnswerArea({
           {showRetryText ? quizStringsPack[lang].record_retry_button : quizStringsPack[lang].recording_button}
         </span>
       </button>
+      {showRetryText ? <div style={{maxWidth: "560px", margin: "2rem auto", fontSize: "1.2em", color: "rgba(var(--color-text-rgb), .5)"}}>聞き取りづらい場合は、文章で読み上げてみてください。
+      <div style={{marginTop: "1rem", fontSize: "0.8em"}}>例：「low」の場合は「very low level」または「running low on battery」を読み上げてみてください。</div>
+      </div> : null}
       {!browserSupportsSpeechRecognition ? 
         <div style={{color: "red", marginTop: "1rem"}}>
           This browser does not support speech. 
