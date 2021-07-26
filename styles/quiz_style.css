@@ -425,10 +425,15 @@ main {
   height: 100%;
   display: inline-block;
   vertical-align: middle;
-  margin-right: 1rem;
 }
 .homeNav > .session > .item span {
+  margin-left: 1rem;
   vertical-align: middle;
+}
+@media (max-width: 680px) {
+  .homeNav > .session > .item span {
+    display: none;
+  }
 }
 
 .topics {
@@ -441,6 +446,17 @@ main {
 .topics .wrap {
   display: grid;
   grid-template-rows: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+@media (max-width: 680px) {
+  .topics {
+    display: block;
+    padding-top: 2rem;
+  }
+  .topics .wrap {
+    display: block;
+    padding: 2rem .5rem;
+  }
 }
 .topics .item {
   text-align: center;
@@ -472,6 +488,39 @@ main {
 }
 .topics .item .icon .icon-main > svg {
   width: 45%;
+}
+
+.topics .item .personalBestTime {
+  display: inline-block;
+  position: relative;
+  margin-top: 2rem;
+  background: rgba(var(--color-text-rgb), .1);
+  border-radius: .5rem;
+  padding: .5rem 1rem;
+
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s, visibility 0s 0.2s;
+}
+.topics .item .personalBestTime:before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: calc(-1 * var(--tri-size));
+  left: calc(50% - var(--tri-size));
+
+  --tri-size: 1rem;
+  border-left: var(--tri-size) solid transparent;
+  border-right: var(--tri-size) solid transparent;
+  border-bottom: var(--tri-size) solid rgba(var(--color-text-rgb), .1);
+}
+.topics .item .personalBestTime .title {
+  font-size: .8em;
+}
+.topics .item a:hover ~ .personalBestTime {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.2s, visibility 0s;
 }
 
 .tropies-container {

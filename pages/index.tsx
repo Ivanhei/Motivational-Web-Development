@@ -50,7 +50,7 @@ function Topic({link, color, overlay, name, bestTime}: {link, color, overlay, na
 
   return (
     <div className="wrap">
-      <div></div>
+      <div className="spacing"></div>
       <div className="item">
         <Link href={link ? link : ""}>
         <a>
@@ -65,10 +65,13 @@ function Topic({link, color, overlay, name, bestTime}: {link, color, overlay, na
         </a>
         </Link>
 
-        {bestTime ? <div>{bestTimeStr}</div> : <></>}
+        {bestTime ? <div className="personalBestTime">
+          <div className="title">Your Best Time</div>
+          <div>{bestTimeStr}</div>
+        </div> : <></>}
       </div>
-      <div></div>
-      <div></div>
+      <div className="spacing"></div>
+      <div className="spacing"></div>
     </div>
   );
 }
@@ -112,6 +115,7 @@ export default function App(props) {
     }
   }, [subjectShouldUpdate, user?.uid])
 
+  const [bestTimes, setBestTimes] = useState<any>(null)
   
   useEffect(() => {
     const subscriptions = new Subscription();
@@ -125,6 +129,14 @@ export default function App(props) {
         .subscribe(tropies => {
           pendingTropies.current.push(...tropies)
           setPendingTropiesReady(true)
+        })
+    )
+
+    subscriptions.add(
+      subjectUserDoc
+        .pipe(map(userDoc => userDoc.bestTime))
+        .subscribe(bestTimesMap => {
+          setBestTimes(bestTimesMap)
         })
     )
 
@@ -197,21 +209,21 @@ export default function App(props) {
           color="#EE2E22"
           overlay={<ComputerIcon/>}
           link="quiz/CSE"
-          //bestTime={}
+          bestTime={bestTimes?.CSE}
         />
         <Topic
           name="Academics"
           color="#476cff"
           overlay={<AirplaneIcon/>}
           link="quiz/Academics"
-          //bestTime={}
+          bestTime={bestTimes?.Academics}
         />
         <Topic
           name="Texting"
           color="#0bac61"
           overlay={<ChatIcon/>}
           link="quiz/Texting"
-          //bestTime={}
+          bestTime={bestTimes?.Casual}
         />
       </div>
     </div>
