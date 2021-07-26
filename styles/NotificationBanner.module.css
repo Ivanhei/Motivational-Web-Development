@@ -27,6 +27,8 @@
 .notificationBanner .icon svg {
   max-height: 50%;
   max-width: 50%;
+}
+.notificationBanner svg {
   fill: #CD7F32;
 }
 .notificationBanner .detail {

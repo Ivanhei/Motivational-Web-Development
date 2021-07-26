@@ -19,7 +19,7 @@ import React, {
 } from 'react';
 
 import { ReplaySubject, Subject, Subscription } from 'rxjs';
-import { map, mergeMap } from 'rxjs/operators';
+import { map, mergeMap, tap } from 'rxjs/operators';
 
 import * as problemOperators from '@/common/Problems/Operators'
 import * as tropyOperators from '@/common/Tropies/Operators'
@@ -122,7 +122,7 @@ export default function App(props) {
 
     subscriptions.add(
       subjectUserDoc
-        .pipe(map(userDoc => userDoc.queuedTropyNotifications))
+        .pipe(map(userDoc => userDoc.queuedTropyNotifications || []))
         .pipe(problemOperators.convertDocRefArrayToDocSnapshotArray)
         .pipe(problemOperators.convertDocSnapshotArrayToDocs)
         .pipe(tropyOperators.convertTropyDocsToTropies)

@@ -8,7 +8,7 @@ import { TrophyIcon } from '@/assets/Icons'
 export default function NotificationBanner({shown, message, tropy: {name, color}}: {shown: boolean, message: string, tropy: TropyInterface}) {
   return <div className={`
     ${notificationStyles.notificationBanner}
-    ${trophyStyles[color]}
+    ${trophyStyles[color]} ${trophyStyles.trophy}
     ${shown ? notificationStyles.shown : ""}
   `}>
       <div className={notificationStyles.icon}><TrophyIcon/></div>

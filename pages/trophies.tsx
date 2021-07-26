@@ -9,11 +9,12 @@ import NavgigationBar from '@/components/NavigationBar';
 import { useEffect, useState } from 'react';
 
 import { Tropy } from '@/common/Tropies/Types';
+import { LoadingIcon } from '@/assets/Icons'
 import { useTrophiesWithStatusSubject, useTrophiesSubject } from '@/common/Tropies/hooks';
 import { useUserDocSubject, useUserSubject } from '@/common/User/hooks';
 
 export default function App(props) {
-  const [trophies, setTrophies] = useState<Tropy[]>([]);
+  const [trophies, setTrophies] = useState<Tropy[]>(null);
 
   const subjectUser = useUserSubject();
   const subjectUserDoc = useUserDocSubject(subjectUser);
@@ -36,15 +37,15 @@ export default function App(props) {
       <NavgigationBar language={props.language}/>
       <div className="tropies-container session">
         <div className="tropies">
-          {trophies.map(trophy => {
+          {trophies ? trophies.map(trophy => {
             return <div key={trophy._ref.id} className="item">
-              <div className={`icon ${trophy.achived ? trophyStyles[trophy.color] : trophyStyles.hidden}`}><TrophyIcon/></div>
+              <div className={`icon ${trophy.achived ? trophyStyles[trophy.color] : trophyStyles.hidden} ${trophyStyles.trophy}`}><TrophyIcon/></div>
               <div className="details">
                 <div className="name">{trophy.achived ? trophy.name : "？？？（？？？）"}</div>
                 <div className="description">{trophy.description}</div>
               </div>
             </div>
-          })}
+          }) : <div className="loading"><LoadingIcon/></div>}
         </div>
       </div>
     </div>

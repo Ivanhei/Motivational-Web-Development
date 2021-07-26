@@ -86,8 +86,6 @@ function useTrophyChecker(
 
           remainingTrophies
             .forEach(trophy => {
-              /**/console.log(trophy.check(sessionResult), trophy.color, trophy.name, trophy.condition)
-
               if (trophy.check(sessionResult))
               newlyDoneTropiesRefs.push(trophy._ref)
             })
@@ -139,7 +137,7 @@ export default function QuizApp({topic, language}: {
   // fetching problems
   useEffect(() => {
     // subjects
-    const subjectFinishedTopic = new Subject<boolean>();
+    const subjectFinishedTopic = new ReplaySubject<boolean>(1);
 
     const subjectTopicFinishedProblems = subjectUser
       .pipe(filter(user => !!user))
@@ -150,6 +148,7 @@ export default function QuizApp({topic, language}: {
         .collection('finishedProblems').doc(topic.id)
         .get()))
       .pipe(problemOperators.convertDocSnapshotToDoc)
+      .pipe(map(doc => doc.problems ? doc : {...doc, problems: []}))
       .pipe(share())
 
     const subjectTopicDoc = new Subject<any>();
@@ -158,7 +157,7 @@ export default function QuizApp({topic, language}: {
       .pipe(map((topic: any) => topic.problems))
 
     const subjectProblemsDocRefArray = combineLatest([
-      subjectTopicFinishedProblems.pipe(map(doc => doc.problems)),
+      subjectTopicFinishedProblems.pipe(map(doc => doc.problems || [])),
       subjectTopicProblemRefs
     ])
       .pipe(map(([doneProblemRefs, allProblemRefs]) => {
