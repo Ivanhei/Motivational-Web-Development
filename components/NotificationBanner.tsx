@@ -1,4 +1,5 @@
 import notificationStyles from '@/styles/NotificationBanner.module.css'
+import trophyStyles from '@/styles/Trophy.module.css'
 
 import { TropyInterface } from "@/common/Tropies/Types";
 
@@ -8,7 +9,7 @@ export default function NotificationBanner({shown, message, tropy: {name, color}
   console.log(notificationStyles[color]);
   return <div className={`
     ${notificationStyles.notificationBanner}
-    ${notificationStyles[color]}
+    ${trophyStyles[color]}
     ${shown ? notificationStyles.shown : ""}
   `}>
       <div className={notificationStyles.icon}><TrophyIcon/></div>

@@ -29,21 +29,6 @@
   max-width: 50%;
   fill: #CD7F32;
 }
-.notificationBanner.ruby .icon svg {
-  fill: #FF5F5F;
-}
-.notificationBanner.diamond .icon svg {
-  fill: #7CE7FF;
-}
-.notificationBanner.gold .icon svg {
-  fill: #FFD700;
-}
-.notificationBanner.silver .icon svg {
-  fill: #C0C0C0;
-}
-.notificationBanner.bronze .icon svg {
-  fill: #CD7F32;
-}
 .notificationBanner .detail {
   padding: 0.5rem;
   flex-grow: 1;

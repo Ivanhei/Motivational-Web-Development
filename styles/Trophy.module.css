@@ -1,0 +1,20 @@
+
+.ruby svg {
+  fill: #FF5F5F;
+}
+.diamond svg {
+  fill: #7CE7FF;
+}
+.gold svg {
+  fill: #FFD700;
+}
+.silver svg {
+  fill: #C0C0C0;
+}
+.bronze svg {
+  fill: #CD7F32;
+}
+.hidden svg {
+  fill: #000;
+  fill: var(--color-text);
+}

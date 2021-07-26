@@ -1,21 +1,31 @@
 import Head from 'next/head';
 
+import trophyStyles from '@/styles/Trophy.module.css'
+
+import { TrophyIcon } from '@/assets/Icons'
+
 import NavgigationBar from '@/components/NavigationBar';
 
-import { useTrophiesSubject } from '@/common/Tropies/hooks';
 import { useEffect, useState } from 'react';
+
 import { Tropy } from '@/common/Tropies/Types';
+import { useTrophiesWithStatusSubject, useTrophiesSubject } from '@/common/Tropies/hooks';
+import { useUserDocSubject, useUserSubject } from '@/common/User/hooks';
 
 export default function App(props) {
-  const subjectAllTrophies = useTrophiesSubject();
   const [trophies, setTrophies] = useState<Tropy[]>([]);
 
+  const subjectUser = useUserSubject();
+  const subjectUserDoc = useUserDocSubject(subjectUser);
+
+  const subjectTrophiesWithStatus = useTrophiesWithStatusSubject(subjectUserDoc);
+  
   useEffect(() => {
 
-    subjectAllTrophies.subscribe(trophies => {
+    subjectTrophiesWithStatus.subscribe(trophies => {
       setTrophies(trophies)
     })
-  }, [subjectAllTrophies]);
+  }, [subjectTrophiesWithStatus]);
   
 
   return <>
@@ -26,12 +36,15 @@ export default function App(props) {
       <NavgigationBar language={props.language}/>
       <div className="tropies-container session">
         <div className="tropies">
-          開発途中です！もうしばらくお待ちください！
-          <br/>
-          Development in progress. Please wait for a while.
-          {/* {trophies.map(trophy => {
-            return <div key={trophy._ref.id}>{trophy.name}</div>
-          })} */}
+          {trophies.map(trophy => {
+            return <div key={trophy._ref.id} className="item">
+              <div className={`icon ${trophy.achived ? trophyStyles[trophy.color] : trophyStyles.hidden}`}><TrophyIcon/></div>
+              <div className="details">
+                <div className="name">{trophy.achived ? trophy.name : "？？？（？？？）"}</div>
+                <div className="description">{trophy.description}</div>
+              </div>
+            </div>
+          })}
         </div>
       </div>
     </div>

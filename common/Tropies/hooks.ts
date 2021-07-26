@@ -77,3 +77,35 @@ export function useRemainingTrophiesSubject(subjectUserDoc: Observable<UserDoc>)
 
   return subjectRemainingTrophies;
 }
+
+export function useTrophiesWithStatusSubject(subjectUserDoc: Observable<UserDoc>): Subject<Array<Tropy>> {
+  const subjectTrophies = useTrophiesSubject();
+  const subjectTrophiesWithStatus = useMemo(() => new Subject<Array<Tropy>>(), []);
+
+  useEffect(() => {
+    const subscriptions = new Subscription();
+
+    // make it hot after all circuitry completed.
+    subscriptions.add(
+      combineLatest([
+        subjectTrophies,
+        subjectUserDoc.pipe(map(userDoc => userDoc.finishedTropies || []))
+      ])
+        .pipe(map(([trophies, doneTrophies]) => {
+          if (!doneTrophies || doneTrophies.length === 0)
+            return trophies.map(trophy => ({...trophy, achived: false} as Tropy))
+          else
+            return trophies.map(
+              trophy => ({...trophy, achived: doneTrophies.some(doneTrophy => trophy._ref.isEqual(doneTrophy))})
+            )
+        }))
+        .subscribe(subjectTrophiesWithStatus)
+    );
+
+    return () => {
+      subscriptions.unsubscribe();
+    };
+  }, [subjectTrophies, subjectTrophiesWithStatus, subjectUserDoc]);
+
+  return subjectTrophiesWithStatus;
+}
