@@ -561,7 +561,9 @@ main {
   padding: 2.5rem;
 }
 .tropies-box .tropies .item {
-  height: 5rem;
+  --trophy-item-height: 5rem;
+  height: var(--trophy-item-height);
+  overflow-x: auto;
   background-color: #ffffff;
 
   display: flex;
@@ -570,27 +572,29 @@ main {
 .tropies-box .tropies .item:nth-child(2n + 1) {
   background-color: #EEEEEE;
 }
-.tropies-box .tropies .icon {
+.tropies-box .tropies .item .icon {
   padding: 1rem;
   height: 100%;
-  aspect-ratio: 1 / 1;
+  min-width: var(--trophy-item-height);
+  aspect-ratio: 1 / 1; /* not supported in safari */
 }
-.tropies-box .tropies .icon svg {
+.tropies-box .tropies .item .icon svg {
   max-height: 100%;
   max-width: 100%;
   height: 100%;
 }
-.tropies-box .tropies .details {
+.tropies-box .tropies .item .details {
   padding: .2rem;
   flex-grow: 1;
+  white-space: nowrap;
 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
 }
-.tropies-box .tropies .details .name {}
-.tropies-box .tropies .details .description {}
+.tropies-box .tropies .item .details .name {}
+.tropies-box .tropies .item .details .description {}
 
 /* overlay */
 .overlay-container {
