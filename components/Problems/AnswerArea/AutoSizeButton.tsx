@@ -22,9 +22,10 @@ export default function AutoSizeButton(props: React.ButtonHTMLAttributes<HTMLBut
     const outterEl = outter.current;
     const resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
-        if (entry.contentBoxSize[0]) {
+        if (entry.contentBoxSize && entry.contentBoxSize[0]) {
           doResize(entry.contentBoxSize[0].inlineSize)
-          // doResize(entry.contentBoxSize.inlineSize)
+        } else if (entry.contentBoxSize) {
+          doResize((entry.contentBoxSize as any).inlineSize)
         } else {
           doResize(entry.contentRect.width)
         }

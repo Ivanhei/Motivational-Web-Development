@@ -356,6 +356,7 @@ main {
   max-width: 100%;
   /* fill:#d7ffb8; */
   fill: #FAFAFA;
+  width: 100%; /* for safari */
 }
 
 .advice.incorrect {
